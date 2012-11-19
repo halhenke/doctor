@@ -1,0 +1,189 @@
+Keyboard Settings & Keymappings
+
+Xmodmaps maps keycodes (the actual output of the physical keyboard) to KeySyms (Logical/Virtual names)
+
+Important Files:
+default keyboard...thing:
+/etc/default/keyboard
+xorg global input settings:
+/etc/X11/xorg.conf
+Present in Debian but not Ubuntu?
+/etc/X11/Xmodmap
+Lowlevel Modifier key mask stuff:
+/usr/include/X11/X.h
+Available KeySym names:
+/usr/include/X11/keysymdef.h
+
+Important Keyboard Tools:
+See the base linux mappings with:
+xmodmap
+See the output of various keys with:
+xev
+See the output of a single key by pressing Control-V in a terminal:
+Also - 
+Graphical xmodmap configuration tool:
+xkeycaps
+Is called to modify the way terminal prcesses key inputs:
+loadkeys
+
+ftp://ftp.lyx.org/pub/sgml-tools/website/HOWTO/Keyboard-and-Console-HOWTO/t1659.html
+
+How Does This All fit Together?
+http://forums.gentoo.org/viewtopic.php?t=51783
+loadkeys is for the console (and cannot be used in X), xmodmap is for use in X, and xkb, which is loaded with command "xsetkbmap", is a newer method for for making changes in the keymap under X. 
+
+Xkb comes with a set of predefined "rules" for changing the keyboard layout and is quite modular (i.e. you may defined your keymap using as may rules as you like, one after the other), so as long as you want to do something somebody has done before (e.g. use dvorak, turn off "Caps Lock" or swap the Ctrl and Caps Lock keys) it's easy. Redefining the keymap from ground up seems a bit more complex though (haven't tried this myself yet though). 
+
+Xmodmaps are hardware-specific (i.e. if you change your [hardware] keyboard into something else, or use it on a different architecture, you may have to make changes for your xmodmap to work -- using xkb you would just change the rule specifying what keyboard hardware you got)If you want to produce an xmodmap, take a look at the program xkeycaps -- a graphical xmodmap editor which much simplifies making your own. 
+
+The format of loadkeys and xmodmap files are similar, but they're *not* compatible (sigh!).
+
+In KDE:
+khotkeys ?
+~/.kde/share/config/kglobalshortcutsrc
+~/.kde/share/config/khotkeysrc
+
+Debian - new:
+/etc/default/keyboard
+Debian - old:
+/etc/console-tools/remap
+Ubuntu - virtual consoles
+/etc/default/console-setup 
+
+PROBLEMS:
+In KDE, in Emacs the super key only works with some keys
+* For some keys such as s-f it will say s-f is undefined despite it showing up in emacs keybindings
+* For other keys such as s-up the input just wont register to emacs at all
+
+Appears to be a bug in KDE:
+https://bugs.kde.org/show_bug.cgi?id=157468
+
+
+
+If you want to use it like in windows, to trigger the menu, go to System -> Preferences -> Keyboard Shortcuts. Scroll down to and click on 'Show the panel's main menu'. Click on the right hand cell, which should change to 'New shortcut...' and press the Windows key.
+
+EDIT: turns out this doesn't work but you can make it work by pressing Alt+F2 then entering
+
+gconftool-2 --set /apps/metacity/global_keybindings/panel_main_menu --type string "Super_L"
+You can bind it to other things as well. You can use it as part of a key combination in for another shortcut or for an action in compiz. For example, I have my Windows key bound to the Initiate Window Resize action (because this is easier than trying to grab the sides of the window) which can be found in Compiz Config Settings Manager  under Window Management -> Resize Window.
+
+
+Going to work around this wih a combo of xmodmap and EMACS:
+The problem:
+1 My Emacs commands are geared around an OS X configuration where Super key is used a lot
+2 KDE sits between the xmodmap settings and breaks the use of the Super key as a modifier for SOME key combinations (Super key + arrow keys, s-f) but not others (s-c, s-o etc)
+
+The solution:
+xmodmap Super key to something else and then translate that to Super key locally in emacs, thus preserving all my existing emacs bindings...
+
+
+The idea - more detail - 
+xmodmap -e 'keycode 133 = F13'
+Put F13 in the appropriate mod group
+And then pick it up in Emacs by translating to super key (pseudocode follows)
+(translate-command-thing "F13" "s")
+This SHOULD make emacs recognise all Super_L key combinations rather than just those that KDE doesnt eat and destroy for whatever fucked up reason.
+
+Emacs key remapping functions:
+input-decode-map
+"This variable holds a keymap that describes the character sequences sent by function keys on an ordinary character terminal. This keymap has the same structure as other keymaps, but is used differently: it specifies translations to make while reading key sequences, rather than bindings for key sequences."
+ local-function-key-map
+"This variable holds a keymap similar to input-decode-map except that it describes key sequences which should be translated to alternative interpretations that are usually preferred. It applies after input-decode-map and before key-translation-map."
+key-translation-map
+"This variable is another keymap used just like input-decode-map to translate input events into other events. It differs from input-decode-map in that it goes to work after local-function-key-map is finished rather than before; it receives the results of translation by local-function-key-map."
+
+Results:
+If I change Command from Super_L to f13 in xmodmap and then call
+(define-key key-translation-map  (kbd "<f13>") (kbd "<s-right>"))
+Then pressing the Command key will call "s-right" and move to the end of the line
+e.g. then i can call the exact command but i cant seem to set f13 as a prefix command....
+
+
+Emacs cry for help:
+I'm using kde on Ubuntu 12.04 and it seems to be "eating" the Windows/Super key before emacs can see it.
+
+This sucks since i have a lot of commands bound to it.
+
+It doesn't happen all the time e.g. "<Super-o>" works but "<Super-up>" doesnt.
+
+This doesn't happen using the xfce or enlightenment window managers.
+
+I've played around with xmodmap and looked at some xkb settings but no dice so far. I think it might be something in xkb or maybe something that kde does "after".
+
+Does anyone have any ideas?
+
+Hope this made sense to someone...
+
+
+
+https://wiki.archlinux.org/index.php/Extra_Keyboard_Keys
+
+1 Scancode - Produced by the Kernel in response to key press
+2 KeyCode - Corresponds to a function
+3 Symbol - The way xorg refers to keys
+
+xmodmap: Keycode to KeySym?
+xkdb: Alternate and more extended KeySyms in Symbols?
+kde: Takes KeySyms/Symbols and eatc them?
+
+xev: Gives KeyCodes and KeySyms
+KeyCode  | KeySym
+133		| Super_L
+
+"Note: In 2.6 kernels raw mode, or scancode mode, is not very raw at all. Scan codes are first translated to key codes, and when scancodes are desired the key codes are translated back...there is no guarantee at all that the final result corresponds to what the keyboard hardware did send. To change behavior back to the old raw mode, add the parameter atkbd.softraw=0 to your kernel while booting. This can be removed for later boots when the old raw functionality is not required."
+
+Map scancodes to keycodes
+There are three ways of mapping scancodes to keycodes:
+- Using udev
+- Using the kernel tool setkeycodes
+
+Extra Keyboard Keys in Console
+https://wiki.archlinux.org/index.php/KEYMAP
+
+Configuring the Console Keymap
+Edit personal.map using your favorite editor. Examples:
+* Make the Right Alt key same as Left Alt key (Emacs)
+change the line include "linux-with-alt-and-altgr" to include "linux-with-two-alt-keys"
+* Swap CapsLock with Escape (Vim)
+make keycode 1 = Caps_Lock and keycode 58 = Escape
+* Make CapsLock another Control key
+change the line keycode 58 = Caps_Lock to keycode 58 = Control
+* Swap CapsLock with Left Control key
+make keycode 29 = Caps_Lock and keycode 58 = Control
+
+These directives associate a keycode with a keysym
+dumpkeys
+loadkeys
+showkeys
+
+Using third-party programs
+keytouch
+actkbd
+xbindkeys
+
+
+kde - Maybe edit the following files while kde is not running
+and maybe disable the "Start the Input Action Daemons on Login" option under
+System Settings -> Custom Shortcuts -> 
+vim ~/.kde/share/config/khotkeysrc
+vim ~/.kde/share/config/kglobalshortcutsrc 
+
+
+WAIT - In KDE 
+Settings -> Input Device -> Keyboard -> Layout
+If you tick 'Configure Layout' and press on the Shortcut area  and 
+input the keys "Super" + "right Arrow" it shows fucking "Meta + Right"
+and then says 
+"The shortcut Meta + Right conflicts with the following key combination:
+Shortcut 'Meta + Right' in Application KWin for action Move Right" !!!!!!!!
+
+To the Batmobile!!!!!!!!!!!! 
+
+OK - 
+Settings -> Shortcuts & Gestures -> Global Keyboard Shortcuts
+and THEN under 'KDE component' you can select different KDE things 
+which have their own Keyboard Shortcuts - many of which are 'Meta' i.e. 'Super' o_o
+Fingers crossed.....
+
+AAAAAWWWWWWWWWWWWW   YEEEEEEEEEEEEEEEEEEEEEEEAAAAAAAAAAHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+

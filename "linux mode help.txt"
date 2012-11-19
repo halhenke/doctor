@@ -1,0 +1,451 @@
+* Desktop Configuration
+Use:
+$ dconf-editor
+to change many hidden/non-obvious settings in Linux
+Also: 
+Settings->Keyboard->Shortcut
+AND
+Settings->Keyboard Layout
+for various weird things
+
+* Package Management
+
+** Update Package List
+$ apt-get update
+
+** Search for package
+e.g. port search package
+$ apt-cache search package
+OR to match against/search only the package names
+$ apt-cache search -n package
+
+
+** Info on package
+e.g. port info package
+$ apt-cache show package
+or more detail
+$ apt-cache showpkg package
+
+
+** Package Dependencies
+apt-cache depends sbcl
+
+** Show installed packages
+e.g. port installed | grep python
+$ dpkg --get-selections | grep python
+OR
+$ dpkg -l
+
+** Show available packages
+$ apt-cache pkgnames
+
+** Show which version of a package is installed
+e.g. port installed | grep python
+$ dpkg -l | grep package
+
+** Show which packages a package needs that arent yet installed
+
+
+Show which package dependecies our SYSTEM currently has unfulfilled
+$ apt-cache unmet package
+
+Show where files from a package are installed
+$ dpkg-query -L bash-completion
+
+Reconfigure package
+$ dpkg-reconfigure packagename
+
+
+
+* Server/Apache Management
+
+** Restart the server
+$ sudo /etc/init.d/apache2 restart
+OR
+$ service apache2 reload
+OR
+$ apache2ctl restart
+
+other useful stuff maybe:
+check and modify which apache modules are available and enabled
+$ a2enmod
+copies a site from available to enabled directory of apache:
+$ a2ensite drupal-cat-au-website.conf  
+
+User name that runs apache etc is set in:
+/etc/apache2/envvars
+
+However are we restarting
+/etc/init.d/apache2
+OR
+ /usr/sbin/apache2
+
+** Available/Enabled Sites
+
+I edited the apache2 file:
+/etc/apache2/sites-available/default
+adding:
+    Alias /hal/ "/home/hal/work/"
+    <Directory "/home/hal/work/">
+        Options Indexes MultiViews FollowSymLinks
+        AllowOverride None
+        Order deny,allow
+        Deny from all
+        Allow from 127.0.0.0/255.0.0.0 ::1/128
+    </Directory>
+so that i can access my /home/hal/work folder at the URL:
+http://localhost/hal/
+
+Later we added
+a file:
+drupal-cat-au-website.conf 
+to the directory:
+/etc/apache2/sites-available
+This specified some site specific error/access logging in a new directory/file
+/var/log/sitelogs/drupal-site-cat-au-website/
+did:
+$ chgrp www-data /var/log/sitelogs/drupal-site-cat-au-website/
+$ chmod g+w /var/log/sitelogs/drupal-site-cat-au-website/
+$ a2ensite drupal-cat-au-website.conf 
+
+** Hosts file
+Also have to add the line:
+127.0.0.1 d.catalyst-au.net
+to /etc/hosts where d.catalyst-au.net is the SeverName from drupal-cat-au-website.conf 
+
+
+* Postgres Setup
+
+First grant yourself superuser privileges:
+sudo -su postgres createuser yourname
+
+list databases
+$ psql -l
+
+Then login with 
+psql -d databasename
+
+
+Databases live in
+/var/lib/postgresql/9.1/main/
+Configuration lives in
+/etc/postgresql/9.1/main/
+Log files live in:
+/var/log/postgres
+
+sudo -u postgres 
+
+Create Database and then
+psql databasename < data_base_dump
+
+Restart postgres with
+sudo /etc/init.d/postgresql restart
+
+Also - 
+in pg_hba.conf under: 
+# IPv4 local connections:
+we changed:
+host    all             all             127.0.0.1/32            md5
+to:
+host    all             all             127.0.0.1/32            trust
+
+which meant we dont have to provide passwords for local connections (in drush at least)
+
+* Drupal Setup With Postgres - FRESH INSTALL
+
+Important last step - Grant all:
+
+CREATE DATABASE drupaldb;
+CREATE USER drupalapp WITH PASSWORD 'lapurd';
+GRANT ALL ON DATABASE drupalbd TO drupalapp;
+
+But also - if you have already set $db_url in settings.php
+then drupal assumes the site is already setup and tries to read the presumably empty database
+See: 
+http://drupal.org/node/965028
+So you have to go to your_site_root_url/install.php
+to call the setup explicitly
+
+* Drupal Site Config
+
+Need the php postgres driver
+$ sudo apt-get install php5-pgsql
+
+php log in:
+...
+
+* Below relates by example to the Catalyst Australian website: cat-au-website
+
+Site was "stored" in two parts - a git repository with the drupal code/directory structure: 
+$ git clone git+ssh://gitprivate.catalyst.net.nz/git/private/drupal/cat-au-website.git cat-au-website
+and a 
+pg_dump backup of the postgres database on the machine vedra:
+root@vedra://data/rsync/cabotage/var/backups/pg/pg-9.0-main/current/pg-catalyst_website-2012-11-06-220105.pgdump
+To get this database from vedra i  logged into vedra as root:
+$ ssh vedra
+
+Sites are deployed onto the machine "bordon"
+into the 
+/var/www/drupal-site-cat-au-website
+I copied the sites/default/settings.php file from here to my machine and made a couple of changes:
+changed:
+$conf["archimedes_site_environment"] = "staging";
+to:
+$conf["archimedes_site_environment"] = "development";
+had to change the database settings:
+$db_url["default"] = "pgsql://catalyst_website:Eu4mee5hAuk1pa7v@db-host/catalyst_website";
+to:
+$db_url["default"] = "pgsql://catalyst_website:Eu4mee5hAuk1pa7v@localhost/hal/cat-au-website/";
+
+Also - so that the site cannot write to its own directory/self:
+I created a directory
+/var/lib/sitedata/cat-au-drupal/files/ (could be anywhere)
+and then created a symlink to it 
+sites/default/files -> /var/lib/sitedata/cat-au-drupal/files/
+
+
+** Drupal Update Module Procedure:
+1 Login as admin
+2 Go to available updates
+3 Click on Download for an outdated module (Yellow/Red) sorted by urgency (Red first)
+4 Save in some tmp directory
+5 cd to site directory/sites/all/modules
+6 Find directory where module is - 
+Could be: 
+contrib/
+patched/
+custom/
+or, if older project, everything in the one directory
+BE CAREFUL IF IT IS A MODULE IN PATCHED - you willl have to apply patches again or modify/ignore patches if module no longer needs them.
+otherwise:
+7 tar -xvf ~/directory_where_tgz_is_downloaded/old-module.tgz    in_parent_directory_of_old-module
+will update/replace old module.
+8 Create a new branch 
+8 Commit changes per module (easier to use git bisect to trace the problem if an update breaks the site)
+9 Push new branch to remote repo before your machine dies....
+10 If all is cool - deploy via API1 method described here:
+https://wiki.wgtn.cat-it.co.nz/wiki/Drupal/Getting_Started#For_API_1
+Wiki is wrong -  
+$options['dh-project'] = 'cat-au-website';
+is set in drushrc.local.php and not drushrc.php
+However API-1 method still seems to apply to Drupal 6 sites - at least thre are no 6.x versions of debuild
+only 7.x-1.0 and 7.x-2.0
+
+I did
+$ sudo apt-get install apache2-mpm-itk
+which removed:
+apache2-mpm-prefork
+may want to reverse this situation later.....
+
+
+* Drush & Drush Problems
+
+You should make sure you have the Catalyst version.
+The one from git is more recent than the one from the Catalyst stable/unstable repository
+
+If you get the error 
+"No valid version control or backup engine found (the --version-control option was set to "git")"
+Then you are probably not working in a git repository
+ - if you didnt clone it somewhere then just 'git ini't
+
+* Drupal Deployment
+See here:
+https://wiki.wgtn.cat-it.co.nz/wiki/Catalyst_Australia_Pty_Ltd/Catalyst_Australia_Debian_repository
+
+Finish changes.
+Run drush dh-make-drupal
+This will make a package to install on the server and a changelist
+
+You then have to put this package AND the changelist in the staging environment
+$ scp drupal-site-cat-au-website_20121112-1_all.deb caldara:/repo-stage
+$ scp drupal-site-cat-au-website_20121112-1_amd64.changes caldara:/repo-stage
+
+Now we put it on the server, in this case 'bordon'
+
+$ ssh bordon
+This server then generates a gpg password file which we can use to get a onetime password for this session.
+Copy the contents of this file to our own machine 
+$ cat password.txt.gpg
+and grab everything e.g.:
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+hQEMAzGI0LlowIRAAQf8DZfx4DeJld7cYpy/1mAbsFUnDuU6h1uvwV8bs8/jz1NX
+659cOLfRD0FfrouQswOcY8FkH+TMympjFkNPXz4I/nD2YWsw6Bcr2+FpOYfqGhRB
+sY6S3BXthnEsmKHRWICpuBDPt3qntIxL5XESu1Qy2OY4F2yh58vikXfA3sweShfg
+sERIAKteE56AOp3AlBfi+84Ksg+T5EghTNrCS0SBNHFzY/AIriVig1ghx5vmhiSV
+gnTVVN7v2PiTw3dsQDq6XMkdQACDKUE9d7MuDMwsMYWXclSdt37uMfG8oby22/om
+OJov3goKal7c8TIiszRNP8/BYKiQ4qpYzU438TjZ2tLABAFRQXj7Gd0VCTGVaJkp
+kM4IZv0316Btfq6XQxMSB7pfCGN2BlJrxAnyrxxYOdro59+SAcjCBLScIHUVNCyv
+BMdx66F49Hc8Fu+EJzCpDwWal9a/xmUsf6lVmAfdd2ndph5S2vGdC3h0QFUr51Cg
+XKiilCLWqAa2lyd2AGSJTxDCt7QHk/A8uE1gHsFM8utp/Z2tyFEVG+aRr85HfqhU
+eJkgnHL8jxyat0bk3Qs7vbiOnl0pHR1NrXB3JVp9KSKBkQrxzGk=
+=ydW7
+-----END PGP MESSAGE-----
+
+and save it in a local file (any name will do e.g. password_tmp.txt)
+Then:
+$ gpg -d password_tmp.txt
+Enter secret phrase and we now have a shell password to work on bordon.
+If we want to set something more permanentwe can use this to change our password for bordon via the command:
+$ passwd
+We then run 
+$ sudo apt-get update
+presumably so that we can see that the package is available from the staging area.
+And then:
+$ dpkg -l | grep cat-au
+$ sudo apt-get install drupal-site-cat-au-website 
+Just to be careful update the database:
+$ drush updatedb
+and clear the cache
+$ drush cc all
+
+To check it out (become root):
+$ sudo -s
+$ cd /var/www/drupal-site-cat-au-website/
+$ ls -lta
+
+There is a gpg thing which gi
+
+
+* Getting Important Passwords
+
+$ ssh turing
+then use:
+$ pview -d sydney catalyst-au.net
+where sydney is a group and catalyst-au-net is a search term IIRC
+This returns a format
+catalyst-au drupal site - email_address
+
+
+
+* Git commands
+
+List all files in a branch (recursively)
+git ls-tree -r branch
+
+git ls-tree -r branch | wc -l
+
+git diff --name-only updates_2012_11-core-upgrade upstream/6.x |wc -l
+
+What bevan did:
+git branch updates_2012_11-core-upgrade
+git checkout updates_2012_11-core-upgrade
+git checkout upstream/catalyst-6.x
+git checkout -b catalyst-6.x
+git pull upstream catalyst-6.x
+git checkout updates_2012_11-core-upgrade
+git merge catalyst-6.x
+
+What i did:
+git branch updates_2012_11-core-upgrade
+git checkout updates_2012_11-core-upgrade
+git merge upstream/catalyst-6.x
+
+
+
+Querying Drupal node_type table
+SELECT type, name, module, has_title, title_label, has_body, body_label, custom, modified, locked, orig_type FROM node_type;
+
+* Things I learned Trying to Speed up KDE
+
+** $ free -m
+total       used       free     shared    buffers     cached
+Mem:          7967       6094       1873          0         62        936
+-/+ buffers/cache:       5095       2872
+Swap:         8170          0       8170
+
+
+** Turn the swap off
+$ sudo swapoff -a
+and on
+$ sudo swapon -a
+
+** Look at the "swappiness"
+$ cat /proc/sys/vm/swappiness 
+
+** See here:
+http://forum.kde.org/viewtopic.php?f=66&t=85803
+We edit the system file:
+/etc/sysctl.conf
+adding the following lines:
+# HAL - trying to make KDE snappier
+vm.swappiness=20
+vm.vfs_cache_pressure=50
+
+** This thread is the greatest:
+http://forum.kde.org/viewtopic.php?f=66&t=85803&sid=ee5334e50b6b877d1b5e644b07f355ad&start=15
+possible causes:
+ - akonadiserver / akonadi processes 
+ - Fixing the application which excessively spawns kio_trash would help also. 
+Grepping ~/.xsession-errors for " Killing update job for "trash:/"" may help reveal the culprit, with the KIO debugging area enabled. KRunner does this intensively.
+ - Nepomuk 
+ - the Oxygen widget style
+
+** Dealing With Akonadi
+The Akonadi server is launched automatically at login whenever any Akonadi-enabled application requests access to it.
+
+To disable the Akonadi subsystem, first, shut down the running Akonadi server from the control module or the command line:
+
+akonadictl stop
+Now, edit the file ~/.config/akonadi/akonadiserverrc and change StartServer from true to false:
+
+StartServer=false
+The Akonadi server should no longer launch automatically on login.
+
+** A useful tool to accurately show memory growth over time
+exmap
+
+** Scripts for investigating memory problems:
+-----------------------------------------------------------------------------
+#!/bin/sh
+
+printf "%-6s %-9s %s\n" "PID" "Total" "Command"
+printf "%-6s %-9s %s\n" "---" "-----" "-------"
+
+for PID in `ps -e | /usr/bin/awk '$1 ~ /[0-9]+/ { print $1 }'`
+do
+CMD=`ps -o comm -p $PID | tail -1`
+# Avoid "pmap: cannot examine 0: system process"-type errors
+# by redirecting STDERR to /dev/null
+TOTAL=`pmap $PID 2>/dev/null | tail -1 | \
+/usr/bin/awk '{ print $2 }'`
+[ -n "$TOTAL" ] && printf "%-6s %-9s %s\n" "$PID" "$TOTAL" "$CMD"
+done | sort -n -k2 
+-----------------------------------------------------------------------------
+This little one liner is also good for snapshotting i.e. execute this at a particularly laggy moment if possible:
+$ ps -eo pcpu,%mem,cmd|sort -k2 -r
+
+
+
+* Changing my machine name
+sudo edit /etc/hostname
+and replaced 
+catalyst-MS-7681
+with 
+HAL9000
+
+also see 
+man hostname
+for related info
+
+* checking my distro version
+$ cat /etc/issue
+
+* Adding my passphrase to my ssh shell settings
+used the command 
+ssh-add
+
+
+* Setting up VirtualBox
+Get an iso disk image of the requested distribution
+
+They were found on caldara:
+scp caldara:/home/shared/isos/ubuntu-10.04-server-amd64.iso .
+
+
+* logging in from home
+With the browser:
+FoxyProxy for Firefox or similar for Chrome
+

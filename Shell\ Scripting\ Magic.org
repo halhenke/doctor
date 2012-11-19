@@ -1,0 +1,5 @@
+* How to add extension to all files in a folder in Unix/Linux
+
+# extension = .xml
+# Dont think this is recursive...is it?
+find . -type f -exec mv {} {}.xml ';'
