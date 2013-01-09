@@ -1,0 +1,1375 @@
+#+TITLE: Upgrade From Rails 2.3.4 of Dec 2012
+
+* Current Hurricane Site - Dev/Staging/Prod environments and Upgrading Pitfalls
+** Potential Upgrade Problems
+
+*** Rails 3.2 Needs >= Ruby 1.8.7
+So we are just scraping by here...
+*However*
+ - There are "marshalling bugs" in 1.8.7 Ruby that can crash Rails
+ - Ruby Enterprise Edition has these fixed since the release of 1.8.7-2010.02
+ - Philemon is running  Ruby Enterprise Edition 2009.10 :-(
+
+*** If we go to Ruby 1.9 then we need to skip 1.9.1 - use 1.9.2 or 1.9.3
+ - 1.9.1 segfaults apparently
+ - The Debian/Ubuntu package repo on my machine only has 1.9.1...
+   - actually my machine has 1.9.3 but a hell of a lot more packages for 1.9.1.
+   - not sure if this is because i added some unstable repo to my source.list
+
+*** some of the Rake stuff would need to be rewritten 
+ - uses an earlier syntax.
+ - Probably not a huge deal
+
+*** Rails 3 has Different Directory Structure
+Not a huge deal
+
+*** Rails 3 has different Routing Syntax
+Not a huge deal
+
+*** Rails 3 has asset pipeline
+
+*** Rails 3 and the use of bundler
+This could be abig productivity boon in terms of different people in a team working on the same Rails app
+ - automatically standardises and synchronises Ruby/Rails/Gem versions between different machines so there is no need to 
+manually try to match environments between different machines 
+Rail 2 used to use "config.gem" declarations in the config/environment.rb file
+
+*** vendor/plugins 
+ - Not a big part of Rails 3 world. Deprecated in 3.2 and will be phased out by Rails 4.
+ - Update procedure is to 
+     - extract them as Gems & bundle them
+     - put them in lib/myplugin/ and setup with config/initializers/myplugin.rb
+ - They are like Gems but installed into the vendor/plugin directory and deployed with the app - i.e. they are app-specific
+ - Bundler package manager and Gemfiles pretty much makes this redundant.
+ - Some stuff like "db_populate" would normally be a straight Rake task
+*** Converting Rails 2 PLugins to Rails 3
+http://code.coneybeare.net/how-to-convert-simple-rails-23-style-plugins
+
+
+*** salient points
+The Philemon version of Rake is /ancient/ish
+At Rake 10.0 a lot of  deprecated stuff gets unsupported
+
+** Current Ruby/Rails/Gem/specs
+*** On my dev Box
+**** Ubuntu version
+Ubuntu 10.04.4 LTS
+**** Ruby Version
+ruby 1.8.7 (2012-02-08 MBARI 8/0x6770 on patchlevel 358) [x86_64-linux], MBARI 0x6770, Ruby Enterprise Edition 2012.02
+**** gem -v
+1.3.7
+**** Gem list 
+actionmailer (2.3.4)
+actionpack (2.3.4)
+activemodel (3.2.9)
+activerecord (2.3.4)
+activeresource (2.3.4)
+activesupport (3.2.9, 2.3.4)
+arel (3.0.2)
+builder (3.1.4, 3.0.4)
+calendar_date_select (1.16.4)
+capistrano (2.5.19)
+capistrano-ext (1.2.1)
+cucumber (0.3.99)
+daemon_controller (1.1.0)
+daemons (1.1.0)
+diff-lcs (1.1.3)
+fastercsv (1.5.5)
+fastthread (1.0.7)
+gbdev-validates_as_email (0.5.1)
+googlecharts (1.3.6)
+haml (3.1.7)
+highline (1.6.15)
+htmlentities (4.3.1)
+i18n (0.6.1)
+json (1.7.5)
+mislav-will_paginate (2.2.3)
+multi_json (1.3.7)
+net-scp (1.0.4)
+net-sftp (2.0.5)
+net-ssh (2.6.2)
+net-ssh-gateway (1.1.0)
+paperclip (2.3.3)
+passenger (3.0.18, 2.2.15)
+pg (0.14.1)
+polyglot (0.3.3)
+rack (1.4.1, 1.0.1)
+rails (2.3.4)
+rake (10.0.2)
+rdoc (3.12)
+ruby-net-ldap (0.0.4)
+ruby-ole (1.2.11.5)
+rubyist-aasm (2.1.1)
+spreadsheet (0.7.4)
+sqlite3 (1.3.6)
+sqlite3-ruby (1.3.3)
+term-ansicolor (1.0.7)
+treetop (1.4.12)
+tzinfo (0.3.35)
+
+**** vendor/plugins
+acts_as_audited
+acts_as_list
+acts_as_tree
+acts_as_tsearch
+country_select
+db_populate
+declarative_authorization
+default_value_for
+delayed_job
+exception_notification
+localized_dates
+restful_authentication
+theme_support
+tiny_mce
+unobtrusive
+*** On Philemon (production)
+**** Ruby Version
+ruby 1.8.7 (2009-06-12 patchlevel 174) [x86_64-linux], MBARI 0x6770, Ruby Enterprise Edition 2009.10
+**** gem -v
+1.3.7
+**** Gem list
+actionmailer (2.3.8, 2.3.4)
+actionpack (2.3.8, 2.3.4)
+activerecord (2.3.8, 2.3.4)
+activeresource (2.3.8, 2.3.4)
+activesupport (2.3.8, 2.3.4)
+calendar_date_select (1.16.1, 1.15)
+capistrano (2.5.19, 2.5.9)
+cgi_multipart_eof_fix (2.5.0)
+daemons (1.1.0, 1.0.10)
+fastercsv (1.5.3, 1.5.0)
+fastthread (1.0.7)
+fiveruns_tuneup (0.8.20)
+gbdev-validates_as_email (0.5.1)
+gem_plugin (0.2.3)
+god (0.7.18)
+googlecharts (1.6.0, 1.3.6)
+haml (3.0.13, 2.2.15)
+highline (1.6.1, 1.5.1)
+htmlentities (4.3.1)
+mislav-will_paginate (2.3.11, 2.2.3)
+mongrel (1.1.5)
+mysql (2.8.1)
+net-scp (1.0.2)
+net-sftp (2.0.4, 2.0.2)
+net-ssh (2.0.23, 2.0.15)
+net-ssh-gateway (1.0.1)
+paperclip (2.3.3, 2.3.1.1)
+passenger (2.2.15, 2.2.5)
+pg (0.9.0, 0.8.0)
+postgres (0.7.9.2008.01.28)
+prawn (0.8.4, 0.5.1)
+prawn-core (0.8.4, 0.5.1)
+prawn-format (0.2.3, 0.2.1)
+prawn-layout (0.8.4, 0.2.1)
+prawn-security (0.8.4)
+rack (1.1.0, 1.0.1)
+rails (2.3.8, 2.3.4)
+rake (0.8.7)
+rspec (1.3.0, 1.2.9)
+rspec-rails (1.3.2, 1.2.9)
+ruby-net-ldap (0.0.4)
+ruby-ole (1.2.10.1)
+rubygems-update (1.3.7)
+rubyist-aasm (2.1.1)
+spreadsheet (0.6.4.1)
+sqlite3-ruby (1.2.5)
+
+*** On Epaphrus (staging)
+**** Ubuntu version
+Ubuntu 10.04.4 LTS
+**** Ruby Version
+ruby 1.8.7 (2009-06-12 patchlevel 174) [i686-linux], MBARI 0x8770, Ruby Enterprise Edition 2009.10
+**** gem -v
+1.3.5
+**** Gem list
+actionmailer (2.3.4)
+actionpack (2.3.4)
+activemodel (3.0.4)
+activerecord (2.3.4)
+activeresource (2.3.4)
+activesupport (3.0.4, 2.3.4)
+arel (2.0.8)
+builder (2.1.2)
+calendar_date_select (1.16.2)
+capistrano (2.5.19)
+capistrano-ext (1.2.1)
+daemons (1.1.0)
+fastercsv (1.5.4)
+fastthread (1.0.7)
+gbdev-validates_as_email (0.5.1)
+god (0.7.18)
+googlecharts (1.3.6)
+haml (3.0.25)
+highline (1.6.1)
+htmlentities (4.3.1)
+i18n (0.5.0)
+mislav-will_paginate (2.2.3)
+mysql (2.8.1)
+net-scp (1.0.4)
+net-sftp (2.0.5)
+net-ssh (2.1.0)
+net-ssh-gateway (1.0.1)
+paperclip (2.3.3)
+passenger (2.2.5)
+pg (0.8.0)
+postgres (0.7.9.2008.01.28)
+prawn (0.8.4)
+prawn-core (0.8.4)
+prawn-layout (0.8.4)
+prawn-security (0.8.4)
+rack (1.0.1)
+rails (2.3.4)
+rails-xmlrpc (0.3.6)
+rake (0.8.7)
+ruby-net-ldap (0.0.4)
+ruby-ole (1.2.11.1)
+rubyist-aasm (2.1.1)
+spreadsheet (0.6.5.2)
+sqlite3-ruby (1.2.5)
+tzinfo (0.3.24)
+
+*** What each Gem does
+**** Standard Ruby Stuff
+# Runs various tasks in a specific DSL - originally a make derivative
+rake (0.8.7)
+
+**** Standard Rails stuff
+# Core Rails Classes
+actionmailer (2.3.8, 2.3.4)
+actionpack (2.3.8, 2.3.4)
+activerecord (2.3.8, 2.3.4)
+activeresource (2.3.8, 2.3.4)
+activesupport (2.3.8, 2.3.4)
+
+# HTTP request/response wrapper
+rack (1.1.0, 1.0.1)
+rails (2.3.8, 2.3.4)
+# haml is a pythonistic data format
+haml (3.0.13, 2.2.15)
+
+**** Testing
+# Standard testing suite
+rspec (1.3.0, 1.2.9)
+rspec-rails (1.3.2, 1.2.9)
+
+**** Database/Server/File-system Interface
+# Database Interfaces
+pg (0.9.0, 0.8.0)
+postgres (0.7.9.2008.01.28)
+sqlite3-ruby (1.2.5)
+mysql (2.8.1)
+# Network Interface
+net-scp (1.0.2)
+net-sftp (2.0.4, 2.0.2)
+net-ssh (2.0.23, 2.0.15)
+net-ssh-gateway (1.0.1)
+# Run Rails on Apache/nginx
+passenger (2.2.15, 2.2.5)
+# Stores & retrieves files/images on the server
+paperclip (2.3.3, 2.3.1.1)
+# Very simple Ruby server
+mongrel (1.1.5)
+**** Deployment
+capistrano (2.5.19, 2.5.9)
+
+****  Specialist Gems
+# Prawn is a PDF generator for Ruby
+prawn (0.8.4, 0.5.1)
+prawn-core (0.8.4, 0.5.1)
+prawn-format (0.2.3, 0.2.1)
+prawn-layout (0.8.4, 0.2.1)
+prawn-security (0.8.4)
+# Automatically break lists into sub-lists indexed by page
+mislav-will_paginate (2.3.11, 2.2.3)
+# Finite state Machines for Ruby Classes - e.g. States and rules for transitioning betwen them
+rubyist-aasm (2.1.1)
+# Facilitate encoding and decoding of named and numerical entities in HTML and XHTML documents
+htmlentities (4.3.1)
+# Logging/Ruby object querying- alternative to "puts this/that"
+highline (1.6.1, 1.5.1)
+# Sever process monitoring framework
+god (0.7.18)
+# GemPlugin is a system that lets your users install gems and lets you load
+# them as additional features to use in your software
+gem_plugin (0.2.3)
+# an ActiveRecord validation helper called validates_as_email
+gbdev-validates_as_email (0.5.1)
+# A JavaScript DatePicker for RubyOnRails - Prototype based
+calendar_date_select (1.16.1, 1.15)
+# Legacy hotfix for Ruby concurrency
+fastthread (1.0.7)
+# FasterCSV is intended as a replacement to Ruby's standard CSV library - faster, smaller, cleaner
+fastercsv (1.5.3, 1.5.0)
+# Fixes an exploitable bug in CGI multipart parsing which affects Ruby <= 1.8.5
+cgi_multipart_eof_fix (2.5.0)
+# A toolkit to convert a Ruby script to run as a controllable daemon
+daemons (1.1.0, 1.0.10)
+# Pure Ruby LDAP library
+ruby-net-ldap (0.0.4)
+# Ruby Google Chart API
+googlecharts (1.6.0, 1.3.6)
+# Display call stack information on Rails requests
+fiveruns_tuneup (0.8.20)
+# A library for easy read/write access to OLE compound documents for Ruby
+ruby-ole (1.2.10.1)
+# An update for ruby_gems
+rubygems-update (1.3.7)
+# Read and write Microsoft Excel compatible spreadsheets
+spreadsheet (0.6.4.1)
+
+*** Actively developed Gems & Neglected Gems
+**** Recent
+faster_csv - 7 months
+googlecharts - 9 months
+ruby-ole 9 days
+spreadsheet - year ago
+
+**** Old
+daemons - 3 years
+ruby-net-ldap 2 years
+
+**** Ancient
+Mongrel - 5 years ago
+gem_plugin 4 years ago
+gbdev-validates_as_email 4 years ago
+fastthread (1.0.7) 4 years ago
+cgi_multipart_eof_fix 4 years ago
+fiveruns_tuneup 3 years
+
+
+
+
+* Going From Rails 2 to 3
+
+Rails 3.2 Now depends on/requires budler and railties
+*Bundler* - super useful
+*Railties* - Basically ties everything else together - part of Rails 3s move to become more modular
+
+
+Easier to go from Rails 2.3.9 to 3
+ * 2.3.9 lists most of the deprecations
+http://stackoverflow.com/questions/3648063/rails-3-deprecated-methods-and-apis
+
+
+
+
+* Installing Bundler on Rails 2.3
+ - See this page
+http://gembundler.com/rails23.html
+ - Install bundler gem
+
+make a new branch called bundler
+Files that will be changed:
+#       new file:   Gemfile
+#       modified:   config/boot.rb
+#       modified:   config/environment.rb
+#       new file:   config/preinitializer.rb
+
+** Making The Gemfile
+Anything declared in config/environment.rb as:
+config.gem "gemname", :version => "0.6",  :lib => 'gem_require_name'
+becomes:
+gem "gemname", "0.6",  :require => 'gem_require_name'
+
+** Try to create a fresh install in another directory and get it running on apache
+mkdir bundler-cane
+cd bundler-cane
+git clone ../../hurricane/rails-sis
+git checkout bundler
+
+*BE VERY CAREFUL WHICH DIRECTORY YOU ARE EDITING IN YOUR EMACS BUFFERS*
+
+*** Configure Bundler to use local Gem directory
+bundle config --local path ../bundleGems
+bundler check
+bundler install
+
+*** Setup apache vhost to use new directory and new host
+/edit sites-available
+sudo a2ensite
+sudo /etc/init.d/apache2 reload
+edit /etc/hosts on virtual machine
+edit /etc/hosts on *HOST* machine - VERY IMPORTANT if you want to reach the site in your browser
+
+*** Changing the Rails App
+Had to comment out the following line in config/environment.rb:
+=RAILS_GEM_VERSION = '2.3.4' unless defined? RAILS_GEM_VERSION=
+Had to copy/generate a new config/databse.yml
+*** Pull down the submodules
+git submodule init
+git submodule update
+
+
+
+
+
+
+
+* Rake Upgrades - do we still use rake/rdoctask?
+Apparently the new syntax require
+rdoc >= 2.4.2
+"Use rdoc/task instead (in RDoc 2.4.2+)"
+
+** Lets check
+grep -R "rdoctask" vendor/
+vendor/plugins/acts_as_tree/Rakefile:require 'rake/rdoctask'
+vendor/plugins/restful_authentication/Rakefile:require 'rake/rdoctask'
+vendor/plugins/acts_as_tsearch/Rakefile:require 'rake/rdoctask'
+vendor/plugins/acts_as_audited/Rakefile:require 'rake/rdoctask'
+vendor/plugins/declarative_authorization/Rakefile:require 'rake/rdoctask'
+vendor/plugins/tiny_mce/Rakefile:require 'rake/rdoctask'
+** So old syntax is used by these plugins:
+acts_as_tree
+restful_authentication
+acts_as_tsearch
+acts_as_audited
+declarative_authorization
+tiny_mce
+
+
+* My Upgrade - Plans
+** Did a branch with Bundler installed
+** I already have latest Ruby on my machine
+** Rails 2.314 With bundler - dead simple
+ - Now I am getting deprecated Rails 3 warnings in Rake routes etc. Pretty cool.
+ - Site seems to work fine
+ - 
+** Get the particular versions/commits that vendor/plugins git submodules are requiring:
+*** Where this info is in the main .git file
+Submodule info is in main app:
+.git/config file
+remote is in:
+git/config
+and current commit is in:
+.git/HEAD
+*** A list from .git/config of all plugin repos
+[submodule "vendor/plugins/acts_as_audited"]
+     url = git://github.com/collectiveidea/audited.git
+ [submodule "vendor/plugins/acts_as_list"]
+     url = git://github.com/rails/acts_as_list.git
+ [submodule "vendor/plugins/acts_as_tree"]
+     url = git://github.com/rails/acts_as_tree.git
+ [submodule "vendor/plugins/acts_as_tsearch"]
+     url = git://github.com/pka/acts_as_tsearch.git
+ [submodule "vendor/plugins/country_select"]
+     url = git://github.com/rails/country_select.git
+ [submodule "vendor/plugins/db_populate"]
+     url = git://github.com/joshknowles/db-populate.git
+ [submodule "vendor/plugins/declarative_authorization"]
+     url = git://github.com/stffn/declarative_authorization.git
+ [submodule "vendor/plugins/default_value_for"]
+     url = git://github.com/FooBarWidget/default_value_for.git
+ [submodule "vendor/plugins/delayed_job"]
+     url = git://github.com/collectiveidea/delayed_job.git
+ [submodule "vendor/plugins/exception_notification"]
+     url = git://github.com/rails/exception_notification.git
+ [submodule "vendor/plugins/localized_dates"]
+     url = git://github.com/clemens/localized_dates.git
+ [submodule "vendor/plugins/restful_authentication"]
+     url = git://github.com/technoweenie/restful-authentication.git
+ [submodule "vendor/plugins/theme_support"]
+     url = git://github.com/mylescarrick/theme_support.git
+ [submodule "vendor/plugins/tiny_mce"]
+     url = git://github.com/kete/tiny_mce.git
+ [submodule "vendor/plugins/unobtrusive"]
+     url = git://github.com/dwg/unobtrusive.git
+*** acts_as_audited
+***** remote
+  git://github.com/collectiveidea/audited.git 
+***** Head
+commit 1931aa0dd63093e4ae5e846816633cf2fcc5a75c
+Author: Brandon Keepers <brandon@collectiveidea.com>
+Date:   Fri Jan 16 14:17:58 2009 -0500
+*** Heres how its done via git submodule command
+**** git submodule status
+ 1931aa0dd63093e4ae5e846816633cf2fcc5a75c vendor/plugins/acts_as_audited (rails-1.2.x-24-g1931aa0)
+ 8771a632dc26a7782800347993869c964133ea29 vendor/plugins/acts_as_list (8771a63)
+ 20988cac158bcf7f7535a3c5dd193165797d719a vendor/plugins/acts_as_tree (heads/master)
+ b1cf499e55fb6af6efe3b4dca892efadf90a353a vendor/plugins/acts_as_tsearch (heads/master)
+ d3b5d8656df3defc1653aafe1a9bb5f0164c1741 vendor/plugins/country_select (d3b5d86)
+ 48523f662b62f228224706dd1e8c38336fa0ecbd vendor/plugins/db_populate (heads/master)
+ 0f44a3a48b5932d05576f00d9bbbc060b583894c vendor/plugins/declarative_authorization (rel_0_2-55-g0f44a3a)
+ a501a4444050846e53d21a1cffa3ef9ffb618025 vendor/plugins/default_value_for (release-1.0.1~24)
+ 82c9740d0004003ca4a81500401010b95898fd57 vendor/plugins/delayed_job (v1.8.0)
+ e8b603e523c14f145da7b3a1729f5cc06eba2dd1 vendor/plugins/exception_notification (pre-2-3)                                                                                                                                                 
+ 8bc85aa33b9b4d96d42957e1a8c9e97be1d756cf vendor/plugins/localized_dates (8bc85aa)                                                                                                                                                        
+ 61cd9b377c0b481384f123dc628a2f8cc5ea5fdf vendor/plugins/restful_authentication (61cd9b3)                                                                                                                                                 
+ cf1fe1d8b6c180d564201b35ac78040acd76cb41 vendor/plugins/theme_support (heads/master)                                                                                                                                                     
+ fff20032ecf54d335ab4175afdbd9609ef67229d vendor/plugins/tiny_mce (v0.1.0~35)                                                                                                                                                             
+ 5b77bf4d961d27f33d2b7e884246b34ffe256638 vendor/plugins/unobtrusive (heads/master) 
+**** git submodule foreach "git config --get remote.origin.url"
+Entering 'vendor/plugins/acts_as_audited'
+git://github.com/collectiveidea/audited.git
+Entering 'vendor/plugins/acts_as_list'
+git://github.com/rails/acts_as_list.git
+Entering 'vendor/plugins/acts_as_tree'
+git://github.com/rails/acts_as_tree.git
+Entering 'vendor/plugins/acts_as_tsearch'
+git://github.com/pka/acts_as_tsearch.git
+Entering 'vendor/plugins/country_select'
+git://github.com/rails/country_select.git
+Entering 'vendor/plugins/db_populate'
+git://github.com/joshknowles/db-populate.git
+Entering 'vendor/plugins/declarative_authorization'
+git://github.com/stffn/declarative_authorization.git
+Entering 'vendor/plugins/default_value_for'
+git://github.com/FooBarWidget/default_value_for.git
+Entering 'vendor/plugins/delayed_job'
+git://github.com/collectiveidea/delayed_job.git
+Entering 'vendor/plugins/exception_notification'
+git://github.com/rails/exception_notification.git
+Entering 'vendor/plugins/localized_dates'
+git://github.com/clemens/localized_dates.git
+Entering 'vendor/plugins/restful_authentication'
+git://github.com/technoweenie/restful-authentication.git
+Entering 'vendor/plugins/theme_support'
+git://github.com/mylescarrick/theme_support.git
+Entering 'vendor/plugins/tiny_mce'
+git://github.com/kete/tiny_mce.git
+Entering 'vendor/plugins/unobtrusive'
+git://github.com/dwg/unobtrusive.git
+
+** Adding vendor/plugins to the bundle file:
+*** 3 of the plugins are gem already:
+vendor/plugins/delayed_job/delayed_job.gemspec
+vendor/plugins/restful_authentication/restful-authentication.gemspec
+vendor/plugins/declarative_authorization/declarative_authorization.gemspec
+
+delayed_job
+restful-authentication
+declarative_authorization
+
+**** When declared as gems and not plugins some of these cause conflicts 
+*restful-authentication*
+restful-authentication 1.1.1 ~> 2.1.0) rails
+i.e. it needs a version of Rails 2.1
+*Delayed jobs has no dependecy info*
+*declarative Authorization*
+'declarative authorisation', '>= 2.1.0' rails
+**** SOLUTION
+ - update Restful Authentication gem?
+   - No - the latest on master branch has same Rails 2.1.x dependency
+ - ignore dependency?
+
+** Deploying to production
+*** Bundler
+ - Might be tricky
+ - Might involve changes to capistrano script
+   - Since cap script is version controlled not necessaily a big deal
+   - can keep it consigned to my bundler branch
+*** Ruby upgrade
+ - Cant be done via bundler....?
+   - Bundler has a Ruby version thing but its pretty limited i think.
+ - Get debian package.
+ - Install
+ - Will restart be necessary?
+ - probably...
+*** Rails Upgrade
+**** via Bundler
+ - Will all be done at once
+ - installing system gems requires sudo permissions
+ - so we should install to a specific path
+bundle install --path vendor/bundle.
+http://andre.arko.net/2011/06/11/deploying-with-bundler-notes/
+#+BEGIN_QUOTE
+Okay, so now we have our gems installed on the server into an application-specific path. There is one potential issue remaining: what happens if a developer changes the Gemfile, forgets to run bundle install, and then tries to deploy? The deploy script will install the bundle on the production server, but the server will be running against gems that have never been tested at all. You can avoid the potential disaster by using bundle install --frozen. Frozen mode means that Bundler checks the Gemfile against the Gemfile.lock file, and refuses to install if they don't match. The error message instructs you to run bundle install on your development machine, make sure everything works, and then check in a new Gemfile.lock with the versions that you are now sure work with your application.
+#+END_QUOTE
+bundle install --deployment
+
+**** via gem
+ - sudo gem update?
+ - restart?
+
+** Deprecation Warnings
+*** Rails 2.3.14
+config.load_paths is deprecated and removed in Rails 3, please use autoload_paths instead
+config.load_paths is deprecated and removed in Rails 3, please use autoload_paths instead
+config.load_paths= is deprecated and removed in Rails 3, please use autoload_paths= instead
+*** Rake 0.9.0
+DEPRECATION WARNING: Rake tasks in vendor/plugins/acts_as_audited/tasks, vendor/plugins/acts_as_tsearch/tasks, vendor/plugins/acts_as_tsearch/tasks, vendor/plugins/db_populate/tasks, vendor/plugins/declarative_authorization/tasks, vendor/plugins/delayed_job/tasks, vendor/plugins/localized_dates/tasks, vendor/plugins/restful_authentication/tasks, vendor/plugins/theme_support/tasks, and vendor/plugins/tiny_mce/tasks are deprecated. Use lib/tasks instead. (called from /home/hal/bundler-cane/bundleGems/ruby/1.8/gems/rails-2.3.14/lib/tasks/rails.rb:10)
+
+
+
+* My Upgrade - Staging
+** Added http://gems.github.com to the gem source list
+gem  sources -a http://gems.github.com
+** Clean up some old Rails 3.2.1 Stuff
+Manually in this order:
+
+sudo gem uninstall rails -v=3.2.1
+sudo gem uninstall railties -v=3.2.1
+sudo gem uninstall activemodel -v=3.2.1
+sudo gem uninstall activerecord -v=3.2.1
+sudo gem uninstall actionpack -v=3.2.1
+sudo gem uninstall activeresource -v=3.2.1
+sudo gem uninstall activemodel -v=3.2.1
+Uninstalling activesupport 3.0.4
+sudo gem uninstall activesupport -v=3.0.4
+failed for now - some dependencies
+
+
+** Upgrade Ruby
+*** BIG PROBLEMS encountered on first run
+**** Recompile Passenger
+ - passenger module needs to be recompiled with "Curl development headers with SSL support"
+ - So we need
+sudo apt-get install libcurl4-openssl-dev
+Then 
+sudo passenger-install-apache2-module 
+
+Then create file:
+passenger-1.8.7-2012.02.conf:
+PassengerRoot /usr/local/lib/ruby/gems/1.8/gems/passenger-3.0.11
+PassengerRuby /usr/local/bin/ruby  
+
+and
+passenger-1.8.7-2012.02.load:
+LoadModule passenger_module /usr/local/lib/ruby/gems/1.8/gems/passenger-3.0.11/ext/apache2/mod_passenger.so
+
+ - change modules
+sudo a2dismod passenger-1.8.7-2009.10
+sudo a2enmod passenger-1.8.7-2012.02
+
+ - restart server
+sudo /etc/init.d/apache2 restart
+
+**** Then cant find Rails 2.3.4
+Have to uninstall Rails 3.2.1
+and then reinstall Rails 2.3.4
+
+**** Then get "undefined method `name' for "actionmailer":String" error
+My gem is version
+1.8.15 
+Getting rid of newer ActionMailer didnt work
+So I had to downgade the gem:
+sudo  gem install rubygems-update -v 1.3.5
+sudo  update_rubygems --version=1.3.5
+
+did a 
+sudo /etc/init.d/apache2 restart
+and it finally worked
+
+
+
+
+* My Upgrade - Production
+** Differences to Staging (epaphrus)
+ - philemon is amd64
+ - passenger_module declarations is in =/etc/apache2/conf.d/modrails=
+   - not in =/etc/apache2/mods_available=
+** Upgrade Ruby
+*** Preparation
+**** Upload Ruby packages
+Get a package of ORIGINAL version of Ruby on epaphrus server - just in case:
+scp ruby-enterprise_1.8.7-2009.10_i386.deb hal@epaphrus:~/upgrade
+Get a package of NEW version of Ruby on epaphrus server:
+scp ruby-enterprise_1.8.7-2012.02_i386_ubuntu10.04.deb hal@epaphrus:~/upgrade
+
+**** Install the package
+sudo dpkg -i ruby-enterprise_1.8.7-2012.02_i386_ubuntu10.04.deb
+
+**** Pre-emptively install new passenger apache modules
+These may be able to work as copied staight from staging - the /should/ be the same form:
+*passenger-1.8.7-2012.02.conf*:
+PassengerRoot /usr/local/lib/ruby/gems/1.8/gems/passenger-3.0.11
+PassengerRuby /usr/local/bin/ruby  
+*passenger-1.8.7-2012.02.load*:
+LoadModule passenger_module /usr/local/lib/ruby/gems/1.8/gems/passenger-3.0.11/ext/apache2/mod_passenger.so
+
+**** Rebuild Passenger
+*Need this first*
+sudo apt-get install libcurl4-openssl-dev
+sudo passenger-install-apache2-module 
+
+**** Disable Old Passenger/Apache modules and enable new ones
+sudo a2dismod passenger-1.8.7-2009.10
+sudo a2enmod passenger-1.8.7-2012.02
+
+**** Restart Apache and delayed jobs
+sudo /etc/init.d/apache2 restart
+sudo  /etc/init.d/delayed_jobs stop
+#Check
+ps -ef | grep delayed_jobs
+sudo  /etc/init.d/delayed_jobs start
+
+** Add http://gems.github.com to the gem source list?
+gem  sources -a http://gems.github.com
+
+
+** Upgrade Rails
+sudo gem install rails -v=2.3.14
+
+*** How do we know that it still isnt running rails 2.3.4?
+ - Uninstalling big old gem dependencies is not straightforward.....
+ - There is that shitty line in config/envirnment.rb:
+#+BEGIN_SRC ruby
+# Specifies gem version of Rails to use when vendor/rails is not present
+ RAILS_GEM_VERSION = '2.3.4' unless defined? RAILS_GEM_VERSION
+#+END_SRC ruby
+
+*Either* 
+ - change the line to 2.3.14
+ - remove it
+ - remove the older rails and see what happens...
+
+*** Heres how we know
+Changing the line to
+#+BEGIN_SRC ruby
+ RAILS_GEM_VERSION = '2.3.14' unless defined? RAILS_GEM_VERSION
+#+END_SRC ruby
+ - does not complain if 2.3.14 is installed
+ - and does not complain after rails 2.3.4 is uninstalled
+ *It does complain when i change it back to 2.3.4 and only 2.3.24 is installed*
+ - only *after* i restart the server though...
+** Upgrade Rake
+sudo gem install rake -v=0.9.0
+
+*Hurricane will not crash if we update rake even though it breaks without changes to Rakefile (at least)*
+However:
+rake routes
+will reveal that things arent right.
+
+** Deploy new commit
+ - Has fixes for Rails 2.3.14
+ - has new rake syntax
+ - Should restart server
+** Check stuff
+ _Check rake 0.9.0 works_
+sudo -s "( cd /app/mynbcs/current ; rake routes )"
+_Check that the new syntax is used_
+( cd /app/mynbcs/current ; cat Rakefile )
+_Check that the weird Rails version line has been updated:_
+( cd /app/mynbcs/current ; cat config/environment.rb )
+** ERRORS FROM STAGING 
+*** after rails/rake gem upgrades
+When trying to load MyNBCS I got the passenger eror page:
+saying:
+undefined method `requirement' for #<Rails::GemDependency>
+and i was getting rake route errors
+
+**** SOLUTION
+sudo gem update --system
+sudo /etc/init.d/apache2 restart
+this updated my rubygems to: 
+1.8.24
+
+
+
+
+** ERRORS FROM ACTUAL PRODUCTION UPGRADE
+*** Rake 0.9.2.2 and Passenger 3 - STILL NOT UNDERSTOOD
+For whatever reason, after: 
+sudo gem install rails -v=2.3.14
+sudo gem install rake -v=0.9.0
+rake 0.9.2.2 was suddenly installed on philemon
+ - definitely wasnt there before
+
+Uninstalled it
+
+Similarly, 
+before:
+passenger (2.2.15, 2.2.5)
+after:
+passenger (3.0.11, 2.2.15)
+
+*** development Database? - FIXED
+sudo -s "( cd /app/mynbcs/current ; rake --trace routes )"
+DEPRECATION WARNING: Rake tasks in vendor/plugins/acts_as_audited/tasks, vendor/plugins/acts_as_tsearch/tasks, vendor/plugins/acts_as_tsearch/tasks, vendor/plugins/db_populate/tasks, vendor/plugins/declarative_authorization/tasks, vendor/plugins/delayed_job/tasks, vendor/plugins/localized_dates/tasks, vendor/plugins/restful_authentication/tasks, vendor/plugins/theme_support/tasks, and vendor/plugins/tiny_mce/tasks are deprecated. Use lib/tasks instead. (called from /usr/local/lib/ruby/gems/1.8/gems/rails-2.3.14/lib/tasks/rails.rb:10)
+ - Invoke routes (first_time)
+ - Invoke environment (first_time)
+ - Execute environment
+config.load_paths is deprecated and removed in Rails 3, please use autoload_paths instead
+config.load_paths is deprecated and removed in Rails 3, please use autoload_paths instead
+config.load_paths= is deprecated and removed in Rails 3, please use autoload_paths= instead
+rake aborted!
+development database is not configured
+
+ - why? Surely this is a production environment?
+
+**** SOLUTION
+***** Old Solution
+I had to manually, on production, add this to the config/database.yml file:
+
+development:
+  adapter: postgresql
+  database: mynbcs-rails-dev
+  username: mynbcs
+  password: mynbcs123
+
+Yeah...Thats right...
+
+***** New solution
+Rather than hacking on the database.yml like that things work out fine if we 
+set RAILS_ENV before we call something like a rake task from the command line:
+#+BEGIN_SRC bash
+sudo bash -c " export RAILS_ENV=production; cd /app/mynbcs/current/; /usr/local/bin/rake routes "
+#+END_SRC bash
+*** Passenger sort of running? - FIXED
+$ passenger-status: 
+ Phusion Passenger: no passenger_native_support.so found for the current Ruby interpreter. Compiling one...
+ ........
+ERROR: Phusion Passenger doesn't seem to be running.
+**** Solution
+I recompiled the passenger_module and updated the file
+ =/etc/apache2/conf.d/modrails=
+*** pg postgres mismatch? - SEEMINGLY FIXED
+*hal-rails-box*
+pg (0.14.1)
+*epaphrus*
+postgres (0.7.9.2008.01.28)
+*philemon*
+pg (0.9.0)
+postgres (0.7.9.2008.01.28)
+**** Solution
+I deleted the postgres gem
+
+*** cronjob sends deprecation errors - FIXED
+From: Cron Daemon <root@mynbcs.nsw.edu.au>
+Subject: Cron <deploy@philemon>  (cd /app/mynbcs/current; /usr/local/bin/rake --silent delayed_job:touch_file) | logger -p local0.info
+To: deploy@mynbcs.nsw.edu.au
+--------------------------------------------------------------------------------
+config.load_paths is deprecated and removed in Rails 3, please use autoload_paths instead
+config.load_paths is deprecated and removed in Rails 3, please use autoload_paths instead
+config.load_paths= is deprecated and removed in Rails 3, please use autoload_paths= instead
+--------------------------------------------------------------------------------
+**** SOLUTION
+Either override both:
+Rails:: Configuration.load_paths
+Rails:: Configuration.load_paths=
+(Not being called from =ActiveSupport::Deprecation so ActiveSupport::Deprecation.silenced = true= does nothing)
+or easier to just change to autolad_paths
+
+** more details on WEIRD gem update error
+ - After updating rails and rake MANY  gems suddenly have weird versions installed
+
+*** before
+hal@philemon:~/upgrade/ruby_packages$ gem list --local
+
+***LOCAL GEMS***
+
+actionmailer (2.3.8, 2.3.4)
+actionpack (2.3.8, 2.3.4)
+activerecord (2.3.8, 2.3.4)
+activeresource (2.3.8, 2.3.4)
+activesupport (2.3.8, 2.3.4)
+calendar_date_select (1.16.1, 1.15)
+capistrano (2.5.19, 2.5.9)
+cgi_multipart_eof_fix (2.5.0)
+daemons (1.1.0, 1.0.10)
+fastercsv (1.5.3, 1.5.0)
+fastthread (1.0.7)
+fiveruns_tuneup (0.8.20)
+gbdev-validates_as_email (0.5.1)
+gem_plugin (0.2.3)
+god (0.7.18)
+googlecharts (1.6.0, 1.3.6)
+haml (3.0.13, 2.2.15)
+highline (1.6.1, 1.5.1)
+htmlentities (4.3.1)
+mislav-will_paginate (2.3.11, 2.2.3)
+mongrel (1.1.5)
+mysql (2.8.1)
+net-scp (1.0.2)
+net-sftp (2.0.4, 2.0.2)
+net-ssh (2.0.23, 2.0.15)
+net-ssh-gateway (1.0.1)
+paperclip (2.3.3, 2.3.1.1)
+passenger (2.2.15, 2.2.5)
+pg (0.9.0, 0.8.0)
+postgres (0.7.9.2008.01.28)
+prawn (0.8.4, 0.5.1)
+prawn-core (0.8.4, 0.5.1)
+prawn-format (0.2.3, 0.2.1)
+prawn-layout (0.8.4, 0.2.1)
+prawn-security (0.8.4)
+rack (1.1.0, 1.0.1)
+rails (2.3.8, 2.3.4)
+rake (0.8.7)
+rspec (1.3.0, 1.2.9)
+rspec-rails (1.3.2, 1.2.9)
+ruby-net-ldap (0.0.4)
+ruby-ole (1.2.10.1)
+rubygems-update (1.3.7)
+rubyist-aasm (2.1.1)
+spreadsheet (0.6.4.1)
+sqlite3-ruby (1.2.5)
+
+hal@philemon:~/upgrade/ruby_packages$ sudo gem install rails -v=2.3.14
+...
+Successfully installed rails-2.3.14
+hal@philemon:~/upgrade/ruby_packages$ sudo gem install rake -v=0.9.0
+Successfully installed rake-0.9.0
+
+*** Directly after
+hal@philemon:~/upgrade/ruby_packages$ gem list --local
+
+***LOCAL GEMS***
+
+actionmailer (3.2.1, 2.3.14, 2.3.8, 2.3.4)
+actionpack (3.2.1, 2.3.14, 2.3.8, 2.3.4)
+activemodel (3.2.1)
+activerecord (3.2.1, 2.3.14, 2.3.8, 2.3.4)
+activeresource (3.2.1, 2.3.14, 2.3.8, 2.3.4)
+activesupport (3.2.1, 2.3.14, 2.3.8, 2.3.4)
+arel (3.0.1)
+builder (3.0.0)
+bundler (1.0.22)
+calendar_date_select (1.16.1, 1.15)
+capistrano (2.5.19, 2.5.9)
+cgi_multipart_eof_fix (2.5.0)
+daemon_controller (1.0.0)
+daemons (1.1.0, 1.0.10)
+erubis (2.7.0)
+fastercsv (1.5.3, 1.5.0)
+fastthread (1.0.7)
+fiveruns_tuneup (0.8.20)
+gbdev-validates_as_email (0.5.1)
+gem_plugin (0.2.3)
+god (0.7.18)
+googlecharts (1.6.0, 1.3.6)
+haml (3.0.13, 2.2.15)
+highline (1.6.1, 1.5.1)
+hike (1.2.1)
+htmlentities (4.3.1)
+i18n (0.6.0)
+journey (1.0.2)
+json (1.6.5)
+mail (2.4.1)
+mime-types (1.17.2)
+mislav-will_paginate (2.3.11, 2.2.3)
+mongrel (1.1.5)
+multi_json (1.1.0)
+mysql (2.8.1)
+net-scp (1.0.2)
+net-sftp (2.0.4, 2.0.2)
+net-ssh (2.0.23, 2.0.15)
+net-ssh-gateway (1.0.1)
+paperclip (2.3.3, 2.3.1.1)
+passenger (3.0.11, 2.2.15)
+pg (0.9.0)
+polyglot (0.3.3)
+postgres (0.7.9.2008.01.28)
+prawn (0.8.4, 0.5.1)
+prawn-core (0.8.4, 0.5.1)
+prawn-format (0.2.3, 0.2.1)
+prawn-layout (0.8.4, 0.2.1)
+prawn-security (0.8.4)
+rack (1.4.1, 1.1.0)
+rack-cache (1.1)
+rack-ssl (1.3.2)
+rack-test (0.6.1)
+rails (3.2.1, 2.3.14, 2.3.8, 2.3.4)
+railties (3.2.1)
+rake (0.9.2.2, 0.9.0)
+rdoc (3.12)
+rspec (1.3.0, 1.2.9)
+rspec-rails (1.3.2, 1.2.9)
+ruby-net-ldap (0.0.4)
+ruby-ole (1.2.10.1)
+rubygems-update (1.3.7)
+rubyist-aasm (2.1.1)
+spreadsheet (0.6.4.1)
+sprockets (2.1.2)
+thor (0.14.6)
+tilt (1.3.3)
+treetop (1.4.10)
+tzinfo (0.3.31)
+
+
+* Upgrade 2 - Production
+ - Fixed some deprecation messages from Rails 2.3.14
+ - Everything seems fine...
+** More deprecation stuf being logged?
+This is logged:
+#+BEGIN_SRC
+Dec 13 12:15:01 philemon logger: Gem.source_index called from /usr/local/lib/ruby/gems/1.8/gems/rails-2.3.14/lib/rails/gem_dependency.rb:78.
+Dec 13 12:15:01 philemon logger: NOTE: Gem::SourceIndex#each is deprecated with no replacement. It will be removed on or after 2011-11-01.
+#+END_SRC
+
+Pretty sure from this:
+=deploy  (cd /app/mynbcs/current; /usr/local/bin/rake --silent delayed_job:touch_file) | logger -p local0.info=
+calling this:
+=Delayed::Job.enqueue(Hurricane::TouchFileJob.new)=
+
+
+
+
+* WHY DO EPAPHRUS AND PHILEMON THINK WE ARE IN DEVELOPMENT?
+** epaphrus
+$ sudo script/about
+About your application's environment
+Ruby version              1.8.7 (i686-linux)
+RubyGems version          1.8.24
+Rack version              1.1.3
+Rails version             2.3.14
+Active Record version     2.3.14
+Active Resource version   2.3.14
+Action Mailer version     2.3.14
+Active Support version    2.3.14
+Application root          /app/mynbcs/releases/20121212025912
+Environment               development
+Database adapter          postgresql
+Database schema version   20120301032530
+
+** philemon
+$ sudo script/about
+About your application's environment
+Ruby version              1.8.7 (x86_64-linux)
+RubyGems version          1.8.15
+Rack version              1.1
+Rails version             2.3.14
+Active Record version     2.3.14
+Active Resource version   2.3.14
+Action Mailer version     2.3.14
+Active Support version    2.3.14
+Application root          /app/mynbcs/releases/20121212071045
+Environment               development
+Database adapter          postgresql
+
+
+This is related to the rake routes development database problem
+
+
+Seems if running rake we better tell it what state we are in:
+i.e. this works fine with no errors:
+#+BEGIN_SRC bash
+sudo bash -c " export RAILS_ENV=production; cd /app/mynbcs/current/; /usr/local/bin/rake routes "
+#+END_SRC bash
+
+
+* Plugins Notes - originally FROM "Hurricane Proposal.org" document
+** acts_as_audited
+*** What It Does
+= acts_as_audited
+ 
+ acts_as_audited is an ActiveRecord extension that logs all changes to your models in an audits table.
+ 
+ The purpose of this fork is to store both the previous values and the changed value, making each audit record selfcontained.                                                                                                                              
+*** Current Status
+Now a gem
+** acts_as_list
+*** What It Does
+ ActsAsList
+ ==========
+ 
+ This acts_as extension provides the capabilities for sorting and reordering a number of objects in a list. The class that has   this specified needs to have a +position+ column defined as an integer on the mapped database table.
+ 
+ 
+ Example
+ =======
+ 
+   class TodoList < ActiveRecord::Base
+     has_many :todo_items, :order => "position"
+   end
+ 
+   class TodoItem < ActiveRecord::Base
+     belongs_to :todo_list
+     acts_as_list :scope => :todo_list
+   end
+ 
+   todo_list.first.move_to_bottom
+   todo_list.last.move_higher
+*** Current Status
+Now a gem
+** acts_as_tree
+*** What It Does
+ acts_as_tree
+ ============
+ 
+ Specify this +acts_as+ extension if you want to model a tree structure by providing a parent association and a children association. This requires that you have a foreign key column, which by default is called +parent_id+.
+ 
+   class Category < ActiveRecord::Base
+     acts_as_tree :order => "name"
+   end
+ 
+   Example:
+   root
+    \_ child1
+	 \_ subchild1
+	 \_ subchild2
+ 
+   root      = Category.create("name" => "root")
+   child1    = root.children.create("name" => "child1")
+   subchild1 = child1.children.create("name" => "subchild1")
+ 
+   root.parent   # => nil
+   child1.parent # => root
+   root.children # => [child1]
+   root.children.first.children.first # => subchild1
+*** Current Status
+Now a gem
+_We no longer support Ruby 1.8 or versions if Rails/ActiveRecord older than 3.0. If you're using a version of ActiveRecord older than 3.0 please use 0.1.1._
+** acts_as_tsearch
+*** What It Does
+ ActsAsTsearch
+ =============
+ 
+ Acts_as_tsearch is a plugin for Ruby on Rails which makes it simple to implement scalable, full text search for Rails if        you're using PostgreSQL as your database. It wraps the built-in full text search engine of PostgreSQL with a familiar           'acts_as' implementation.
+*** Current Status
+Does not seem to be packaged as a gem
+May be able to get bundler to source it from Github or this may be an alternative:
+https://github.com/dougal/acts_as_indexed
+** country_select
+*** What It Does
+CountrySelect
+=============
+
+Provides a simple helper to get an HTML select list of countries.  The list of countries comes from the ISO 3166 standard.  While it is a relatively neutral source of country names, it will still offend some users.
+
+Users are strongly advised to evaluate the suitability of this list given their user base.
+*** Current Status
+Since forked as a gem
+** db_populate
+no info
+** declarative_authorization
+*** What It Does
+ The declarative authorization plugin offers an authorization mechanism inspired
+ by _RBAC_.  The most notable distinction to existing authorization plugins is the
+ declarative authorization approach.  That is, authorization rules are not
+ programmatically in between business logic but in an authorization configuration.
+ 
+ Currently, Rails authorization plugins only provide for programmatic
+ authorization rules.  That is, the developer needs to specify which roles are
+ allowed to access a specific controller action or a part of a view, which is
+ not DRY.  With a growing application code base and functions, as it happens
+ especially in agile development processes, it may be decided to introduce new
+ roles.  Then, at several places of the source code the new group needs to be
+ added, possibly leading to omissions and thus hard to test errors.  Another
+ aspect are changing authorization requirements in development or
+ even after taking the application into production.  Then, privileges of
+ certain roles need to be easily adjusted when the original assumptions
+ concerning access control prove unrealistic.  In these situations, a
+ declarative approach as offered by this plugin increases the development
+ and maintenance efficiency.
+*** Current Status
+Now a gem
+** default_value_for
+*** What It Does
+ = Introduction
+ 
+ The default_value_for plugin allows one to define default values for ActiveRecord
+ models in a declarative manner. For example:
+ 
+   class User < ActiveRecord::Base
+     default_value_for :name, "(no name)"
+     default_value_for :last_seen do
+       Time.now
+     end
+   end
+   
+   u = User.new
+   u.name       # => "(no name)"
+   u.last_seen  # => Mon Sep 22 17:28:38 +0200 2008
+ 
+ *Note*: critics might be interested in the "When (not) to use default_value_for?"
+ section. Please read on.
+
+*** Current Status
+Now a gem
+** delayed_job
+*** What It Does
+Delated_job (or DJ) encapsulates the common pattern of asynchronously executing longer tasks in the background.
+      
+ It is a direct extraction from Shopify where the job table is responsible for a multitude of core tasks. Amongst those tasks    are: 
+      
+ * sending massive newsletters
+ * image resizing
+ * http downloads
+ * updating smart collections
+ * updating solr, our search server, after product changes
+ * batch imports 
+ * spam checks 
+** exception_notification
+*** What It Does
+= Exception Notifier Plugin for Rails
+
+The Exception Notifier plugin provides a mailer object and a default set of
+templates for sending email notifications when errors occur in a Rails
+application. The plugin is configurable, allowing programmers to specify:
+
+ * the sender address of the email
+ * the recipient addresses
+ * the text used to prefix the subject line
+
+The email includes information about the current request, session, and
+environment, and also gives a backtrace of the exception.
+*** Current Status
+Now a gem
+** localized_dates
+*** What It Does
+localized_dates
+=================
+
+The localized_dates plugin takes away some of the pain of localizing dates and times. It leverages the power of the
+Rails i18n plugin (http://rails-i18n.org/) to facilitate localization of dates and times.
+*** Current Status
+Still a plugin i think
+** restful_authentication
+*** What It Does
+"Restful Authentication Generator":http://github.com/technoweenie/restful-authentication
+
+This widely-used plugin provides a foundation for securely managing user
+authentication:
+ * Login / logout
+ * Secure password handling
+ * Account activation by validating email
+ * Account approval / disabling by admin
+ * Rudimentary hooks for authorization and access control.
+*** Current Status
+Still a plugin
+** theme_support
+*** What It Does
+= Theme Support for Rails Applications
+
+This plugin provides support for themes to the rails application environment. 
+It supports theme specific images, stylesheets, javascripts, and views. The 
+views can be in ERb (rhtml) or liquid formats. Optionally, you can configure 
+the theme system to ignore any templates except liquid ones.
+*** Current Status
+Replaced by a forked gem version:
+https://github.com/lucasefe/themes_for_rails
+** tiny_mce
+*** What It Does
+This plugin provides for the installation and utilization of TinyMCE 3.2.2 in Ruby on Rails
+applications.
+TinyMCE is a WYSIWYG HTML editing component released under the GNU Public License 2.1 (GPL 2.1) by Moxiecode Systems (http://tinymce.moxiecode.com/)
+*** Current Status
+Still a plugin it seems
+** unobtrusive
+** What It Does
+== Unobtrusive
+
+This is a simple file-copying plugin to ease the process of using specific Javascript libraries in your Rails application.
+
+It includes the LowPro library by Dan Webb, some of his behaviors, the latest version of prototype.js, and a sample unobtrusive.js for you to edit.
+
+The unobtrusive.js file is yours to edit (or rename). You'll also need to include these files in the HTML templates in which you want to use them.
+
+== Usage
+
+  ./script/plugin install git://github.com/dwg/unobtrusive.git
+
+  ./script/generate unobtrusive
+  
+  <%= javascript_include_tag :unobtrusive %>
+
+
+
+*** Current Status
+Still a plugin
+
+* Deprecated Features - According to Official Docs
+** Ruby
+*** 1.8.7 to 1.9.3
+** Rails
+** Rake
+*** 0.9 to 10.0 - deprecated to unsuported
+ -  Classic namespaces are now gone. Rake is no longer able to reflect the options settings in the global variables ($rakefile, $show_tasks, $show_prereqs, $trace, $dryrun and $silent). The --classic-namespace option is no longer supported.
+ -  Global constants are no longer supported. This includes Task, FileTask, FileCreationTask and RakeApp). The constant missing hook to warn about using global rake constants has been removed.
+ -  The Rake DSL methods (task, file, directory, etc) are in their own module (Rake::DSL). The stub versions of these methods (that printed warnings) in Object have been removed. However, the DSL methods are added to the top-level main object. Since main is not in the inheritance tree, the presence of the DSL methods in main should be low impact on other libraries.
+ -  If you want to use the Rake DSL commands from your own code, just include Rake::DSL into your own classes and modules.
+ -  The deprecated syntax for task arguments (the one using :needs) has been removed.
+ -  The --reduce-compat flag has been removed (it’s not needed anymore).
+ -  The deprecated rake/sys.rb library has been removed.
+ -  The deprecated rake/rdoctask.rb library has been removed. RDoc supplies its own rake task now.
+ -  The deprecated rake/gempackagetask.rb library has been removed. Gem supplies its own package task now.
+*** 0.8.7 to 0.9 - Some stuff deprecated
+ -  Rake now warns when the deprecated :needs syntax used (and suggests the proper syntax in the warning).
+ -  Moved Rake DSL commands to top level ruby object ‘main’. Rake DSL commands are no longer private methods in Object. (Suggested by James M. Lawrence/quix)
+ -  Rake now uses case-insensitive comparisons to find the Rakefile on Windows. Based on patch by Roger Pack.
+ -  Rake now requires (instead of loads) files in the test task. Patch by Cezary Baginski.
+ -  Fixed typos. Patches by Sean Scot August Moon and R.T. Lechow.
+ -  Rake now prints the Rakefile directory only when it's different from the current directory. Patch by Alex Chaffee.
+ -  Improved rakefile_location discovery on Windows. Patch by James Tucker.
+ -  Rake now recognizes “Windows Server” as a windows system. Patch by Matthias Lüdtke
+ -  Rake::RDocTask is deprecated. Use RDoc::Task from RDoc 2.4.2+ (require ‘rdoc/task’)
+ -  Rake::GemPackageTask is deprecated. Use Gem::PackageTask (require ‘rubygems/package_task’)
+ -  Rake now outputs various messages to $stderr instead of $stdout.
+ -  Rake no longer emits warnings for Config. Patch by Santiago Pastorino.
+ -  Removed Rake’s DSL methods from the top level scope. If you need to call ‘task :xzy’ in your code, include Rake::DSL into your class, or put the code in a Rake::DSL.environment do … end block.
+ -  Split rake.rb into individual files.
+ -  Support for the –where (-W) flag for showing where a task is defined.
+ -  Fixed quoting in test task. (onestepback.org/redmine/issues/show/44, www.pivotaltracker.com/story/show/1223138)
+ -  Fixed the silent option parsing problem. (onestepback.org/redmine/issues/show/47)
+ -  Fixed :verbose=>false flag on sh and ruby commands.
+ -  Rake command line options may be given by default in a RAKEOPT environment variable.
+ -  Errors in Rake will now display the task invocation chain in effect at the time of the error.
+ -  Accepted change by warnickr to not expand test patterns in shell (allowing more files in the test suite).
+ -  Fixed that file tasks did not perform prereq lookups in scope (Redmine #57).
+
+
+    
+
+
+* Stopping the cronjob ERROR - FIXED see [[*cronjob%20sends%20deprecation%20errors%20-%20FIXED][cronjob sends deprecation errors - FIXED]]
+Added the following:
+=ActiveSupport::Deprecation.silenced = true=
+to the following files
+config/environment.rb:ActiveSupport::Deprecation.silenced = true
+config/environments/development.rb:ActiveSupport::Deprecation.silenced = true
+config/environments/production.rb:ActiveSupport::Deprecation.silenced = true
+
+But nothing stopped...
+
+** redirecting cronjob output
+To redirect the stdout and stderr to a file in your script, place this line above the first command in your script:
+exec 1> log_file 2>&1
+OR:
+10 * * * * your_script > log_file 2>&1
+
+*** better explanation
+
+When using crontab in Linux or Unix to schedule cron jobs, the cron daemon will automatically send the output of the each and every cron job to root or email address set by MAILTO variable on the cron job. The email logs all output generated by commands in the cron job which will otherwise display on the console screen.
+
+Administrator can choose to disable email output of cron jobs by appending “> /dev/null 2>&1″ to the end of command line to pipe and redirect the cron job’s output to /dev/null, a special device file that discards all data written to it without error.
+However, the problem with the “> /dev/null 2>&1″ is that both standard output and standard error returned by the cron jobs are ignored and discarded without email notification. The cron jobs are executed in complete silent.
+
+To know what that “>/dev/null 2>&1″ is actually doing, it’s important to understand the a little bit of concept or theory of the command.
+
+The greater than sign (>) is meant to redirect the program’s output (that resides on the left part of sign) to another place or command (that resides on the right side of sign). In “>/dev/null 2>&1″, it’s been redirected to /dev/null. There is second part (i.e. 2>&1) which redirects 2 into &1.
+
+To understand “2>&1″, it’s necessary to understand standard in, standard out and standard error, the three standard sources of input and output for any program or command. Standard input usually comes from keyboard for interactive program but can also receiving output from another program. The program usually prints to standard output, and sometimes to standard error in the case of exception, debug, warning or error messages.
+
+These three data pipes are file descriptors that usually called STDIN, STDOUT and STDERR, and are numbered as 0, 1, and 2 respectively. They can be called by name, or by number. If a command does not explicitly specify a name or number, it usually refer to STDOUT, the standard output.
+
+From that perspective, the “>/dev/null 2>&1″ redirects the standard output to /dev/null to discard all standard output, and the 2 (standard error or any error message) is been redirected or treated as 1 (standard output), which means all error, warning or debug messages are also discarded or dropped. In other words, the cron job will execute without notification whatsoever, whether or not it’s completed successfully, has warning or failed. The & sign in front of 1 is standard syntax for file descriptor destination.
+
+If you want to receive email notification in case a cron job failed to run properly, just use “>/dev/null” instead of “>/dev/null 2>&1″. “>/dev/null” will only ignore standard output, but will send all warning, debug, error and any other exception messages to root or email address specified.
+
+For example,
+
+ - /sbin/ping -c 5 www.mydigitallife.info > /dev/null 2>&1
+ - /sbin/ping -c 5 www.mydigitallife.info > /dev/null
+
+The first cron job will send no email at all, while the second cron job will notify when there is error and other debug messages occurred.
+
+** At the moment cronjob is
+tail /etc/cron.d/mynbcs
+
+#*/10 * * * *   deploy  (cd /app/mynbcs/current; /usr/local/bin/rake --silent delayed_job:touch_file) | logger -p local0.info
+*/10 * * * *   deploy  (cd /app/mynbcs/current; /usr/local/bin/rake --silent delayed_job:touch_file) > /dev/null 2>&1
+
+
+** PROBLEMS
+*** cant set RAILS_ENV for local script environment to call rake job
+ - it works in cronjob but not from command line
+( RAILS_ENV=production ; sudo /usr/local/bin/rake --trace --silent delayed_job:touch_file )
+
+in cron this works:
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/games
+SHELL=/bin/bash
+RAILS_ENV=production
+and then:
+(cd /app/mynbcs/current; /usr/local/bin/rake --silent delayed_job:touch_file) | logger -p local0.info
+
+is it because its run as user deploy?
+*** Cant stop error messages
+
+* CPU Architectures
+i686
+amd64
+x86_64
+and
+i386

@@ -1,0 +1,219 @@
+Return-Path: <deploy@mynbcs.nsw.edu.au>
+X-Original-To: hurricane-app@catalyst.net.nz
+Delivered-To: danb@catalyst-au.net
+Received: from localhost (localhost [127.0.0.1])
+	by mail.catalyst.net.nz (Postfix) with ESMTP id 79263330A3
+	for <hurricane-app@catalyst.net.nz>; Fri, 21 Sep 2012 19:19:18 +1200 (NZST)
+X-Virus-Scanned: Debian amavisd-new at catalyst.net.nz
+Received: from mail.catalyst.net.nz ([127.0.0.1])
+	by localhost (bertrand.catalyst.net.nz [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id ICMOHubYEepJ for <hurricane-app@catalyst.net.nz>;
+	Fri, 21 Sep 2012 19:19:16 +1200 (NZST)
+Received: from JAMES.master.local (unknown [103.4.85.51])
+	by mail.catalyst.net.nz (Postfix) with ESMTPS id 3856E324C4
+	for <hurricane-app@catalyst.net.nz>; Fri, 21 Sep 2012 19:19:16 +1200 (NZST)
+Received: from philemon.nbcs.catalyst.net.nz ([10.0.0.50]) by JAMES.master.local with Microsoft SMTPSVC(7.5.7601.17514);
+	 Fri, 21 Sep 2012 17:19:15 +1000
+Received: from deploy by philemon.nbcs.catalyst.net.nz with local (Exim 4.71)
+	(envelope-from <deploy@mynbcs.nsw.edu.au>)
+	id 1TExW7-0005NB-LJ
+	for hurricane-app@catalyst.net.nz; Fri, 21 Sep 2012 17:19:15 +1000
+Message-Id: <E1TExW7-0005NB-LJ@philemon.nbcs.catalyst.net.nz>
+Date: Fri, 21 Sep 2012 17:19:15 +1000
+From: Hurricane App <hurricane-app@catalyst.net.nz>
+To: hurricane-app@catalyst.net.nz
+Subject: [MyNBCS Live Errors] cards#update (NoMethodError) "undefined method `parent_id' for nil:NilClass"
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+X-OriginalArrivalTime: 21 Sep 2012 07:19:15.0982 (UTC) FILETIME=[686D32E0:01CD97C9]
+
+A NoMethodError occurred in cards#update:
+
+  undefined method `parent_id' for nil:NilClass
+  [RAILS_ROOT]/app/controllers/cards_controller.rb:174:in `update'
+
+-------------------------------
+Request:
+-------------------------------
+
+  * URL       : https://mynbcs.nsw.edu.au/cards/8424
+  * IP address: 10.20.0.88
+  * Parameters: {"commit"=>"Save", "card_participants_group_id"=>"", "card_id"=>"8424", "action"=>"update", "_method"=>"put", "authenticity_token"=>"SUFAyA7uPunq0muQNZE6wv7aUFYdaUnB85eJL4YbxGw=", "role"=>"staff", "id"=>"8424", "card"=>{"card_action_other"=>{"name"=>"", "id"=>""}, "title"=>"Patterns in Behaviour -Wk 10/T3/2012", "card_category_id"=>"", "notes"=>"<p>Tuesday 18/9/12 Tom came into school without mufti. He called his mother and informed her that he didn’t know. She brought in extra clothes and passed them onto me. An email followed as I mentioned to her that I had had a conversation with him about it specifically the day before. The email stated she would like to know more about the conversation as he repeatedly said he didn’t know. Chantelle overheard me saying this and mentioned that she too had had a conversation about his role model and he asked was it compulsory.  Further to this, students were asked to write in their record books to remind them. All stu
+ dents received this message. I spoke to Thomas about the conversations to which he responded he didn’t remember “and I promise I didn’t have those conversations.” I also asked if he thought Miss Morrison and myself had both at separate times lied to him or had a bad memory to which he said “yes”</p>\r\n<p>Tuesday Later LS1.</p>\r\n<p>On return from changing into his mufti, he asked me where he should be. I instructed him he needed to go to Literacy. I instructed him to let Mr Wearne know where had been and apologise as he entered (as he was quite late.) He responded “I’ll just tell him I was at guitar.” I responded “Tom that is not the Truth?” to which he got upset and walked off. I did not pursue this further.</p>\r\n<p> </p>\r\n<p>Friday 21/09/12  </p>\r\n<p>9 am</p>\r\n<p>I witnessed boys dancing in the vicinity of Thomas as they were lining up. Nothing was directed at Tom rather they were just being boys.  I had spoken to a group of boys who were
+  trying to see who could shout Stefan’s name the loudest . When I gathered the class together and brought the children in, Thomas (very agitated) reported that in the line Harry and Max were yelling loudly in his ear and ‘humping him’.  I spoke to Max and Harry about avoiding Tom, so that he didn’t feel targeted. They agreed that they were just dancing around and were not directing it at Thomas.  Harry agreed that was a good idea, and also stated he is sick of Thomas punching him and his aggressive behaviour to others (he mentioned in particular Joel.) Due to previous history with Tom, I cautioned both Harry and Max to leave Tom alone and to report specific incidences. I spoke to Tom about his perception and how I saw the particular incident.  I stated that I saw boys dancing generally but there was nothing directed at him at all. I was unsure about the screaming as the boys I had cautioned were not  the ones Thomas mentioned  and Thomas was not around at the ti
+ me. This part of it was un resolved. I spoke to Thomas about being the centre of these things and retaliation in the form of shoving was not appropriate. He promised he never punched any one but he shoved in self defence.</p>\r\n<p> </p>\r\n<p>Friday 21/09/12</p>\r\n<p>2.30 pm</p>\r\n<p>During year 5 special Sport time, Daniel Wearne and myself were gathering year 5 together on the steps. We both saw as Thomas and Joel were tackling each other in the sandpit (there was no one instigator they both moved equally towards each other.) There was some rolling and scuffling before  Dan whistled them over and I spoke to Thomas. As Tom was walking towards me he was very angry and yelling at me “Joel was kicking and punching me in the privates . Then he smashed me down on my head.”  I spoke to Thomas again about the perception issue as once again I had witnessed something and the story Thomas was telling me was different. He told me he didn’t do anything but he was just defen
+ ding himself. I asked Tom to calm down. I then spoke to him about these situations occurring increasingly regularly and that he is trying to defend himself to me looks very much as fighting back. I spoke to him and mentioned next term we need to work through this as it was the wrong time to talk about this (2:55 pm.) I dismissed him and spoke to Dan Wearne again, to clarify what I saw so I was not seeing a skewed picture. He agreed both boys were equally involved in the scuffle.</p>", "review_notifiable"=>"kallis@nbcs.nsw.edu.au", "occurred_at"=>"September 21, 2012", "highly_confidential"=>"0", "reporter_id"=>"19631", "parent_category_id"=>"2", "assets_attributes"=>{"0"=>{"description"=>"", "attachable_type"=>"Card", "attachable_id"=>"8424"}}, "card_action_ids"=>[""], "students_attributes"=>{"0"=>{"_delete"=>"0", "role"=>"student", "id"=>"19824", "user_id"=>"18792"}}, "review_date"=>""}, "card_participants_course_id"=>"", "controller"=>"cards", "card_participants_cohort_id"=
+ >""}
+  * Rails root: /app/mynbcs/releases/20120614123754
+
+-------------------------------
+Session:
+-------------------------------
+
+  * session id: nil
+  * data: nil
+
+-------------------------------
+Environment:
+-------------------------------
+
+  * CONTENT_LENGTH                              : 7621
+  * CONTENT_TYPE                                : multipart/form-data; boundary=----WebKitFormBoundaryDdm6inAHjONd5Ud3
+  * DOCUMENT_ROOT                               : /app/mynbcs/current/public
+  * HTTPS                                       : on
+  * HTTP_ACCEPT                                 : text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+  * HTTP_ACCEPT_CHARSET                         : ISO-8859-1,utf-8;q=0.7,*;q=0.3
+  * HTTP_ACCEPT_ENCODING                        : gzip,deflate,sdch
+  * HTTP_ACCEPT_LANGUAGE                        : en-GB,en-US;q=0.8,en;q=0.6
+  * HTTP_CACHE_CONTROL                          : max-age=0
+  * HTTP_CONNECTION                             : keep-alive
+  * HTTP_COOKIE                                 : auth_token=; __utma=38424767.122213918.1322449297.1348207390.1348211566.68; __utmb=38424767.25.10.1348211566; __utmc=38424767; __utmz=38424767.1346638210.60.9.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); _sis_session=BAh7CjoQY2FyZF9zZWFyY2h7EDoNa2V5d29yZHMiCHRvbToNZ3JvdXBfaWQiADoVYWN0aW9uX2NvbXBsZXRlZCIAOglwYWdlaQY6G29jY3VycmVkX2F0X3NpbmNlX2RhdGUiF1NlcHRlbWJlciAyMSwgMjAxMToXcGFyZW50X2NhdGVnb3J5X2lkIgA6HG9jY3VycmVkX2F0X2JlZm9yZV9kYXRlIhdTZXB0ZW1iZXIgMjEsIDIwMTI6GWNhcmRfc3ViY2F0ZWdvcnlfaWRzMDoOY29ob3J0X2lkIgA6DmFjdGlvbl9pZCIAOgx1c2VyX2lkIgA6EF9jc3JmX3Rva2VuIjFTVUZBeUE3dVB1bnEwbXVRTlpFNnd2N2FVRllkYVVuQjg1ZUpMNFlieEd3PToPc2Vzc2lvbl9pZCIlMzMyYTRhZjI1ZGVjOTE2OWY5NTU3NDQ0MDVhNzY0YmMiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA7EGkCr0w%3D--8258ed9b529ddbbdafc8ec0e5b6bec1f3597e7ac
+  * HTTP_HOST                                   : mynbcs.nsw.edu.au
+  * HTTP_ORIGIN                                 : https://mynbcs.nsw.edu.au
+  * HTTP_REFERER                                : https://mynbcs.nsw.edu.au/cards/8424/edit
+  * HTTP_USER_AGENT                             : Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.89 Safari/537.1
+  * PATH_INFO                                   : /cards/8424
+  * QUERY_STRING                                : 
+  * REMOTE_ADDR                                 : 10.20.0.88
+  * REMOTE_PORT                                 : 62053
+  * REQUEST_METHOD                              : PUT
+  * REQUEST_URI                                 : /cards/8424
+  * SCRIPT_NAME                                 : 
+  * SCRIPT_URI                                  : https://mynbcs.nsw.edu.au/cards/8424
+  * SCRIPT_URL                                  : /cards/8424
+  * SERVER_ADDR                                 : 10.0.0.50
+  * SERVER_ADMIN                                : [no address given]
+  * SERVER_NAME                                 : mynbcs.nsw.edu.au
+  * SERVER_PORT                                 : 443
+  * SERVER_PROTOCOL                             : HTTP/1.1
+  * SERVER_SOFTWARE                             : Apache/2.2.14 (Ubuntu)
+  * SSL_TLS_SNI                                 : mynbcs.nsw.edu.au
+  * _                                           : _
+  * action_controller.request.path_parameters   : actionupdateid8424controllercards
+  * action_controller.request.query_parameters  : 
+  * action_controller.request.request_parameters: commitSavecard_participants_group_idcard_id8424rolestaffauthenticity_tokenSUFAyA7uPunq0muQNZE6wv7aUFYdaUnB85eJL4YbxGw=_methodputcardcard_action_othernameidcard_category_idtitlePatterns in Behaviour -Wk 10/T3/2012notes<p>Tuesday 18/9/12 Tom came into school without mufti. He called his mother and informed her that he didn’t know. She brought in extra clothes and passed them onto me. An email followed as I mentioned to her that I had had a conversation with him about it specifically the day before. The email stated she would like to know more about the conversation as he repeatedly said he didn’t know. Chantelle overheard me saying this and mentioned that she too had had a conversation about his role model and he asked was it compulsory.  Further to this, students were asked to write in their record books to remind them. All students received this message. I spoke to Thomas about the conversations to which he responded he d
+ idn’t remember “and I promise I didn’t have those conversations.” I also asked if he thought Miss Morrison and myself had both at separate times lied to him or had a bad memory to which he said “yes”</p>
+  <p>Tuesday Later LS1.</p>
+  <p>On return from changing into his mufti, he asked me where he should be. I instructed him he needed to go to Literacy. I instructed him to let Mr Wearne know where had been and apologise as he entered (as he was quite late.) He responded “I’ll just tell him I was at guitar.” I responded “Tom that is not the Truth?” to which he got upset and walked off. I did not pursue this further.</p>
+  <p> </p>
+  <p>Friday 21/09/12  </p>
+  <p>9 am</p>
+  <p>I witnessed boys dancing in the vicinity of Thomas as they were lining up. Nothing was directed at Tom rather they were just being boys.  I had spoken to a group of boys who were trying to see who could shout Stefan’s name the loudest . When I gathered the class together and brought the children in, Thomas (very agitated) reported that in the line Harry and Max were yelling loudly in his ear and ‘humping him’.  I spoke to Max and Harry about avoiding Tom, so that he didn’t feel targeted. They agreed that they were just dancing around and were not directing it at Thomas.  Harry agreed that was a good idea, and also stated he is sick of Thomas punching him and his aggressive behaviour to others (he mentioned in particular Joel.) Due to previous history with Tom, I cautioned both Harry and Max to leave Tom alone and to report specific incidences. I spoke to Tom about his perception and how I saw the particular incident.  I stated that I saw boys dancing generall
+ y but there was nothing directed at him at all. I was unsure about the screaming as the boys I had cautioned were not  the ones Thomas mentioned  and Thomas was not around at the time. This part of it was un resolved. I spoke to Thomas about being the centre of these things and retaliation in the form of shoving was not appropriate. He promised he never punched any one but he shoved in self defence.</p>
+  <p> </p>
+  <p>Friday 21/09/12</p>
+  <p>2.30 pm</p>
+  <p>During year 5 special Sport time, Daniel Wearne and myself were gathering year 5 together on the steps. We both saw as Thomas and Joel were tackling each other in the sandpit (there was no one instigator they both moved equally towards each other.) There was some rolling and scuffling before  Dan whistled them over and I spoke to Thomas. As Tom was walking towards me he was very angry and yelling at me “Joel was kicking and punching me in the privates . Then he smashed me down on my head.”  I spoke to Thomas again about the perception issue as once again I had witnessed something and the story Thomas was telling me was different. He told me he didn’t do anything but he was just defending himself. I asked Tom to calm down. I then spoke to him about these situations occurring increasingly regularly and that he is trying to defend himself to me looks very much as fighting back. I spoke to him and mentioned next term we need to work through this as it was the wrong t
+ ime to talk about this (2:55 pm.) I dismissed him and spoke to Dan Wearne again, to clarify what I saw so I was not seeing a skewed picture. He agreed both boys were equally involved in the scuffle.</p>occurred_atSeptember 21, 2012review_notifiablekallis@nbcs.nsw.edu.auhighly_confidential0reporter_id19631parent_category_id2review_datestudents_attributes0_delete0rolestudentid19824user_id18792card_action_idsassets_attributes0attachable_typeCarddescriptionattachable_id8424card_participants_course_idcard_participants_cohort_id
+  * action_controller.rescue.request            : #<ActionController::Request:0x812ad10>
+  * action_controller.rescue.response           : #<ActionController::Response:0x812aa18>
+  * rack.errors                                 : #<IO:0xfe19b0>
+  * rack.input                                  : #<PhusionPassenger::Utils::RewindableInput:0x8136d40>
+  * rack.methodoverride.original_method         : POST
+  * rack.multiprocess                           : true
+  * rack.multithread                            : false
+  * rack.request.cookie_hash                    : __utma38424767.122213918.1322449297.1348207390.1348211566.68_sis_sessionBAh7CjoQY2FyZF9zZWFyY2h7EDoNa2V5d29yZHMiCHRvbToNZ3JvdXBfaWQiADoVYWN0aW9uX2NvbXBsZXRlZCIAOglwYWdlaQY6G29jY3VycmVkX2F0X3NpbmNlX2RhdGUiF1NlcHRlbWJlciAyMSwgMjAxMToXcGFyZW50X2NhdGVnb3J5X2lkIgA6HG9jY3VycmVkX2F0X2JlZm9yZV9kYXRlIhdTZXB0ZW1iZXIgMjEsIDIwMTI6GWNhcmRfc3ViY2F0ZWdvcnlfaWRzMDoOY29ob3J0X2lkIgA6DmFjdGlvbl9pZCIAOgx1c2VyX2lkIgA6EF9jc3JmX3Rva2VuIjFTVUZBeUE3dVB1bnEwbXVRTlpFNnd2N2FVRllkYVVuQjg1ZUpMNFlieEd3PToPc2Vzc2lvbl9pZCIlMzMyYTRhZjI1ZGVjOTE2OWY5NTU3NDQ0MDVhNzY0YmMiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA7EGkCr0w=--8258ed9b529ddbbdafc8ec0e5b6bec1f3597e7ac__utmb38424767.25.10.1348211566__utmc38424767__utmz38424767.1346638210.60.9.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not provided)auth_token
+  * rack.request.cookie_string                  : auth_token=; __utma=38424767.122213918.1322449297.1348207390.1348211566.68; __utmb=38424767.25.10.1348211566; __utmc=38424767; __utmz=38424767.1346638210.60.9.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); _sis_session=BAh7CjoQY2FyZF9zZWFyY2h7EDoNa2V5d29yZHMiCHRvbToNZ3JvdXBfaWQiADoVYWN0aW9uX2NvbXBsZXRlZCIAOglwYWdlaQY6G29jY3VycmVkX2F0X3NpbmNlX2RhdGUiF1NlcHRlbWJlciAyMSwgMjAxMToXcGFyZW50X2NhdGVnb3J5X2lkIgA6HG9jY3VycmVkX2F0X2JlZm9yZV9kYXRlIhdTZXB0ZW1iZXIgMjEsIDIwMTI6GWNhcmRfc3ViY2F0ZWdvcnlfaWRzMDoOY29ob3J0X2lkIgA6DmFjdGlvbl9pZCIAOgx1c2VyX2lkIgA6EF9jc3JmX3Rva2VuIjFTVUZBeUE3dVB1bnEwbXVRTlpFNnd2N2FVRllkYVVuQjg1ZUpMNFlieEd3PToPc2Vzc2lvbl9pZCIlMzMyYTRhZjI1ZGVjOTE2OWY5NTU3NDQ0MDVhNzY0YmMiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA7EGkCr0w%3D--8258ed9b529ddbbdafc8ec0e5b6bec1f3597e7ac
+  * rack.request.form_hash                      : commitSavecard_participants_group_idcard_id8424rolestaffauthenticity_tokenSUFAyA7uPunq0muQNZE6wv7aUFYdaUnB85eJL4YbxGw=_methodputcardcard_action_othernameidtitlePatterns in Behaviour -Wk 10/T3/2012card_category_idnotes<p>Tuesday 18/9/12 Tom came into school without mufti. He called his mother and informed her that he didn’t know. She brought in extra clothes and passed them onto me. An email followed as I mentioned to her that I had had a conversation with him about it specifically the day before. The email stated she would like to know more about the conversation as he repeatedly said he didn’t know. Chantelle overheard me saying this and mentioned that she too had had a conversation about his role model and he asked was it compulsory.  Further to this, students were asked to write in their record books to remind them. All students received this message. I spoke to Thomas about the conversations to which he responded he d
+ idn’t remember “and I promise I didn’t have those conversations.” I also asked if he thought Miss Morrison and myself had both at separate times lied to him or had a bad memory to which he said “yes”</p>
+  <p>Tuesday Later LS1.</p>
+  <p>On return from changing into his mufti, he asked me where he should be. I instructed him he needed to go to Literacy. I instructed him to let Mr Wearne know where had been and apologise as he entered (as he was quite late.) He responded “I’ll just tell him I was at guitar.” I responded “Tom that is not the Truth?” to which he got upset and walked off. I did not pursue this further.</p>
+  <p> </p>
+  <p>Friday 21/09/12  </p>
+  <p>9 am</p>
+  <p>I witnessed boys dancing in the vicinity of Thomas as they were lining up. Nothing was directed at Tom rather they were just being boys.  I had spoken to a group of boys who were trying to see who could shout Stefan’s name the loudest . When I gathered the class together and brought the children in, Thomas (very agitated) reported that in the line Harry and Max were yelling loudly in his ear and ‘humping him’.  I spoke to Max and Harry about avoiding Tom, so that he didn’t feel targeted. They agreed that they were just dancing around and were not directing it at Thomas.  Harry agreed that was a good idea, and also stated he is sick of Thomas punching him and his aggressive behaviour to others (he mentioned in particular Joel.) Due to previous history with Tom, I cautioned both Harry and Max to leave Tom alone and to report specific incidences. I spoke to Tom about his perception and how I saw the particular incident.  I stated that I saw boys dancing generall
+ y but there was nothing directed at him at all. I was unsure about the screaming as the boys I had cautioned were not  the ones Thomas mentioned  and Thomas was not around at the time. This part of it was un resolved. I spoke to Thomas about being the centre of these things and retaliation in the form of shoving was not appropriate. He promised he never punched any one but he shoved in self defence.</p>
+  <p> </p>
+  <p>Friday 21/09/12</p>
+  <p>2.30 pm</p>
+  <p>During year 5 special Sport time, Daniel Wearne and myself were gathering year 5 together on the steps. We both saw as Thomas and Joel were tackling each other in the sandpit (there was no one instigator they both moved equally towards each other.) There was some rolling and scuffling before  Dan whistled them over and I spoke to Thomas. As Tom was walking towards me he was very angry and yelling at me “Joel was kicking and punching me in the privates . Then he smashed me down on my head.”  I spoke to Thomas again about the perception issue as once again I had witnessed something and the story Thomas was telling me was different. He told me he didn’t do anything but he was just defending himself. I asked Tom to calm down. I then spoke to him about these situations occurring increasingly regularly and that he is trying to defend himself to me looks very much as fighting back. I spoke to him and mentioned next term we need to work through this as it was the wrong t
+ ime to talk about this (2:55 pm.) I dismissed him and spoke to Dan Wearne again, to clarify what I saw so I was not seeing a skewed picture. He agreed both boys were equally involved in the scuffle.</p>review_notifiablekallis@nbcs.nsw.edu.auoccurred_atSeptember 21, 2012highly_confidential0reporter_id19631parent_category_id2assets_attributes0descriptionattachable_typeCardattachable_id8424card_action_idsstudents_attributes0_delete0rolestudentid19824user_id18792review_datecard_participants_course_idcard_participants_cohort_id
+  * rack.request.form_input                     : #<PhusionPassenger::Utils::RewindableInput:0x8136d40>
+  * rack.request.query_hash                     : 
+  * rack.request.query_string                   : 
+  * rack.run_once                               : false
+  * rack.session                                : card_searchkeywordstompage1action_completedgroup_idoccurred_at_since_dateSeptember 21, 2011occurred_at_before_dateSeptember 21, 2012parent_category_idcohort_idcard_subcategory_idsaction_iduser_id_csrf_tokenSUFAyA7uPunq0muQNZE6wv7aUFYdaUnB85eJL4YbxGw=session_id332a4af25dec9169f955744405a764bcflashuser_id19631
+  * rack.session.options                        : key_session_idhttponlytruepath/domainid332a4af25dec9169f955744405a764bcexpire_after
+  * rack.url_scheme                             : https
+  * rack.version                                : 10
+  
+  * Process: 20169
+  * Server : philemon
+
+-------------------------------
+Backtrace:
+-------------------------------
+
+  [RAILS_ROOT]/app/controllers/cards_controller.rb:174:in `update'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/mime_responds.rb:106:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/mime_responds.rb:106:in `respond_to'
+  [RAILS_ROOT]/app/controllers/cards_controller.rb:164:in `update'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:1331:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:1331:in `perform_action_without_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:617:in `call_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:638:in `run_before_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:206:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:206:in `around_proc'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:182:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:182:in `evaluate_method'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:184:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:635:in `run_before_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:615:in `call_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:610:in `perform_action_without_benchmark'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/benchmarking.rb:68:in `perform_action_without_rescue'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/core_ext/benchmark.rb:17:in `ms'
+  /usr/local/lib/ruby/1.8/benchmark.rb:308:in `realtime'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/core_ext/benchmark.rb:17:in `ms'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/benchmarking.rb:68:in `perform_action_without_rescue'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/rescue.rb:160:in `perform_action_without_flash'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/flash.rb:146:in `perform_action'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:532:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:532:in `process_without_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:606:in `process'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:391:in `process'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:386:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/routing/route_set.rb:437:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:87:in `dispatch'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:121:in `_call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:130:in `build_middleware_stack'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:29:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:29:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/query_cache.rb:34:in `cache'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:9:in `cache'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:28:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:361:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/haml-3.0.13/lib/sass/plugin/rack.rb:41:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/head.rb:9:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/methodoverride.rb:24:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/params_parser.rb:15:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/session/cookie_store.rb:93:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/failsafe.rb:26:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:106:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/rack/request_handler.rb:92:in `process_request'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_request_handler.rb:207:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:441:in `start_request_handler'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:381:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/utils.rb:252:in `safe_fork'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:377:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:163:in `start'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:222:in `start'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:253:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:126:in `lookup_or_add'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:247:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:80:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:246:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:145:in `spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:278:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/bin/passenger-spawn-server:61
+
+

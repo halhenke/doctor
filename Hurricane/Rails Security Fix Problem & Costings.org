@@ -1,0 +1,327 @@
+#+TITLE: Solutions To Potential Rails ActiveRecord SQL Injection problem (CVE-2012-5664)
+* Summary
+ - All Rails instances effected
+ - New fixes have been put out
+   - fixed versions:
+     - 3.0.18
+     - 3.1.9
+     - 3.2.10
+ - No fix offered for 2.3.x versions
+* The Problem
+** ActiveRecord finders
+ - Due to the way dynamic finders in Active Record extract options from method parameters, a method parameter can mistakenly be used as a scope. Carefully crafted requests can use the scope to inject arbitrary SQL. 
+ - Impacted code passes user provided data to a dynamic finder like this:  
+#+BEGIN_SRC ruby 
+Post.find_by_id(params[:id])
+#+END_SRC
+ - *Does not effect record.find() methods* e.g.
+#+BEGIN_SRC ruby 
+Post.find(params[:id])
+#+END_SRC
+
+*** More on dynamic finders 
+ - Rails dynamically creates finder methods on your ActiveRecords for each column in your schema
+ - e.g. if =User= has columns id, name, phone then the model will have methods
+#+BEGIN_SRC ruby
+User.find_by_id(params[:id])
+User.find_by_name(params[:name])
+User.find_by_phone(params[:name])
+#+END_SRC
+
+#Ruby will allows you to pass raw SQL as a parameter to these methods:
+#: User.find_by_name("kotori'; DROP TABLE USERS; --")
+#but it also allows you to 
+
+#+BEGIN_SRC ruby
+# Fetches a user record by name, but only fetch the 'id' and 'name' fields.
+User.find_by_name("kotori", :select => "id, name")
+# => SELECT id, name FROM users WHERE name = 'kotori' LIMIT 1
+
+# You can inject arbitrary SQL if you wish:
+User.find_by_name("kotori", :select => "id, name FROM users; DROP TABLE users; --")
+# => SELECT id, name FROM users; DROP TABLE users; -- FROM users WHERE name = 'kotori' LIMIT 1
+#+END_SRC
+
+ - The vulnerability lies in the fact that “find_by_*” also accepted calls in which only the options parameter is given. In that case, it thinks that the value parameter is nil.
+
+#+BEGIN_SRC ruby
+User.find_by_name(:select => "1; DROP TABLE users; --")
+# => SELECT 1; DROP TABLE users; -- FROM users WHERE name IS NULL LIMIT 1;
+#+END_SRC
+
+ - if user could pass an options hash instead of a string to =User.find_by_name(params[:name])= then they could trigger this
+
+The following URL
+: /example-url?name[select]=whatever&name[limit]=23
+generates a =params[:name]= of =
+:  {"select" => "whatever", "limit" => 23 }
+
+i.e. =params[:name]= is now a hash and not a string
+
+*BUT* its not a "proper" hash with symbol type keys e.g.
+: { :select => "whatever", :limit => 23 }
+and so it wont be accepted by Rails.
+
+However AuthLogic makes the following call
+: User.find_by_persistence_token(the_token)
+in which =the_token= /can/ be an options hash through the use of the Rails session data authentication method.
+
+#+BEGIN_QUOTE
+The Rails session mechanism allows storing arbitrary Ruby objects, including hashes with symbol keys. Rails provides a variety of session stores, the default being the cookie store which stores session data in a cookie on the client. The cookie data is not encrypted, but is signed with an HMAC to prevent tampering. The cookie store is fast, does not require any server-side maintenance, and is only meant for session data that do not contain sensitive information such as credit card numbers. Apps that store sensitive information in the session should use the database session store instead. Nevertheless, it turned out that 95% of all Rails apps only ever store the user authentication credentials in the session, so the cookie store was made the default.
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+So to inject arbitrary SQL, you need to tamper with the cookie, which requires the HMAC key. The HMAC key is the so-called session secret. As the name implies, it is supposed to be secret. Rails generates a random 512-bit secret upon project creation. This is why most Rails apps that are running Authlogic are not exploitable: the attacker does not know the secret. Open source Rails apps however can form a problem. Many of them come with a default session secret, but the user never customizes them, so all those instances end up using the same HMAC key, making them very easily exploitable. Of course, in this case the operator have to worry about more than just SQL injection. If the HMAC key is known then anybody can send fake credentials to the app.
+#+END_QUOTE
+
+** Other part of the problem - HMAC secret token
+#+BEGIN_QUOTE
+/When a RoR application is created the secret which goes into the HMAC will be created along with all the other files a minimal RoR application would need. This secret usually is a 64 byte long random string and lives in railsapp/config/initializers/secret_token.rb. The simple problem is, that most developers are simply not aware of the confidentiality of this file, and in result they'll happly check it into Github or other online repositories./
+#+END_QUOTE
+
+*** In Rails 2.3.x this is stored in
+=config/environment.rb= 
+#+BEGIN_SRC ruby
+config.action_controller.session = {
+         :session_key => '_sis_session',
+         :secret      => 'blah-blah-blah....'
+}
+#+END_SRC
+#+BEGIN_COMMENT
+* "How to exploit" this flaw summary
+1. With some luck - pass a parameter to a =find_by_*= method
+2. Make sure its a hash rather than a string
+3. Make sure its passing a hash where the keys are symbols rather than strings
+   1. With your knowledge of the session verification key, tamper with the cookie to set AuthLogic =user_token= to a symbol-key hash.
+#+END_COMMENT
+* How much of a potential problem is this for MyNBCS specifically:
+** Probably not a huge risk
+ - This is not an immediate threat because our application is not hosted on a public repository and our secret cookie session verification key is thus not publically accessible.
+
+** There may be other exploits
+   - There may be other exploits depending on how our application uses =find_by_*= methods
+     - Do we, or one of our plugins gems, pass a user generated hash with symbol keys to an ActiveRecord dynamic finder method?
+     - Unlikely but possible.
+
+#+BEGIN_COMMENT
+A quick scan of the app reveals the use of these dynamic find methods (*The following does not include vendor/plugins usage of the methods*):
+** grep =find_by_id=
+#+BEGIN_SRC bash
+hal@HAL9000:~/work/rails/hurricane/rails-sis$ grep -Rn "find_by_id" .
+./app/models/story.rb:73:    unless self.author_id? && self.author_type? && self.author_type.classify.constantize.find_by_id(self.author_id)
+./app/models/user.rb:349:      users = users.for_groups(Group.find_by_id(params[:group_id])) unless params[:group_id].blank?
+./app/models/user.rb:353:    users = users.for_cohorts(Cohort.find_by_id(params[:cohort_id])) unless params[:cohort_id].blank?
+./app/controllers/cards_controller.rb:50:        user_ids = User.for_groups(Group.find_by_id(params[:group_id])).collect{|u| u.id}
+./app/controllers/cards_controller.rb:53:          user_ids = User.for_cohorts(Cohort.find_by_id(params[:cohort_id])).collect{|u| u.id}
+./app/controllers/alerts_controller.rb:99:      @alert = @user.alerts.find_by_id(params[:id])
+#+END_SRC
+** grep =find_by_=
+#+BEGIN_SRC bash
+hal@HAL9000:~/work/rails/hurricane/rails-sis$ grep -Rn "find_by_" .
+./management_scripts/tc_student_courses_import.rb:38:  user = User.find_by_schoolpro_id(tc_student_course['school_num'])
+./management_scripts/generate_moodle_export_csv.rb:105:    student_role = EnrolmentRole.find_by_code('student')
+./management_scripts/fix-course-levels-WR86532.rb:19:course = Course.find_by_name('5 Creative Arts')
+./management_scripts/fix-course-levels-WR86532.rb:21:bad_level = Level.find_by_name('Year 9')
+./management_scripts/fix-WR93481.rb:13:Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/fix-WR93481.rb:40:  groupids = Group.find_by_sql('select id from groups where academic_year_id=14').map{|g| g.id}
+./management_scripts/sp_student_process.rb:20:  Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_student_process.rb:45:  default_cohort_id = Cohort.find_by_graduating_year(9999).id
+./management_scripts/sp_student_process.rb:53:  nbcs_school = School.find_by_short_name('NBCS')
+./management_scripts/sp_student_process.rb:85:    user = User.find_by_schoolpro_id(sp_student_hashed[:schoolpro_id])
+./management_scripts/hurrimoodle.rb:137:        student_role = EnrolmentRole.find_by_code('student')
+./management_scripts/sp_subject_process.rb:11:Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_subject_process.rb:28:course_type = CourseType.find_by_permalink('subject')
+./management_scripts/sp_subject_process.rb:70:  course = Course.find_by_schoolpro_id(sp_course_hash[:schoolpro_id])
+./management_scripts/sp_class_process.rb:38:Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_class_process.rb:55:enrolment_role = EnrolmentRole.find_by_code('teacher')
+./management_scripts/sp_class_process.rb:88:#   t = User.staff.find_by_schoolpro_id(sp_group['Teacher_school_num'])
+./management_scripts/sp_class_process.rb:95:      t = User.staff.find_by_schoolpro_id(j.to_s)
+./management_scripts/sp_class_process.rb:102:  course = Course.find_by_schoolpro_id(course_id)
+./management_scripts/sp_class_process.rb:126:  group = course.groups.find_by_schoolpro_id(sp_group_hashed[:schoolpro_id])
+./management_scripts/sp_class_process.rb:144:     teacher = User.staff.find_by_schoolpro_id(sp_teacher_hashed[:schoolpro_id])
+./management_scripts/sp_class_process.rb:185:  t = User.staff.find_by_schoolpro_id(teacher_school_num)
+./management_scripts/sp_class_process.rb:222:      g = Group.find_by_schoolpro_id(c.to_s)
+./management_scripts/sp_class_process.rb:228:      e = Enrolment.find_by_group_id_and_user_id(g.id, t.id)
+./management_scripts/sp_class_process.rb:239:      g = Group.find_by_schoolpro_id(c.to_s)
+./management_scripts/sp_class_process.rb:247:      enrolment_to_activate = Enrolment.find_by_group_id_and_user_id(g.id, t.id)
+./management_scripts/sp_parent_process.rb:68:child_type = RelationshipType.find_by_code('child')
+./management_scripts/sp_parent_process.rb:69:parent_type = RelationshipType.find_by_code('parent')
+./management_scripts/sp_parent_process.rb:96:  Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_parent_process.rb:137:    student = User.students.find_by_schoolpro_id(sp_data['student_school_num'])
+./management_scripts/sp_parent_process.rb:161:      parent = User.find_by_schoolpro_id(sp_parent_hash[:schoolpro_id])
+./management_scripts/sp_parent_process.rb:277:          contact_card = parent.contact_cards.find_by_where('General details')
+./management_scripts/sp_parent_process.rb:307:    parent = User.find_by_schoolpro_id(p.split(':').last)
+./management_scripts/sp_parent_process.rb:308:    student = User.find_by_schoolpro_id(p.split(':').first) 
+./management_scripts/check_enrolment_expiry.rb:29:Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/run_generate_level_summary.rb:28:    pp self.reduce(report_cycle,0,[Level.find_by_name('Year 6')])
+./management_scripts/run_generate_level_summary.rb:66:    self.run 12,'/tmp',0,[Level.find_by_name('Year 6')]
+./management_scripts/sp_enrolment_process.rb:19:Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_enrolment_process.rb:54:enrolment_role = EnrolmentRole.find_by_code('student')
+./management_scripts/sp_enrolment_process.rb:80:  student = User.students.find_by_schoolpro_id(sp_enrolment['school_num'])
+./management_scripts/sp_enrolment_process.rb:81:  group = Group.find_by_schoolpro_id(sp_enrolment['ClassID'])
+./management_scripts/sp_enrolment_process.rb:122:  enrolment = student.enrolments.find_by_group_id_and_enrolment_role_id(group.id, enrolment_role.id)
+./management_scripts/sp_enrolment_process.rb:175:  s = User.students.find_by_schoolpro_id(student_school_pro)
+./management_scripts/sp_enrolment_process.rb:198:      g = Group.find_by_schoolpro_id(c)
+./management_scripts/sp_enrolment_process.rb:204:      e = Enrolment.find_by_group_id_and_user_id(g.id, s.id)
+./management_scripts/sp_enrolment_process.rb:217:      g = Group.find_by_schoolpro_id(c)
+./management_scripts/fix-group-enrolment-WR86530.rb:67:admin = User.find_by_login('catadmin')
+./management_scripts/fix-group-enrolment-WR86530.rb:71:u = User.find_by_login('14lp')
+./management_scripts/sp_comments_process.rb:20:  m = AlertCategory.find_by_name(category_name)
+./management_scripts/sp_comments_process.rb:59:  level = cat.alert_levels.find_by_value(level_value)
+./management_scripts/sp_comments_process.rb:138:  Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_comments_process.rb:155:  nbcs_school = School.find_by_short_name('NBCS')
+./management_scripts/sp_comments_process.rb:189:    reporter = User.find_by_login('catadmin')
+./management_scripts/sp_comments_process.rb:214:    user = User.find_by_schoolpro_id(schoolpro_id)
+./management_scripts/sp_comments_process.rb:224:    alert = Alert.find_by_sp_comment_id(commentID)
+./management_scripts/sp_staff_process.rb:18:  Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_staff_process.rb:35:  nbcs_school = School.find_by_short_name('NBCS')
+./management_scripts/sp_staff_process.rb:73:    user = User.find_by_schoolpro_id(sp_staff_hash[:schoolpro_id])
+./management_scripts/sp_staff_process.rb:129:      if !sp_staff_contact_hash[:mobile].blank? && user.contact_cards.find_by_mobile(sp_staff_contact_hash[:mobile]).nil? then
+./db/fixtures/retired/05_cohorts.rb:14:  c.current_level = Level.find_by_schoolpro_code(grade_code) if grade_code
+./db/fixtures/retired/30_care_management.rb:5:admin_user = User.find_by_login('catadmin')
+./db/fixtures/retired/30_care_management.rb:22:  if i_type = IncidentType.find_by_name(ic[:incident_type])
+./db/fixtures/retired/30_care_management.rb:31:admin_user = User.find_by_login('catadmin')
+./db/fixtures/retired/12_relationships.rb:14:r1 = RelationshipType.find_by_code('parent')
+./db/fixtures/retired/12_relationships.rb:15:r2 = RelationshipType.find_by_code('child')
+./db/fixtures/retired/50_campuses.rb:5:Authorization.current_user = User.find_by_login('catadmin')
+./db/fixtures/retired/10_users.rb:9:u = User.find_by_login("catadmin")
+./db/fixtures/retired/10_users.rb:20:  if role = Role.find_by_code("admin")
+./db/fixtures/retired/01_core.rb:43:    level = Level.find_by_schoolpro_code(lev.to_s)
+./db/migrate/20110322034814_add_warning_learning_level_to_alert_levels.rb:10:    level.alert_category = AlertCategory.find_by_name('Learning')
+./db/migrate/20110322034814_add_warning_learning_level_to_alert_levels.rb:18:    AlertLevel.find_by_name('Warning Learning Level 1').destroy
+./db/migrate/20120229231750_add_alert_types.rb:93:    contact = AlertCategory.find_by_name('Contact')
+./db/migrate/20120229231750_add_alert_types.rb:96:    general = AlertCategory.find_by_name('General')
+./db/migrate/20090508044402_add_schools_to_staff_and_students.rb:5:    Authorization.current_user = User.find_by_login('catadmin')
+./features/support/paths.rb:49:    #     user_profile_path(User.find_by_login($1))
+./features/support/env.rb:13:Authorization.current_user = User.find_by_login('catadmin')
+./features/step_definitions/alerts_steps.rb:3:  Alert.make(:user => @student, :alert_level => alert_category.alert_levels.find_by_value(level))
+./stories/steps/user_steps.rb:33:    @user = User.find_by_login(login)
+./stories/steps/user_steps.rb:114:  @user = User.find_by_login(user_params['login'])
+./stories/steps/user_steps.rb:144:  @user = User.find_by_login(user_params['login'])
+./spec/blueprints.rb:149:  enrolment_role { EnrolmentRole.find_by_code('student') || EnrolmentRole.make }
+./spec/blueprints_helper.rb:7:  user.role_objs << (Role.find_by_code('admin') || Role.make(:admin))
+./spec/blueprints_helper.rb:75:  ac = AlertCategory.find_by_name(name) || AlertCategory.make(:name => name)
+./spec/blueprints_helper.rb:77:    level = ac.alert_levels.find_by_value(i) || AlertLevel.make(:alert_category => ac, :value => i)    
+./spec/models/card_spec.rb:120:    @student = User.find_by_ldap_source('student')
+./lib/ldap_conn.rb:47:    current_user = User.find_by_sp_user_id(full_user_hash[:sp_user_id])
+./lib/ldap_conn.rb:56:#    user = User.find_by_sp_user_id(user_hash[:sp_user_id])
+./lib/ldap.rb:168:    #    current_user = User.find_by_sp_user_id(full_user_hash[:sp_user_id])
+./lib/authenticated_system.rb:131:      user = cookies[:auth_token] && User.find_by_remember_token(cookies[:auth_token])
+./lib/tasks/delayed_job_status.rake:38:    user = User.find_by_login('catadmin')
+./lib/tasks/delayed_job_status.rake:39:    #user = User.find_by_login('14la')  # To test NotificationJob suppresses student emails.
+./config/authorization_rules.rb:243:                                             CardCategory.find_by_name('Commendation')
+./app/helpers/incidents_helper.rb:5:      IncidentIncidentCategory.find_by_incident_category_id(ci.to_i).destroy
+./app/models/staff_profile.rb:45:      for_enrolment_role(EnrolmentRole.find_by_code('teacher'))
+./app/models/timetable_course.rb:10:    #Course.find_by_short_name(self.code)
+./app/models/timetable_course.rb:11:    Course.for_level(self.level).find_by_short_name(self.code)
+./app/models/timetable_course.rb:15:    Group.find_by_short_name(self.code)
+./app/models/group_report.rb:60:    @crcc ||= self.group.course.campus_report_cycle_courses.find_by_campus_report_cycle_id(crc.id) 
+./app/models/group_report.rb:163:        crc = report_cycle.campus_report_cycles.find_by_campus_id(user.student_campus.id)
+./app/models/group_report.rb:165:        crcc = crc.campus_report_cycle_courses.find_by_course_id(self.group.course_id)
+./app/models/story.rb:73:    unless self.author_id? && self.author_type? && self.author_type.classify.constantize.find_by_id(self.author_id)
+./app/models/enrolment.rb:164:    if self.enrolment_role == EnrolmentRole.find_by_code('teacher')
+./app/models/report_cycle.rb:64:      crc = self.campus_report_cycles.find_by_campus_id(campus.id)
+./app/models/report_cycle.rb:80:    Enrolment.for_enrolment_role(EnrolmentRole.find_by_code('student')).
+./app/models/group.rb:147:    student_role_id = EnrolmentRole.find_by_code('student').id
+./app/models/group.rb:152:    enrolment_role = EnrolmentRole.find_by_code('student')
+./app/models/group.rb:170:    teacher_role_id = EnrolmentRole.find_by_code('teacher').id
+./app/models/group.rb:175:    teacher_role_id = EnrolmentRole.find_by_code('teacher').id
+./app/models/group.rb:181:    teacher_role = EnrolmentRole.find_by_code('teacher')
+./app/models/group.rb:186:    teacher_role = EnrolmentRole.find_by_code('teacher')
+./app/models/group.rb:190:  def self.find_by_timechart_code(code)
+./app/models/student_profile.rb:56:      for_enrolment_role(EnrolmentRole.find_by_code('student')).
+./app/models/student_profile.rb:71:      for_enrolment_role(EnrolmentRole.find_by_code('student')).
+./app/models/student_profile.rb:88:      crc = report_cycle.campus_report_cycles.find_by_campus_id(self.campus.id)
+./app/models/student_profile.rb:96:      crc = report_cycle.campus_report_cycles.find_by_campus_id(self.campus.id)
+./app/models/academic_year.rb:96:      l = Level.find_by_name(level_name)
+./app/models/academic_year.rb:197:            gsr = GroupStudentReport.find_by_student_and_group_and_report_cycle(student.id,group_id,rc.id)
+./app/models/card_category.rb:39:  COMMENDATION = CardCategory.find_by_name_and_moderation_required("Commendation", true)
+./app/models/student_report.rb:225:      for_enrolment_role(EnrolmentRole.find_by_code('student')).
+./app/models/user.rb:349:      users = users.for_groups(Group.find_by_id(params[:group_id])) unless params[:group_id].blank?
+./app/models/user.rb:353:    users = users.for_cohorts(Cohort.find_by_id(params[:cohort_id])) unless params[:cohort_id].blank?
+./app/models/user.rb:501:    find_by_sql('SELECT DISTINCT users.* FROM users
+./app/models/user.rb:1249:    while User.find_by_login(new_login)
+./app/models/user.rb:1283:    User.find_by_sql("SELECT DISTINCT(state) FROM users").collect{|u| u.state}
+./app/models/group_student_report.rb:82:      collect{|g| g.group_reports.find_by_report_cycle_id(self.report_cycle) }.compact.
+./app/models/group_student_report.rb:238:  def self.find_by_student_and_group_and_report_cycle( student_id , group_id , report_cycle_id )
+./app/models/card.rb:337:          card_card_action = CardCardAction.find_by_card_id_and_card_action_id(self.id, card_action.id)
+./app/models/card.rb:438:                  raise ActiveRecord::Rollback unless CardCardAction.find_by_card_id_and_card_action_id(self.id, attributes['card_action_id']).update_attributes(attributes)
+./app/models/card.rb:442:              raise ActiveRecord::Rollback unless CardCardAction.find_by_card_id_and_card_action_id(self.id, other_action.id).update_attributes(:completed_in_card_id => n_subcard.id, :completed => true)
+./app/models/card.rb:493:            user_card = UserCard.find_by_user_id_and_role(duc.id, method.to_s.singularize)
+./app/models/card.rb:515:          story = Story.find_by_user_id_and_author_type_and_author_id(student.user.id, self.class.name.to_s, self.id)
+./app/models/card.rb:531:        stories_to_delete = self.stories - self.students.map{|student| Story.find_by_user_id_and_author_type_and_author_id(student.user.id, self.class.name.to_s, self.id)}
+./app/views/cards/_form.html.erb:162:	            <% cca = CardCardAction.find_by_card_id_and_card_action_id(@card.id, card_card_action.object.card_action_id) %>
+./app/views/cards/_form.html.erb:176:			  <% cca = CardCardAction.find_by_card_id_and_card_action_id(@card.id, card_action.id) %>
+./app/views/cards/_form.html.erb:186:		  	<% cca = (@card.card_action_other.blank? ? nil : CardCardAction.find_by_card_id_and_card_action_id(@card.id, @card.card_action_other.id)) %>
+./app/views/report_cycles/_action_panel.html.erb:3:        <% crc = report_cycle.campus_report_cycles.find_by_campus_id(current_user.campus.id) # must exist if the above conds pass %>
+./app/views/report_cycles/_action_panel.html.erb:9:          <% student_report = current_user.student_profile.student_reports.find_by_campus_report_cycle_id(crc.id) %>
+./app/views/group_reports/index.html.erb:16:        <%= render :partial => 'group_report', :locals => {:group_report => group.group_reports.find_by_report_cycle_id(@report_cycle.id), :group => group} %>
+./app/views/group_reports/index.html.erb:28:        <% group_report = group.group_reports.find_by_report_cycle_id(@report_cycle.id) %>
+./app/views/student_reports/_group_student_reports.html.erb:90:                <% target = gsr.report_elements.targets.find_by_report_question_id(question.id) %>
+./app/views/student_reports/_group_student_reports.html.erb:105:                <% rating = gsr.report_elements.ratings.find_by_report_question_id(question.id) %>
+./app/views/student_reports/_group_student_reports_external.html.erb:29:                <% target = gsr.report_elements.targets.find_by_report_question_id(question.id) %>
+./app/views/student_reports/_group_student_reports_external.html.erb:44:                <% rating = gsr.report_elements.ratings.find_by_report_question_id(question.id) %>
+./app/views/report_targets/index.html.erb:29:      <% current_target = @user.report_targets.find_by_report_cycle_id_and_group_id_and_report_question_id(@report_cycle.id, @group.id, report_question.id) %>
+./app/views/report_targets/index.html.erb:40:            <% checked =  @user.report_targets.find_by_report_cycle_id_and_group_id_and_report_question_id_and_report_scale_level_id(@report_cycle.id, @group.id, report_question.id, report_scale_level.id).present?  %>
+./app/views/users/_timetable.html.erb:6:         <% group = groups.find_by_timechart_code(lesson.timetable_course.code) %>
+./app/views/users/_report_cycle.html.erb:9:        <% crc = report_cycle.campus_report_cycles.find_by_campus_id(@user.campus.id) # must exist if the above conds pass %>
+./app/views/users/_report_cycle.html.erb:15:        <% student_report = @user.student_profile.student_reports.find_by_campus_report_cycle_id(crc.id) %>
+./app/controllers/report_targets_controller.rb:21:        target = @user.report_targets.find_by_report_cycle_id_and_group_id_and_report_question_id(@report_cycle.id, @group.id, report_question.id)
+./app/controllers/course_types_controller.rb:17:    @course_type = CourseType.find_by_permalink(params[:id])
+./app/controllers/course_types_controller.rb:38:    @course_type = CourseType.find_by_permalink(params[:id])
+./app/controllers/course_types_controller.rb:61:    @course_type = CourseType.find_by_permalink(params[:id])
+./app/controllers/course_types_controller.rb:78:    @course_type = CourseType.find_by_permalink(params[:id])
+./app/controllers/groups_controller.rb:21:    student_role = EnrolmentRole.find_by_code('student')
+./app/controllers/groups_controller.rb:22:    teacher_role = EnrolmentRole.find_by_code('teacher')
+./app/controllers/cards_controller.rb:50:        user_ids = User.for_groups(Group.find_by_id(params[:group_id])).collect{|u| u.id}
+./app/controllers/cards_controller.rb:53:          user_ids = User.for_cohorts(Cohort.find_by_id(params[:cohort_id])).collect{|u| u.id}
+./app/controllers/courses_controller.rb:37:      @groups = @course.groups.for_academic_year(AcademicYear.find_by_short_name(params[:academic_year])).paginate(:page => params[:page])
+./app/controllers/courses_controller.rb:53:    @course.course_type = CourseType.find_by_permalink(params[:course_type])
+./app/controllers/courses_controller.rb:132:    @course_type = CourseType.find_by_permalink(params[:course_type]) unless params[:course_type].nil?
+./app/controllers/pages_controller.rb:20:    @page = Page.find_by_permalink(params[:id])
+./app/controllers/pages_controller.rb:42:    @page = Page.find_by_permalink(params[:id])
+./app/controllers/pages_controller.rb:65:    @page = Page.find_by_permalink(params[:id])
+./app/controllers/pages_controller.rb:82:    @page = Page.find_by_permalink(params[:id])
+./app/controllers/users_controller.rb:171:    @user = User.find_by_activation_code(params[:activation_code]) unless params[:activation_code].blank?
+./app/controllers/users_controller.rb:184:    @user = User.find_by_activation_code(params[:activation_code]) unless params[:activation_code].blank?
+./app/controllers/alerts_controller.rb:99:      @alert = @user.alerts.find_by_id(params[:id])
+#+END_SRC
+
+#+END_COMMENT
+
+* Potential Fixes
+1. *Upgrade to the latest Rails 3.x version*
+   - This solves everything, you don’t need to do anything else. =“find_by_*”= has been patched so that the first parameter may not be an options hash.
+2. *Apply provided 2.3.x patches*
+   - Should solve root of the problem with the least ammount of labour
+3. *Manually fix code with workarounds* - ensure that we only pass strings or integers to =“find_by_*”= methods, e.g. =find_by_name(params[:name].to_s)=
+   - This requires changing all code, /including third party code/.
+   - Not recommended as we’ll likely overlook things.
+   - Much easier to patch instead
+4. *Keep the session secret a secret*
+   - There may be other exploits depending on how our application uses =find_by_*= methods
+#+BEGIN_COMMENT
+4. *Some localised monkey patch of Active Record/Rails?*
+   - Avoid the rest of upgrade but merely dynamically change Active Record - either in Rails setup code or with git patch
+   - /Ugly/ solution. Effectively forking Rails.
+#END_COMMENT
+
+
+* Estimated Costs for Potential Fixes
+1. Cost as described previously for upgrading
+   - i.e. a full Rails 3 upgrade approximately *1 month*
+2. *A few hours* - pretty straightforward and self-contained.
+   - Shouldn't be any complications with existing code.
+3. Not very labour intensive in terms of updating Catalyst generated code - *about a day*.
+4. This is the default and thus *doesn't require doing anything*.
+   - However, although unlikely, other issues may exist where the app calls an ActiveRecord dynamic finder on a hash with symbol keys, depending on what the app is doing. Would need some scrutiny to check up on this - *About a day* for our code or less though third party code makes this more complicated.
+#+BEGIN_COMMENT
+4. *A couple of days* to be reasonably careful but could do in a day probably. 
+#END_COMMENT
+
+* Bottom Line
+ - This is probably not an immediate threat because our application source code is not hosted on a public repository and our secret cookie session verification key is thus not publicly accessible.
+ - There may be other exploitable options due to the way ActiveRecord dynamic finders work and so it makes sense to patch Rails 2.3.14 on philemon for now at least
+#but this is the main one and it requires knowledge of the session verification key (and for the application to use AuthLogic).
+
+

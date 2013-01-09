@@ -1,0 +1,1624 @@
+* 2012 Ruby 1.8.7 vs 2009 Ruby 1.8.7
+Firstly i got a different disribution of Ruby
+http://rubyenterpriseedition.googlecode.com/files/ruby-enterprise_1.8.7-2012.02_amd64_ubuntu10.04.deb
+as
+http://rubyforge.org/frs/download.php/66163/ruby-enterprise_1.8.7-2009.10_amd64.deb
+seemed to be down....
+
+** Gem version
+gem --version
+1.8.15
+whereas we need:
+sudo gem update --system 1.3.7
+
+** Installs more gems and more recent vesions
+This installed a bunch of gems - not the same as theother sistro apparently....
+
+*** 2012 Gems
+actionmailer (3.2.1)
+actionpack (3.2.1)
+activemodel (3.2.1)
+activerecord (3.2.1)
+activeresource (3.2.1)
+activesupport (3.2.1)
+arel (3.0.1)
+builder (3.0.0)
+bundler (1.0.22)
+daemon_controller (1.0.0)
+erubis (2.7.0)
+fastthread (1.0.7)
+hike (1.2.1)
+i18n (0.6.0)
+journey (1.0.2)
+json (1.6.5)
+mail (2.4.1)
+mime-types (1.17.2)
+multi_json (1.1.0)
+mysql (2.8.1)
+passenger (3.0.11)
+polyglot (0.3.3)
+rack (1.4.1)
+rack-cache (1.1)
+rack-ssl (1.3.2)
+rack-test (0.6.1)
+rails (3.2.1)
+railties (3.2.1)
+rake (0.9.2.2)
+rdoc (3.12)
+sprockets (2.1.2)
+thor (0.14.6)
+tilt (1.3.3)
+treetop (1.4.10)
+tzinfo (0.3.31)
+
+*** 2009 Gems
+fastthread (1.0.7)
+ mysql (2.8.1)
+ passenger (2.2.5)
+ pg (0.8.0)
+ rack (1.0.1)
+ rake (0.8.7)
+ sqlite3-ruby (1.2.5)
+
+* OK so I just deleted everything and started again yeah...
+
+Starting with rdoc as pretty much everything else tries to use this... - no version specified...
+
+Then rake... - no version specified...
+Then sqlite3..... - no version specified...
+which needed this first:
+sudo apt-get install libsqlite3-dev
+Then rack - no version specified...
+Then pg - no version specified....
+
+Then:
+#+BEGIN_SRC bash
+sudo gem install capistrano --version "=2.5.19"
+sudo gem install capistrano-ext
+sudo gem install passenger --version "=2.2.15"
+#+END_SRC bash
+
+Gets a little trickier now...
+sudo gem install postgres
+...and then immediately uninstalled - its "pretty depreciataed"
+
+I decided to install rails without rdoc and ri documentation as the wiki sort of advises
+#+BEGIN_SRC bash
+sudo gem install rails --version "=2.3.4" --no-rdoc --no-ri
+#+END_SRC bash
+As of yet i have not installed:
+#+BEGIN_SRC bash
+sudo gem install paperclip --version "=2.3.3"
+ # sudo gem install prawn --version "=0.8.4"  # Prawn is no longer used in the system -- Danb 14:05, 15 August 2011 (NZST)
+sudo gem install cucumber --version "=0.3.99"
+#+END_SRC bash
+Because apparently its a *big deal* of some kind: Their is a rake script to install everything somewhere....
+
+* Install apache stuff
+sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev
+
+* build essential
+sudo apt-get install build-essential
+
+* A passenger bit
+sudo passenger-install-apache2-module
+
+...and this gave me the following error:
+#+BEGIN_SRC bash
+Compiling and installing Apache 2 module...
+cd /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15
+/usr/local/bin/ruby -S /usr/local/bin/rake clean apache2
+# /usr/local/bin/ruby -S /usr/local/bin/rake clean apache2
+rake aborted!
+undefined method `desc' for #<RakeExtensions::Subdir:0x21b8c10>
+(See full trace by running task with --trace)
+#+END_SRC bash
+
+
+* Getting the vendor/plugins and getting the gems
+The vendor/plugins are currently git submodules
+installed via:
+cd $RAILS_ROOT
+git submodule init
+git submodule update
+
+while the gems, specified in config/environment.rb via the config.gem order  are installed via:
+sudo rake gems:install
+
+* I couldnt run rake tasks because I had libreadline6 or something - pretty weird
+So Daniel had me
+sudo apt-get install libreadline5
+
+* So I finally got the app installed and am configuring it
+
+** The aforementioned gems and the gem install task
+environment.rb
+Rails::Initializer.run 
+mentions the paperclip gem
+but not
+cucumber
+So i'm gonna go ahead and install that now...
+
+Passenger has stilll not been setup with apache...
+
+** Errors
+upon calling the task
+#+BEGIN_SRC shell-mode
+sudo rake gems:install
+#+END_SRC shell-mode
+*** 
+rake aborted!
+no such file to load -- rake/rdoctask
+In Rakefile change 
+#+BEGIN_SRC conf-mode
+require 'rake/rdoctask'
+#+END_SRC conf-mode
+to
+#+BEGIN_SRC ruby
+require 'rdoc/task' 
+#+END_SRC ruby
+ * earlier method is deprecated
+
+*** rake and cucumber
+cucumber (0.3.99)
+rake (10.0.2)
+rake aborted!
+undefined method `desc' for #<Cucumber::Rake::Task:0x3127638>
+
+*IN the end i just commented out the cucumber task*
+
+Relevant sites
+https://groups.google.com/forum/?fromgroups=#!topic/cukes/b3KGb4gqWvo
+http://www.mail-archive.com/rspec-users@rubyforge.org/msg12435.html
+
+*** something
+rake aborted!
+syntax error on line 3, col 12: `   database: mynbcs-rails-dev'
+ Careful with whitespace in HAML files i.e.
+database.yml
+
+*** Whoops forgot to install paperclip
+sudo gem install paperclip --version "=2.3.3"
+
+
+** OK - time to load the live DB backup and test thins out...
+
+Loaded
+
+** Added apache mod_passenger directives to 
+/etc/apache2/conf.d/mod_rails
+might later set this up in a Debian style module.load and module.conf thing as according to:
+http://www.control-escape.com/web/configuring-apache2-debian.html
+
+** Problems with passenger
+The 
+sudo passenger-install-apache2-module
+command failed to install on passenger 2.215
+So i just updated to 
+passenger 3.0.18
+this told me to get Curl development headers with SSL support:
+sudo apt-get install libcurl4-openssl-dev
+
+After: successfully installed the Apache 2 module and i edited mod_rails accordingly
+
+** mega - problem with pasenger - development/log permissions
+Passenger runs as the user and so the development logs have to be chowned by the user for Rails to be able to start.
+
+
+* Dealing With Site Errors
+** supervisions_controller#add_supervisions
+
+Seems that params is sometimes nil?
+#+BEGIN_SRC ruby
+ # POST /users/1/supervisions
+  def add_supervisions
+    errors = []
+    enrolment_ids = params[:enrolment][:id]
+#+END_SRC ruby
+  * URL       : https://mynbcs.nsw.edu.au/users/21435/supervisions/add_supervisions?controllers=supervisions
+  * IP address: 10.12.0.48
+  * Parameters: {"commit"=>"Add", "controllers"=>"supervisions", "action"=>"add_supervisions", "authenticity_token"=>"pQKQnT9gUE5tb6d80Gj79VgjTBAlXbNrSZqJTEi9pLw=", "user_id"=>"21435", "controller"=>"supervisions"}
+  * Rails root: /app/mynbcs/releases/20120508075739
+
+* aasm Gem
+"Active State Machine for ruby classes"
+Used to define states like :active for enrolment - if a course has begun but has not finished
+
+* Date.today
+On my local dev virtual machine  Date.today gives "2012-11-26"
+No wonder some enrolments are showing as active when they shouldnt
+
+
+
+* Some spare diagnostic code
+** User.show.html - environment.rb
+  <p>"@enrolments count:  "<%= @enrolments.count %></p>
+  <p>"@Date today:  "<%= Date.today %></p>
+  <p>"@Page variable:  "<%= @page %></p>
+  <p>"@user.enrolments.active count:  "<%= @user.enrolments.active.count %></p>
+  <p>"@user.enrolments.pending count:  "<%= @user.enrolments.pending.count %></p>
+  <p>"@user.enrolments.completed count:  "<%= @user.enrolments.completed.count %></p>
+  <p>"@user.enrolments count:  "<%= @user.enrolments.count %></p>
+  <% @enrolments.each do |e| %>
+      <p><%=e.id%> " : " <%= e.group.academic_year.short_name %> <%= Date.today.between?(e.activate_on, e.complete_on) %>"Date activated on: " <%= e.activate_on %>
+	"@Date today:  "<%= Date.today %>
+	"Date completed on: "  <%= e.complete_on %>
+      </p>
+  <% end %>
+
+* Some spare rails console code:
+u1.enrolments.active.paginate(:page => 1).each { |e| print e.id; print " | activate on: "; print e.activate_on; print " | complete on: "; p e.complete_on }; 0
+u1.enrolments.active.paginate(:page => 2).each { |e| print e.id; print " | activate on: "; print e.activate_on; print " | complete on: "; p e.complete_on }; 0
+u1.enrolments.active.paginate(:page => 1).each { |e| print e.id; print " | activate on: "; print e.activate_on; print " | complete on: "; print e.complete_on; print " | group - id: "; p e.group.id }; 0
+
+** From psql
+select id, user_id, activate_on, complete_on from enrolments where user_id = 17970;
+select e.id, e.user_id, e.group_id, e.activate_on, e.complete_on, g.id from enrolments AS e join groups AS g on e.group_id = g.id where user_id = 17970;
+select e.id, e.user_id, e.group_id, e.activate_on, e.complete_on, g.id from enrolments AS e left join groups AS g on e.group_id = g.id where user_id = 17970 AND g.id IS NULL;
+
+* Capistrano and ssh
+Capistrano will connect/deploy to the server using the username 'deploy'.
+In order for this to work your ssh public key (id_rsa.pub) must be in deploys list of authorized keys
+We did this in a hackish way by copying my public key to hal@epaphrus:
+scp ~/.ssh/id_rsa.pub hal@epaphrus:~/
+then logging into epaphrus:
+ssh epaphrus
+get root:
+(if you have sudo)
+sudo su root
+(else if you have access to the root password from turing)
+su root
+and jamming it into the authorized keys for deploy@epaphrus:
+cat id_rsa.pub >> /home/deploy/.ssh/authorized_keys
+
+** Brilliant site on Capistrano andd ssh keys
+Actually not sure how relevant anymore given the above fix...
+http://roninonrails.blogspot.com.au/2007/10/using-capistrano-with-ssh-agent.html
+
+
+* Philemon Virtual Servers - mynbcs & mynbc-80
+People seem to come through mynbcs
+** mynbcs Info
+ - 10.0.0.50:443
+ - SSL stuff
+    DocumentRoot /app/mynbcs/current/public
+*** Logging
+    CustomLog /var/log/sitelogs/mynbcs/access_ssl.log combined
+    ErrorLog  /var/log/sitelogs/mynbcs/error_ssl.log
+
+** mynbcs-80 Info
+ - 10.0.0.50:80
+    DocumentRoot /app/mynbcs/current/public
+*** Logging
+    CustomLog /var/log/sitelogs/mynbcs/access_80.log combined
+    ErrorLog  /var/log/sitelogs/mynbcs/error_80.log
+
+
+* Problem With rake on my machine and philemon 
+My rake version doesnt accept
+rake/rdoctask
+but instead likes the updated
+rdoc/task
+Philemon is the reverse....Obviously i dont want to push this every time....downgrade? :-(
+
+*Yep - going to downgrade from 10.0.2 to 0.8.7*
+
+
+* After deploy - restart delayed_job
+delayed_job is a raketask / vendor plugin
+sudo su root
+ps -ef | grep delay
+/etc/init.d/delayed_jobs stop
+/etc/init.d/delayed_jobs start
+ps -ef | grep delay
+
+
+* Giant Mega-List of  Errors
+
+** alerts#index (ActiveRecord::StatementInvalid) "PGError: ERROR:  invalid input syntax for type timestamp: \"jan 2012\"\nLINE 1: ...06-16 23:59:59.999999') AND (alerts.created_at >= E'jan 2012...\n                                                             ^\n: SELECT \"alerts\".* FROM \"alerts\"   INNER JOIN \"users\" ON \"users\".id = \"alerts\".user_id INNER JOIN \"student_profiles\" ON student_profiles.user_id = users.id  WHERE ((((alerts.created_at < '2012-06-16 23:59:59.999999') AND (alerts.created_at >= E'jan 2012')) AND (alerts.id IN (SELECT DISTINCT ON (ac2.id, a2.user_id) a2.id FROM alerts a2\n                    INNER JOIN alert_levels al2 ON a2.alert_level_id = al2.id\n                    INNER JOIN alert_categories ac2 on al2.alert_category_id = ac2.id\n                    ORDER BY ac2.id, a2.user_id, a2.created_at DESC))) AND (student_profiles.cohort_id = E'9'))  ORDER BY alerts.created_at DESC LIMIT 15 OFFSET 0"
+A ActiveRecord::StatementInvalid occurred in alerts#index:
+
+  PGError: ERROR:  invalid input syntax for type timestamp: "jan 2012"
+LINE 1: ...06-16 23:59:59.999999') AND (alerts.created_at >= E'jan 2012...
+                                                             ^
+: SELECT "alerts".* FROM "alerts"   INNER JOIN "users" ON "users".id = "alerts".user_id  INNER JOIN "student_profiles" ON student_profiles.user_id = users.id  WHERE ((((alerts.created_at < '2012-06-16 23:59:59.999999') AND (alerts.created_at >= E'jan 2012')) AND (alerts.id IN (SELECT DISTINCT ON (ac2.id, a2.user_id) a2.id FROM alerts a2
+                    INNER JOIN alert_levels al2 ON a2.alert_level_id = al2.id
+                    INNER JOIN alert_categories ac2 on al2.alert_category_id = ac2.id
+                    ORDER BY ac2.id, a2.user_id, a2.created_at DESC))) AND (student_profiles.cohort_id = E'9'))  ORDER BY alerts.created_at DESC LIMIT 15 OFFSET 0
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract_adapter.rb:219:in `log' 
+
+
+** application#index (ActionController::MethodNotAllowed) "Only get, put, and delete requests are allowed." -- IN PROGRESS
+A ActionController::MethodNotAllowed occurred in application#index:
+
+  Only get, put, and delete requests are allowed.
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/routing/recognition_optimisation.rb:64:in `recognize_path'
+
+*** NOTES
+hmmm similar to what i got when i deleted the show route from student_reports controller
+
+So its trying to post....
+
+_Referred by_
+https://mynbcs.nsw.edu.au/session/new
+which leads to session POST
+and /users/1 GET
+
+** cards#update (NoMethodError) "undefined method `parent_id' for nil:NilClass" - IN PROGRESS
+A NoMethodError occurred in cards#update:
+
+  undefined method `parent_id' for nil:NilClass
+  [RAILS_ROOT]/app/controllers/cards_controller.rb:174:in `update'
+
+*** NOTES
+Occurred from 
+21/09/2012
+11/05/2012
+
+cards_controller.rb:174:
+=@card_subcategories = filtered_subcategories(@card.card_category.parent_id, @current_user)=
+i.e. @card.card_category is nil
+Param passed to the page:
+"card_category_id"=>""
+
+**** Quick Fix
+Check for @card.card_category.nil?
+in update method
+
+** cards#create (SignalException) "SIGTERM"
+A SignalException occurred in cards#create:
+
+  SIGTERM
+  /usr/local/lib/ruby/1.8/yaml.rb:380:in `quick_emit'
+** cards#create (NoMethodError) "undefined method `name' for nil:NilClass" - IN PROGRESS
+A NoMethodError occurred in cards#create:
+
+  undefined method `name' for nil:NilClass
+  [RAILS_ROOT]/app/models/card.rb:427:in `save_with_nested_attributes'
+*** Notes
+Last happened: 16/05/12
+Should be still active?
+
+app/models/card.rb:427:
+Card.save_with_nested_attributes
+#+BEGIN_SRC ruby
+425          unless params[:card][:card_action_other].blank? || params[:card][:card_action_other][:completed].blank?
+426            other_action = self.card_action_other
+427            action_names_a.push(other_action.name)
+#+END_SRC ruby
+so self.card_action_other = nil
+
+**** Quick Fix
+Check for other_action.nil?
+in update method
+
+** cards#index (ActiveRecord::StatementInvalid) "PGError: ERROR:  invalid input syntax for type timestamp: \"February, 2012\"\nLINE 1: ...08-20 23:59:59.999999') AND (cards.occurred_at >= E'February...\n                                                             ^\n: SELECT \"cards\".* FROM \"cards\" INNER JOIN \"user_cards\" ON user_cards.card_id = cards.id INNER JOIN \"users\" AS \"users1\" ON \"users1\".id = \"user_cards\".user_id WHERE (((((cards.occurred_at < '2012-08-20 23:59:59.999999') AND (cards.occurred_at >= E'February, 2012')) AND (users1.id = E'1115')) AND (cards.parent_id IS NULL)) AND ((\"cards\".\"highly_confidential\" <> 't')))  ORDER BY cards.occurred_at DESC"
+A ActiveRecord::StatementInvalid occurred in cards#index:
+
+  PGError: ERROR:  invalid input syntax for type timestamp: "February, 2012"
+LINE 1: ...08-20 23:59:59.999999') AND (cards.occurred_at >= E'February...
+                                                             ^
+: SELECT "cards".* FROM "cards" INNER JOIN "user_cards" ON user_cards.card_id = cards.id INNER JOIN "users" AS "users1" ON "users1".id = "user_cards".user_id WHERE (((((cards.occurred_at < '2012-08-20 23:59:59.999999') AND (cards.occurred_at >= E'February, 2012')) AND (users1.id = E'1115')) AND (cards.parent_id IS NULL)) AND (("cards"."highly_confidential" <> 't')))  ORDER BY cards.occurred_at DESC
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract_adapter.rb:219:in `log'
+
+
+** cohorts#index (WillPaginate::InvalidPage) "\"$002 and 1=0--\" given as value, which translates to '0' as page number"
+A WillPaginate::InvalidPage occurred in cohorts#index:
+
+  "$002 and 1=0--" given as value, which translates to '0' as page number
+  /usr/local/lib/ruby/gems/1.8/gems/mislav-will_paginate-2.2.3/lib/will_paginate/collection.rb:51:in `initialize'
+** cohorts#index (WillPaginate::InvalidPage) "\"'2\" given as value, which translates to '0' as page number"
+A WillPaginate::InvalidPage occurred in cohorts#index:
+
+  "'2" given as value, which translates to '0' as page number
+  /usr/local/lib/ruby/gems/1.8/gems/mislav-will_paginate-2.2.3/lib/will_paginate/collection.rb:51:in `initialize'
+
+
+** group_reports#edit (ActiveRecord::StatementInvalid) "PGError: ERROR:  duplicate key value violates unique constraint \"grp_stdnt_rprts_unique_on_group_report_id_student_report_id\"\n: INSERT INTO \"group_student_reports\" (\"created_at\", \"student_report_id\", \"updated_at\", \"cam\", \"group_report_id\", \"hidden\") VALUES('2012-11-01 02:45:58.174191', 23716, '2012-11-01 02:45:58.174191', NULL, 8001, 'f') RETURNING \"id\""
+A ActiveRecord::StatementInvalid occurred in group_reports#edit:
+
+  PGError: ERROR:  duplicate key value violates unique constraint "grp_stdnt_rprts_unique_on_group_report_id_student_report_id"
+: INSERT INTO "group_student_reports" ("created_at", "student_report_id", "updated_at", "cam", "group_report_id", "hidden") VALUES('2012-11-01 02:45:58.174191', 23716, '2012-11-01 02:45:58.174191', NULL, 8001, 'f') RETURNING "id"
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract_adapter.rb:219:in `log'
+** group_reports#new (ActiveRecord::StatementInvalid) "PGError: ERROR:  duplicate key value violates unique constraint \"group_reports_unique_on_group_id_report_cycle_id\"\n: INSERT INTO \"group_reports\" (\"report_cycle_id\", \"created_at\", \"updated_at\", \"group_id\", \"cached_category_indicators_for\", \"cached_category_indicators\") VALUES(21, '2012-11-04 07:25:50.455113', '2012-11-04 07:25:50.455113', 7082, NULL, NULL) RETURNING \"id\""
+A ActiveRecord::StatementInvalid occurred in group_reports#new:
+
+  PGError: ERROR:  duplicate key value violates unique constraint "group_reports_unique_on_group_id_report_cycle_id"
+: INSERT INTO "group_reports" ("report_cycle_id", "created_at", "updated_at", "group_id", "cached_category_indicators_for", "cached_category_indicators") VALUES(21, '2012-11-04 07:25:50.455113', '2012-11-04 07:25:50.455113', 7082, NULL, NULL) RETURNING "id"
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract_adapter.rb:219:in `log'
+** group_reports#show (ActionView::TemplateError) "wrong number of arguments (1 for 0)"
+A ActionView::TemplateError occurred in group_reports#show:
+
+  wrong number of arguments (1 for 0)
+  On line #37 of app/views/group_reports/show.html.erb
+
+    34:         <th class="sub_head strong_left_border">Target</th>
+    35:         <th class="sub_head">Actual</th>
+    36:       <% end %>
+    37:       <th class="sub_head strong_left_border">Mark<br/>(Avg <%= gsrs.first.cam_mean.round(1) %>)</th>
+    38:       <th class="sub_head">Quartile</th>
+    39:       <th class="sub_head comment hideable strong_left_border">&nbsp;</th>
+    40:       <th class="sub_head strong_left_border">&nbsp;</th>
+
+** group_reports#show (ActiveRecord::StatementInvalid) "PGError: ERROR:  duplicate key value violates unique constraint \"grp_stdnt_rprts_unique_on_group_report_id_student_report_id\"\n: INSERT INTO \"group_student_reports\" (\"created_at\", \"student_report_id\", \"updated_at\", \"cam\", \"group_report_id\", \"hidden\") VALUES('2012-05-22 08:28:42.640649', 21011, '2012-05-22 08:28:42.640649', NULL, 7426, 'f') RETURNING \"id\""
+A ActiveRecord::StatementInvalid occurred in group_reports#show:
+
+  PGError: ERROR:  duplicate key value violates unique constraint "grp_stdnt_rprts_unique_on_group_report_id_student_report_id"
+: INSERT INTO "group_student_reports" ("created_at", "student_report_id", "updated_at", "cam", "group_report_id", "hidden") VALUES('2012-05-22 08:28:42.640649', 21011, '2012-05-22 08:28:42.640649', NULL, 7426, 'f') RETURNING "id"
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract_adapter.rb:219:in `log'
+
+
+** group_student_reports#update (ActiveRecord::StatementInvalid) "PGError: ERROR:  duplicate key value violates unique constraint \"rprt_lmnts_unique_on_group_student_report_id_element_type_repor\"\n: INSERT INTO \"report_elements\" (\"created_at\", \"updated_at\", \"group_student_report_id\", \"report_scale_level_id\", \"value\", \"element_type\", \"staff_profile_id\", \"report_question_id\") VALUES('2012-05-16 04:10:16.023894', '2012-05-16 04:10:16.023894', 143925, 21, NULL, E'target', NULL, 2377) RETURNING \"id\""
+A ActiveRecord::StatementInvalid occurred in group_student_reports#update:
+
+  PGError: ERROR:  duplicate key value violates unique constraint "rprt_lmnts_unique_on_group_student_report_id_element_type_repor"
+: INSERT INTO "report_elements" ("created_at", "updated_at", "group_student_report_id", "report_scale_level_id", "value", "element_type", "staff_profile_id", "report_question_id") VALUES('2012-05-16 04:10:16.023894', '2012-05-16 04:10:16.023894', 143925, 21, NULL, E'target', NULL, 2377) RETURNING "id"
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract_adapter.rb:219:in `log'
+
+
+** groups#show (ActionView::TemplateError) "undefined method `full_name' for nil:NilClass" - FIXED by DANIEL
+A ActionView::TemplateError occurred in groups#show:
+
+  undefined method `full_name' for nil:NilClass
+  On line #25 of app/views/enrolments/_enrolment.html.erb
+
+    22:   </td>
+    23:     <td class="last">
+    24:       <% if enrolment.for_external_student? %>
+    25:         <%= "#{enrolment.supervisions.collect{|s| link_to(s.supervisor.full_name, user_path(s.supervisor))}.to_sentence} <br/>" if enrolment.supervisions%>
+    26:         <%= link_to("Set / change", edit_enrolment_path(enrolment), :class => 'edit_link') if permitted_to?(:update, enrolment) %>
+    27:       <% elsif enrolment.for_internal_student? %>
+    28:         <%= link_to(enrolment.user.student_profile.care_teacher.full_name, user_path(enrolment.user.student_profile.care_teacher)) if enrolment.user.student_profile.care_teacher %>
+
+*** Notes & Daniel Fix
+Occurred several times on 11/05/2012
+Changed by Daniel on 11/05/2012
+
+
+
+
+
+
+
+
+
+
+
+
+
+** stories#index (ActiveRecord::StatementInvalid) "PGError: ERROR:  invalid input syntax for type timestamp: \"2011\"\nLINE 1: ...-24 23:59:59.999999') AND (stories.occurred_at >= E'2011')) ...\n                                                             ^\n: SELECT * FROM \"stories\" WHERE ((((stories.occurred_at < '2012-05-24 23:59:59.999999') AND (stories.occurred_at >= E'2011')) AND ((stories.author_type =E'Card' AND stories.author_id IN (826,1742,4513,4514,5793,5794,5795,5796,5797,5798)) OR (stories.author_type =E'Alert' AND stories.author_id IN (NULL)))) AND (\"stories\".user_id = 3218))  ORDER BY stories.created_at DESC LIMIT 15 OFFSET 0"
+A ActiveRecord::StatementInvalid occurred in stories#index:
+
+  PGError: ERROR:  invalid input syntax for type timestamp: "2011"
+LINE 1: ...-24 23:59:59.999999') AND (stories.occurred_at >= E'2011')) ...
+                                                             ^
+: SELECT * FROM "stories" WHERE ((((stories.occurred_at < '2012-05-24 23:59:59.999999') AND (stories.occurred_at >= E'2011')) AND ((stories.author_type =E'Card' AND stories.author_id IN (826,1742,4513,4514,5793,5794,5795,5796,5797,5798)) OR (stories.author_type =E'Alert' AND stories.author_id IN (NULL)))) AND ("stories".user_id = 3218))  ORDER BY stories.created_at DESC LIMIT 15 OFFSET 0
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract_adapter.rb:219:in `log'
+
+
+** student_profiles#show (ActionView::TemplateError) "No context given or inferable from object"
+A ActionView::TemplateError occurred in student_profiles#show:
+
+  No context given or inferable from object
+  On line #31 of app/views/student_profiles/show.html.erb
+
+    28:     <div>
+    29:       <strong>Contact teacher/s: </strong>
+    30:         <%= @student_profile.contact_teachers.collect do |contact_teacher|
+    31:           link_to_if(permitted_to?(:show, contact_teacher), contact_teacher.full_name, user_path(contact_teacher))
+    32:         end.to_sentence %>
+    33:      </div>
+    34:   <% end %>
+
+
+** student_reports#bulk_actions (ActionView::MissingTemplate) "Missing template student_reports/bulk_actions.erb in view path themes/nbcs/views:app/views:vendor/plugins/declarative_authorization/app/views" - IN PROGRESS
+A ActionView::MissingTemplate occurred in student_reports#bulk_actions:
+
+  Missing template student_reports/bulk_actions.erb in view path themes/nbcs/views:app/views:vendor/plugins/declarative_authorization/app/views
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_view/paths.rb:66:in `find_template'
+
+*** NOTES
+**** Background Before Solution
+OK 
+So this is called from 
+group_student_reports_controller#destroy
+#+BEGIN_SRC ruby
+   @group_student_report = @student_report.group_student_reports.find(params[:id])
+    group_report = @group_student_report.group_report
+    report_cycle = group_report.report_cycle
+   @group_student_report.destroy
+
+    format.html { redirect_to(report_cycle_group_report_path(report_cycle, group_report)) }
+#+END_SRC ruby
+
+*Wait* 
+Couldn't find StudentReport with ID=bulk_actions
+Looking for Student Report with id=bulk
+
+*OK so*
+http://hurricane-dev/student_reports/bulk_actions?care_group=7382&report_cycle=21
+is matching one of:
+/student_reports/:student_report_id/group_student_reports(.:format)
+rather than:
+/student_reports/bulk_actions(.:format) 
+
+or matching
+PUT  /student_reports/:id(.:format) {:action=>"update", :controller=>"student_reports"}
+
+*AGAIN*
+bulk_actions_student_reports POST   /student_reports/bulk_actions(.:format)                                                                 {:action=>"bulk_actions", :controller=>"student_reports"}
+
+_*WAIT*_
+student_reports#bulkactions
+
+Parameters:
+
+{"id"=>"bulk_actions",
+ "report_cycle"=>"21",
+ "care_group"=>"7382"}
+
+*The error is coming from*
+#+BEGIN_SRC ruby
+ private
+  def load_student_report
+    @student_report = StudentReport.find(params[:id],
+                                         :include => [:group_student_reports,
+                                                      {:student_profile => :user}]) if params[:id]
+  end
+#+END_SRC ruby
+
+there is a before_filter loadstudent_report on 
+before_filter :load_student_report, :only => [:show, :edit, :update, :understand, :learning_indicators, :google_chart]
+OK its calling 
+ - student_reports#show
+ - so routes is matching:
+ - GET    /student_reports/:id(.:format) to show
+ - id is coming out as bulk_actions and other parameters are being read from that......
+
+Not sure why 
+ - student_reports/:id
+ - is being called before 
+ - student_reports/bulk_actions
+ - when the order is reversed in the precedence....
+
+- Hmmmm. bulk_actions is listed as a POST method in rake routes...
+
+Heres the routes.rb bit:
+#+BEGIN_SRC ruby
+  map.resources(:student_reports,
+                :except => [:index, :create],
+                :collection => {:bulk_actions => :post, :save_spelling => :put},
+                :member => {
+                  :understand => :get,
+                  :google_chart => :get}) do |student_report|
+    student_report.resources(:group_student_reports,
+                             :as => 'group_student_reports/group/:group_id',
+                             :only => :new)
+    student_report.resources :group_student_reports, :except => :new
+  end
+#+END_SRC ruby
+
+If i add
+= :except => [:index, :create, :show],=
+Then i get
+_Only post, put, and delete requests are allowed_
+and rake routes shows:
+student_report PUT    /student_reports/:id(.:format)                                             {:action=>"update", :controller=>"student_reports"}
+                         DELETE /student_reports/:id(.:format)                                          {:action=>"destroy", :controller=>"student_reports"
+
+rake routes tells me:
+report_cycle_group_report GET    /report_cycles/:report_cycle_id/group_reports/:id(.:format)  {:action=>"show", :controller=>"group_reports"}
+
+i.e. redirect to controller
+group_reports#show
+Not sure where 
+student_reports#bulk_actions is coming from
+
+routes.rb
+#+BEGIN_SRC ruby
+ map.resources(:student_reports,
+                :except => [:index, :create],
+                :collection => {:bulk_actions => :post, :save_spelling => :put},
+                :member => {
+                  :understand => :get,
+                  :google_chart => :get}) do |student_report|
+#+END_SRC ruby
+So there is a student_reports bulk actions thing
+could it be that we are passing reoprt_cycle & group_report to 
+
+**** Getting closer
+*OK heres another insight*
+Chrome tells me we are calling 
+http://hurricane-dev/student_reports/bulk_actions
+with GET
+but in routes.rb the route is declared as only :post
+change to get and it matches to student_reports#bulkactions
+_so why is GET being called?_
+
+*Its referred from this URL*
+report_cycles/21/student_reports?care_group_id=7382&show_all=1
+which matches
+report_cycle_student_reports GET  /report_cycles/:report_cycle_id/student_reports(.:format)   {:action=>"index", :controller=>"student_reports"}
+
+**** So the problem is....
+That student_reports#bulk_actions is /not matching anything/ and issuing a render command.
+We fall through all the condition checks and by default 
+student_reports/bulk_actions.erb
+is looked for, which does not exist
+
+** student_reports#google_chart (SignalException) "SIGTERM"
+A SignalException occurred in student_reports#google_chart:
+
+  SIGTERM
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/postgresql_adapter.rb:1105:in `extract_pg_identifier_from_name'
+** student_reports#google_chart (SocketError) "getaddrinfo: Temporary failure in name resolution"
+A SocketError occurred in student_reports#google_chart:
+
+  getaddrinfo: Temporary failure in name resolution
+  /usr/local/lib/ruby/1.8/net/http.rb:560:in `initialize'
+** student_reports#select_group (ActionView::TemplateError) "SignalException: SIGTERM: SELECT \"group_student_reports\".* FROM \"group_student_reports\"   INNER JOIN \"group_reports\" ON \"group_reports\".id = \"group_student_reports\".group_report_id  INNER JOIN \"groups\" ON \"groups\".id = \"group_reports\".group_id  WHERE (\"group_student_reports\".student_report_id = 23110) AND ((groups.id = 7287) AND (\"group_student_reports\".student_report_id = 23110))  LIMIT 1"
+A ActionView::TemplateError occurred in student_reports#select_group:
+
+  SignalException: SIGTERM: SELECT "group_student_reports".* FROM "group_student_reports"   INNER JOIN "group_reports" ON "group_reports".id = "group_student_reports".group_report_id  INNER JOIN "groups" ON "groups".id = "group_reports".group_id  WHERE ("group_student_reports".student_report_id = 23110) AND ((groups.id = 7287) AND ("group_student_reports".student_report_id = 23110))  LIMIT 1
+  On line #11 of app/views/student_reports/select_group.html.erb
+
+    8:     <ul class="resource">
+    9:     <% @groups.each do |group| %>
+    10:       <li class="<%= cycle(:odd, :even, :name => 'all') %>">
+    11:         <% if @group_student_report = @student_report.group_student_reports.for_group(group).first %>
+    12:           <%= link_to(group.name_with_teacher, edit_student_report_group_student_report_path(@student_report, @group_student_report)) %>
+    13:         <% else %>
+    14:           <%= link_to(group.name_with_teacher, new_student_report_group_student_report_path(@student_report, group)) %>
+** student_reports#select_group (ActiveRecord::StatementInvalid) "PGError: ERROR:  duplicate key value violates unique constraint \"stdnt_rprts_unique_on_student_profile_id_campus_report_cycle_id\"\n: INSERT INTO \"student_reports\" (\"created_at\", \"campus_report_cycle_id\", \"student_profile_id\", \"updated_at\", \"cached_category_indicators_for\", \"cached_category_indicators\") VALUES('2012-07-30 09:01:42.814851', 39, 7172, '2012-07-30 09:01:42.814851', NULL, NULL) RETURNING \"id\""
+A ActiveRecord::StatementInvalid occurred in student_reports#select_group:
+
+  PGError: ERROR:  duplicate key value violates unique constraint "stdnt_rprts_unique_on_student_profile_id_campus_report_cycle_id"
+: INSERT INTO "student_reports" ("created_at", "campus_report_cycle_id", "student_profile_id", "updated_at", "cached_category_indicators_for", "cached_category_indicators") VALUES('2012-07-30 09:01:42.814851', 39, 7172, '2012-07-30 09:01:42.814851', NULL, NULL) RETURNING "id"
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract_adapter.rb:219:in `log'
+** student_reports#show (ActionView::TemplateError) "SIGTERM"
+A ActionView::TemplateError occurred in student_reports#show:
+
+  SIGTERM
+  On line #21 of app/views/student_reports/_learning_indicators.html.erb
+
+    18:         <td><%= category_name %></td>
+    19:         <%- @student_report.related_student_reports.each do |sr| -%>
+    20:           <td class="<%= "de-emphasize" unless (sr==@student_report) %>"><%= "#{sprintf("%.1f", sr.category_indicators[category_name][:target_mean])}" if sr.category_indicators[category_name] && sr.category_indicators[category_name][:target_mean] && !@student_report.prevent_targets? %></td>
+    21:           <td class="<%= "de-emphasize" unless (sr==@student_report) %>"><%= "#{sprintf("%.1f", sr.category_indicators[category_name][:rating_mean])}" if sr.category_indicators[category_name] && sr.category_indicators[category_name][:rating_mean] %></td>
+    22:         <%- end -%>
+    23:       </tr>
+    24:     <%- end -%>
+
+
+** supervisions#add_supervisions (NoMethodError) "undefined method `[]' for nil:NilClass" - FIXED
+A NoMethodError occurred in supervisions#add_supervisions:
+
+  undefined method `[]' for nil:NilClass
+  [RAILS_ROOT]/app/controllers/supervisions_controller.rb:18:in `add_supervisions'
+
+*** FIX
+app/controllers/supervisions_controller.rb
++    if (params.has_key?(:enrolment) && (params.has_key?(:id)))
++      enrolment_ids = params[:enrolment][:id]
++    else
++      # render "You failed".html_safe
++      # redirect_to #user_supervisions_path(current_user)
++      flash[:error] = "You must select at least one student to add"
++      return redirect_to :back #:controller => 'supervisions', :action => 'index'
++    end
+
+
+
+** users#reactivate (ActionController::InvalidAuthenticityToken) "ActionController::InvalidAuthenticityToken"
+A ActionController::InvalidAuthenticityToken occurred in users#reactivate:
+
+  ActionController::InvalidAuthenticityToken
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/request_forgery_protection.rb:79:in `verify_authenticity_token'
+** users#reset_password (ActionController::InvalidAuthenticityToken) "ActionController::InvalidAuthenticityToken"
+A ActionController::InvalidAuthenticityToken occurred in users#reset_password:
+
+  ActionController::InvalidAuthenticityToken
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/request_forgery_protection.rb:79:in `verify_authenticity_token'
+** users#show (ActionView::MissingTemplate) "Missing template users/show.erb in view path themes/scil/views:app/views:vendor/plugins/declarative_authorization/app/views"
+A ActionView::MissingTemplate occurred in users#show:
+
+  Missing template users/show.erb in view path themes/scil/views:app/views:vendor/plugins/declarative_authorization/app/views
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_view/paths.rb:66:in `find_template'
+** users#show (ActionView::TemplateError) "SIGTERM"
+A ActionView::TemplateError occurred in users#show:
+
+  SIGTERM
+  On line #4 of app/views/users/_enrolment.html.erb
+
+    1: <% course = enrolment.group.course  %>
+    2: <tr class="<%= cycle :odd, :even %>">
+    3:   <td>
+    4:     <%= link_to_if(permitted_to?(:show, course), "#{enrolment.group.name_with_teacher}", group_path(enrolment.group)) %>
+    5:   </td>
+    6:   <td><%= enrolment.group.academic_year.short_name %></td>
+    7:   <td class="last">
+** users#show (ActionView::TemplateError) "undefined method `course' for nil:NilClass" - FIXED
+A ActionView::TemplateError occurred in users#show:
+
+  undefined method `course' for nil:NilClass
+  On line #1 of app/views/users/_enrolment.html.erb
+
+    1: <% course = enrolment.group.course  %>
+    2: <tr class="<%= cycle :odd, :even %>">
+    3:   <td>
+    4:     <%= link_to_if(permitted_to?(:show, course), "#{enrolment.group.name_with_teacher}", group_path(enrolment.group)) %>
+*** BUG & FIX
+
+user.id 17970 is enrolled in enrollment.id 250094
+which refers to group.id 8490.
+There is no group with id 8490
+
+app/views/users/_enrolment.html.erb
+
++<% unless enrolment.group.nil? %>
+ <% course = enrolment.group.course  %>
+ <tr class="<%= cycle :odd, :even %>">
+   <td>
+@@ -12,4 +13,5 @@
+       <% end %>
+     <% end %>
+   </td>
+-</tr>
+\ No newline at end of file
++</tr>
++<% end %>
+
+** users#reset_password (ActionController::InvalidAuthenticityToken)
+ActionController::InvalidAuthenticityToken
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/request_forgery_protection.rb:79:in `verify_authenticity_token'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+* Old wiki error?
+** 2010-06-10 - group_reports#update (ActiveRecord::UnknownAttributeError) "unknown attribute: report_elements_at<script type"
+A ActiveRecord::UnknownAttributeError occurred in group_reports#update:
+
+  unknown attribute: report_elements_at<script type
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/base.rb:2744:in `attributes='
+
+-------------------------------
+Request:
+-------------------------------
+
+  * URL       : https://mynbcs.nsw.edu.au/report_cycles/9/group_reports/3061
+  * IP address: 10.0.0.5
+  * Parameters: {"report_cycle_id"=>"9", "group_report"=>{"group_student_reports_attributes"=>{"0"=>{"rating_report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"474"}, "1"=>{"report_scale_level_id"=>"", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"476"}, "3"=>{"report_scale_level_id"=>"", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"477"}, "4"=>{"report_scale_level_id"=>"", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"478"}}, "comment_attributes"=>{"commenter_id"=>"17964", "message"=>""}, "report_elements_at<script type"=>"=", "cam"=>"", "id"=>"65199", "report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"", "id"=>"", "elem
+ ent_type"=>"target"}, "1"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"476"}, "3"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"477"}, "4"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"478"}}}, "1"=>{"rating_report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"24", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"474"}, "1"=>{"report_scale_level_id"=>"4", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"8", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"476"}, "3"=>{"report_scale_level_id"=>"19", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"477"},
+  "4"=>{"report_scale_level_id"=>"14", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"478"}}, "comment_attributes"=>{"commenter_id"=>"17964", "message"=>""}, "cam"=>"", "id"=>"65200", "report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"474"}, "1"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"476"}, "3"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"477"}, "4"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"478"}}}, "2"=>{"rating_report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"24", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"474"}, "1"=>{"report_scale_level_id"=>"4", "id"=>"", "staff_pr
+ ofile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"8", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"476"}, "3"=>{"report_scale_level_id"=>"19", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"477"}, "4"=>{"report_scale_level_id"=>"14", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"478"}}, "comment_attributes"=>{"commenter_id"=>"17964", "message"=>""}, "cam"=>"", "id"=>"65201", "report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"474"}, "1"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"476"}, "3"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"477"}, 
+ "4"=>{"report_scale_level_id"=>"", "id"=>"", "element_type"=>"target", "report_question_id"=>"478"}}}, "3"=>{"rating_report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"23", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"474"}, "1"=>{"report_scale_level_id"=>"2", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"6", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"476"}, "3"=>{"report_scale_level_id"=>"17", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"477"}, "4"=>{"report_scale_level_id"=>"12", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"478"}}, "comment_attributes"=>{"commenter_id"=>"17964", "message"=>""}, "cam"=>"", "id"=>"54714", "report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"22", "id"=>"408112", "element_type"=>"ta
+ rget", "report_question_id"=>"474"}, "1"=>{"report_scale_level_id"=>"2", "id"=>"408113", "element_type"=>"target", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"7", "id"=>"408114", "element_type"=>"target", "report_question_id"=>"476"}, "3"=>{"report_scale_level_id"=>"17", "id"=>"408115", "element_type"=>"target", "report_question_id"=>"477"}, "4"=>{"report_scale_level_id"=>"12", "id"=>"408116", "element_type"=>"target", "report_question_id"=>"478"}}}, "4"=>{"rating_report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"23", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"474"}, "1"=>{"report_scale_level_id"=>"2", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"8", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"476"}, "3"=>{"report_scale_level_id"=>"17", "id"=>"", "staff_profile_id"=>"327", "element_t
+ ype"=>"rating", "report_question_id"=>"477"}, "4"=>{"report_scale_level_id"=>"12", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"478"}}, "comment_attributes"=>{"commenter_id"=>"17964", "message"=>""}, "cam"=>"", "id"=>"55119", "report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"22", "id"=>"409820", "element_type"=>"target", "report_question_id"=>"474"}, "1"=>{"report_scale_level_id"=>"2", "id"=>"409821", "element_type"=>"target", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"7", "id"=>"409822", "element_type"=>"target", "report_question_id"=>"476"}, "3"=>{"report_scale_level_id"=>"17", "id"=>"409823", "element_type"=>"target", "report_question_id"=>"477"}, "4"=>{"report_scale_level_id"=>"12", "id"=>"409824", "element_type"=>"target", "report_question_id"=>"478"}}}, "5"=>{"rating_report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"23", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "r
+ eport_question_id"=>"474"}, "1"=>{"report_scale_level_id"=>"2", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"6", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"476"}, "3"=>{"report_scale_level_id"=>"16", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"477"}, "4"=>{"report_scale_level_id"=>"12", "id"=>"", "staff_profile_id"=>"327", "element_type"=>"rating", "report_question_id"=>"478"}}, "comment_attributes"=>{"commenter_id"=>"17964", "message"=>""}, "cam"=>"", "id"=>"54687", "report_elements_attributes"=>{"0"=>{"report_scale_level_id"=>"21", "id"=>"407983", "element_type"=>"target", "report_question_id"=>"474"}, "1"=>{"report_scale_level_id"=>"1", "id"=>"407984", "element_type"=>"target", "report_question_id"=>"475"}, "2"=>{"report_scale_level_id"=>"6", "id"=>"407985", "element_type"=>"target", "report_question_id"=>"476
+ "}, "3"=>{"report_scale_level_id"=>"16", "id"=>"407986", "element_type"=>"target", "report_question_id"=>"477"}, "4"=>{"report_scale_level_id"=>"11", "id"=>"407987", "element_type"=>"target", "report_question_id"=>"478"}}}}}, "commit"=>"Save", "action"=>"update", "_method"=>"put", "authenticity_token"=>"fjZWp3f4bdgTZ1729xnvYf8kMbheYfm/e9Fxxiq3wNg=", "id"=>"3061", "controller"=>"group_reports"}
+  * Rails root: /app/mynbcs/releases/20100609024419
+
+*** Notes
+*KEY POINT*
+One of the parameters passed is: 
+ "report_elements_at<script type"=>"=",
+
+Looks like part of a page HTML tag has been grabbed ie
+<script type="text/javascript">
+perhaps not escaped properly.
+
+**** Wheres it coming from:
+
+ * HTTP_REFERER                                : https://mynbcs.nsw.edu.au/report_cycles/9/group_reports/3061/edit
+  * HTTP_USER_AGENT                             : Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.4 (KHTML, like Gecko) Chrome/5.0.375.55 Safari/533.4
+  * PATH_INFO                                   : /report_cycles/9/group_reports/3061
+  * QUERY_STRING                                : 
+  * REMOTE_ADDR                                 : 10.0.0.5
+  * REMOTE_PORT                                 : 33244
+  * REQUEST_METHOD                              : PUT
+  * REQUEST_URI                                 : /report_cycles/9/group_reports/3061
+
+
+
+* My first push to production - 06/12/2012
+** My changes summary
+*** Rake file:
+# Change deprecated method
+-require 'rake/rdoctask'
++require 'rdoc/task' # rake/rdoctask fails and is deprecated
+*** app/controllers/supervisions_controller.rb
+# Placed a guard to redirect if nothing set
+-    enrolment_ids = params[:enrolment][:id]
++    if (params.has_key?(:enrolment) && (params.has_key?(:id)))
++      enrolment_ids = params[:enrolment][:id]
++    else
++      # render "You failed".html_safe
++      # redirect_to #user_supervisions_path(current_user)
++      flash[:error] = "You must select at least one student to add"
++      return redirect_to :back #:controller => 'supervisions', :action => 'index'
++    end
+*** app/views/users/show.html.erb
+# Branch off of active enrolments and not all enrolments
+-  <% if @user.enrolments.any? %>
++  <% if @enrolments.any? %>
+*** lib/tasks/cucumber.rake
+# Basically - none of this stuf worked and  stopped me from getting Rails running - was getting a 'desc' something error
++  # Cucumber::Rake::Task.new(:features) do |t|
++    # t.fork = true
++    # t.cucumber_opts = %w{--format pretty}
++  # end
++  # task :features => 'db:test:prepare'
+** My changes diff log
+diff --git a/Rakefile b/Rakefile
+index 3bb0e85..c3cf051 100644
+--- a/Rakefile
++++ b/Rakefile
+@@ -5,6 +5,7 @@ require(File.join(File.dirname(__FILE__), 'config', 'boot'))
+ 
+ require 'rake'
+ require 'rake/testtask'
+-require 'rake/rdoctask'
++# require 'rake/rdoctask'
++require 'rdoc/task' # rake/rdoctask fails and is deprecated
+ 
+ require 'tasks/rails'
+diff --git a/app/controllers/supervisions_controller.rb b/app/controllers/supervisions_controller.rb
+index fe37910..22b05c1 100644
+--- a/app/controllers/supervisions_controller.rb
++++ b/app/controllers/supervisions_controller.rb
+@@ -15,7 +15,15 @@ class SupervisionsController < ApplicationController
+   # POST /users/1/supervisions
+   def add_supervisions
+     errors = []
+-    enrolment_ids = params[:enrolment][:id]
++    if (params.has_key?(:enrolment) && (params.has_key?(:id)))
++      enrolment_ids = params[:enrolment][:id]
++    else
++      # render "You failed".html_safe
++      # redirect_to #user_supervisions_path(current_user)
++      flash[:error] = "You must select at least one student to add"
++      return redirect_to :back #:controller => 'supervisions', :action => 'index'
++    end
++    
+     
+     enrolment_ids.each do |enrolment_id|
+       enrolment = Enrolment.find(enrolment_id)
+@@ -30,7 +38,6 @@ class SupervisionsController < ApplicationController
+     end
+ 
+     flash[:error] = errors.join('<br/>') unless errors.blank?
+-    
+     redirect_to user_supervisions_path(@staff_member)
+   end
+ 
+diff --git a/app/controllers/users_controller.rb b/app/controllers/users_controller.rb
+index 7be8c80..56059cc 100644
+--- a/app/controllers/users_controller.rb
++++ b/app/controllers/users_controller.rb
+@@ -104,7 +104,6 @@ class UsersController < ApplicationController
+   def show
+     @user = User.find(params[:id])
+     @enrolments =  @user.enrolments.active.paginate(:page => params[:page])
+-
+     @page_tabs = [:student] if @user.student?
+ 
+     respond_to do |format|
+diff --git a/app/views/users/show.html.erb b/app/views/users/show.html.erb
+index 48b05fe..6b61f99 100644
+--- a/app/views/users/show.html.erb
++++ b/app/views/users/show.html.erb
+@@ -75,18 +75,18 @@ end
+   <% if @current_user.staff? || @current_user.roles.include?(:admin) then %>
+ 
+   <% if @user.timetable.any? && !(@user.student_campus && @user.student_campus.external?) %>
+-    <% cache("users_#{@user.id}_timetable") do %>
+-      <div id="my_timetable" class="accordion show_block span-15">
+-        <h3 class="span-15">My Timetable</h3>
+-        <div id="timetable" class="body span-15">
+-          <%= render :partial => 'timetable', :locals => {:timetable => @user.timetable, :groups => @user.groups} %>
+-        </div>
+-      </div>
+-    <% end %>
++  <% cache("users_#{@user.id}_timetable") do %>
++  <div id="my_timetable" class="accordion show_block span-15">
++    <h3 class="span-15">My Timetable</h3>
++    <div id="timetable" class="body span-15">
++      <%= render :partial => 'timetable', :locals => {:timetable => @user.timetable, :groups => @user.groups} %>
++    </div>
++  </div>
++  <% end %>
+   <% end %>
+   <% end %>
+ 
+-  <% if @user.enrolments.any? %>
++  <% if @enrolments.any? %>
+   <div id="my_courses" class="show_block span-15">
+     <h3 class="span-15 non-collapsible_header">My Courses</h3>
+     <div class="body span-15">
+@@ -102,7 +102,6 @@ end
+     </div>
+   </div>
+   <% end %>
+-<%# end %>
+ 
+   <% if @user.staff? && @user.supervisions.active.any? %>
+     <div id="my_supervisions" class="accordion show_block span-15 show_at_start">
+diff --git a/lib/tasks/cucumber.rake b/lib/tasks/cucumber.rake
+index 62e14d1..7099847 100644
+--- a/lib/tasks/cucumber.rake
++++ b/lib/tasks/cucumber.rake
+@@ -1,13 +1,16 @@
+ $LOAD_PATH.unshift(RAILS_ROOT + '/vendor/plugins/cucumber/lib') if File.directory?(RAILS_ROOT + '/vendor/plugins/cucumber/lib')
+ 
+ begin
++  # require 'rake'
+   require 'cucumber/rake/task'
++  
++  # desc 'A Cucumber task that does something' #HAL
++  # Cucumber::Rake::Task.new(:features) do |t|
++    # t.fork = true
++    # t.cucumber_opts = %w{--format pretty}
++  # end
++  # task :features => 'db:test:prepare'
+ 
+-  Cucumber::Rake::Task.new(:features) do |t|
+-    t.fork = true
+-    t.cucumber_opts = %w{--format pretty}
+-  end
+-  task :features => 'db:test:prepare'
+ rescue LoadError
+   desc 'Cucumber rake task not available'
+   task :features do
+
+
+* Running Multiple Rails Apps on the One Machine Using Passenger and Apache
+Think you have to have a passenger process for each app - NO
+
+But i had to add an entry on the /etc/hosts file for my machine - not the virtual machine
+pointing to the virtual machine so i could reach the server
+
+
+
+
+* Rake Upgrades - do we still use rake/rdoctask?
+Apparently the new syntax require
+rdoc >= 2.4.2
+"Use rdoc/task instead (in RDoc 2.4.2+)"
+
+* Security Bug - Rails ActiveModel Jan 2013
+#BEGIN_VERSE
+Hal, can you please come up with a costing to implement this.
+
+On 03/01/13 09:41, Liuba Kazakov wrote:
+> FYI
+>
+> I am not sure whether you are subscribed to Rails security
+> notifications...
+>
+> Liuba
+> -------- Forwarded Message --------
+>> From: Aaron Patterson <tenderlove@ruby-lang.org>
+>> Reply-to: rubyonrails-security@googlegroups.com
+>> To: rubyonrails-security@googlegroups.com,
+>> oss-security@lists.openwall.com
+>> Subject: SQL Injection Vulnerability in Ruby on Rails (CVE-2012-5664)
+>> Date: Wed, 2 Jan 2013 13:22:22 -0800
+>>
+>> SQL Injection Vulnerability in Ruby on Rails
+>>
+>> There is a SQL injection vulnerability in Active Record in ALL versions. This vulnerability has been assigned the CVE identifier CVE-2012-5664.
+>>
+>> Versions Affected:  All.
+>> Not affected:       NONE.
+>> Fixed Versions:     3.2.10, 3.1.9, 3.0.18
+>>
+>> Impact
+>> ------
+>> Due to the way dynamic finders in Active Record extract options from method parameters, a method parameter can mistakenly be used as a scope.  Carefully crafted requests can use the scope to inject arbitrary SQL.
+>>
+>> All users running an affected release should either upgrade or use one of the work arounds immediately.
+>>
+>> Impacted code passes user provided data to a dynamic finder like this:
+>>
+>>    Post.find_by_id(params[:id])
+>>
+>> Releases
+>> --------
+>> The  3.2.10, 3.1.9 & 3.0.18 releases are available at the normal locations.
+>>
+>> Workarounds
+>> -----------
+>> The issue can be mitigated by explicitly converting the parameter to an expected value.  For example, change this:
+>>
+>>    Post.find_by_id(params[:id])
+>>
+>> to this:
+>>
+>>    Post.find_by_id(params[:id].to_s)
+>>
+>>
+>> Patches
+>> -------
+>> To aid users who aren't able to upgrade immediately we have provided patches for the two supported release series and two unsupported versions.  They are in git-am format and consist of a single changeset.
+>>
+>> * 3-2-dynamic_finder_injection.patch - Patch for 3.2 series
+>> * 3-1-dynamic_finder_injection.patch - Patch for 3.1 series
+>> * 3-0-dynamic_finder_injection.patch - Patch for 3.0 series
+>> * 2-3-dynamic_finder_injection.patch - Patch for 2.3 series
+>>
+>> Please note that only the 3.1.x and 3.2.x series are supported at present.  Users of earlier unsupported releases are advised to upgrade as soon as possible as we cannot guarantee the continued availability of security fixes for unsupported releases.
+>>
+>> -- 
+>> Aaron Patterson
+>> http://tenderlovemaking.com/
+>>
+>> -- 
+>> You received this message because you are subscribed to the Google Groups "Ruby on Rails: Security" group.
+>> To post to this group, send email to rubyonrails-security@googlegroups.com.
+>> To unsubscribe from this group, send email to rubyonrails-security+unsubscribe@googlegroups.com.
+>> For more options, visit this group at http://groups.google.com/group/rubyonrails-security?hl=en.
+>>
+
+
+-- 
+
+===
+
+Andrew Boag - Director
+andrew.boag@catalyst-au.net
+tel: +61 2 8002 1758
+mob: +61 421 528 125
+http://www.catalyst-au.net
+#END_VERSE
+
+* Solutions To Rails ActiveRecord SQL Injection problem
+ - All Rails instances effected
+ - New fixes have been put out
+   - fixed versions:
+     - 3.0.18
+     - 3.1.9
+     - 3.2.10
+ - No fix offered for 2.3.x versions
+** The problem
+*** ActiveRecord finders
+ - Due to the way dynamic finders in Active Record extract options from method parameters, a method parameter can mistakenly be used as a scope. Carefully crafted requests can use the scope to inject arbitrary SQL. 
+ - Impacted code passes user provided data to a dynamic finder like this:  
+#+BEGIN_SRC ruby 
+Post.find_by_id(params[:id])
+#+END_SRC
+ - *Does not effect =find= methods* e.g.
+#+BEGIN_SRC ruby 
+Post.find(params[:id])
+#+END_SRC
+
+**** More on dynamic finders 
+ - Rails dynamically creates finder methods on your ActiveRecords for each column in your schema
+ - e.g. if =User= has columns id, name, phone then the model will have methods
+#+BEGIN_SRC ruby
+User.find_by_id(params[:id])
+User.find_by_name(params[:name])
+User.find_by_phone(params[:name])
+#+END_SRC
+
+#Ruby will allows you to pass raw SQL as a parameter to these methods:
+#: User.find_by_name("kotori'; DROP TABLE USERS; --")
+#but it also allows you to 
+
+#+BEGIN_SRC ruby
+# Fetches a user record by name, but only fetch the 'id' and 'name' fields.
+User.find_by_name("kotori", :select => "id, name")
+# => SELECT id, name FROM users WHERE name = 'kotori' LIMIT 1
+
+# You can inject arbitrary SQL if you wish:
+User.find_by_name("kotori", :select => "id, name FROM users; DROP TABLE users; --")
+# => SELECT id, name FROM users; DROP TABLE users; -- FROM users WHERE name = 'kotori' LIMIT 1
+#+END_SRC
+
+ - The vulnerability lies in the fact that “find_by_*” also accepted calls in which only the options parameter is given. In that case, it thinks that the value parameter is nil.
+
+#+BEGIN_SRC ruby
+User.find_by_name(:select => "1; DROP TABLE users; --")
+# => SELECT 1; DROP TABLE users; -- FROM users WHERE name IS NULL LIMIT 1;
+#+END_SRC
+
+ - if user could pass an options hash instead of a string to =User.find_by_name(params[:name])= then they could trigger this
+
+The following URL
+: /example-url?name[select]=whatever&name[limit]=23
+generates a =params[:name]= of ={ "select" => "whatever", "limit" => 23 }=
+
+i.e. =params[:name]= is now a hash and not a string
+
+*BUT* its not a "proper" hash with symbol type keys e.g.
+: { :select => "whatever", :limit => 23 }
+and so it wont be accepted by Rails.
+
+However AuthLogic makes the following call
+: User.find_by_persistence_token(the_token)
+in which =the_token= /can/ be an options hash through the use of the Rails session data authentication method.
+
+#+BEGIN_QUOTE
+The Rails session mechanism allows storing arbitrary Ruby objects, including hashes with symbol keys. Rails provides a variety of session stores, the default being the cookie store which stores session data in a cookie on the client. The cookie data is not encrypted, but is signed with an HMAC to prevent tampering. The cookie store is fast, does not require any server-side maintenance, and is only meant for session data that do not contain sensitive information such as credit card numbers. Apps that store sensitive information in the session should use the database session store instead. Nevertheless, it turned out that 95% of all Rails apps only ever store the user authentication credentials in the session, so the cookie store was made the default.
+
+So to inject arbitrary SQL, you need to tamper with the cookie, which requires the HMAC key. The HMAC key is the so-called session secret. As the name implies, it is supposed to be secret. Rails generates a random 512-bit secret upon project creation. This is why most Rails apps that are running Authlogic are not exploitable: the attacker does not know the secret. Open source Rails apps however can form a problem. Many of them come with a default session secret, but the user never customizes them, so all those instances end up using the same HMAC key, making them very easily exploitable. Of course, in this case the operator have to worry about more than just SQL injection. If the HMAC key is known then anybody can send fake credentials to the app.
+#+END_QUOTE
+
+*** Other part of the problem - HMAC secret token
+"When a RoR application is created the secret which goes into the HMAC will be created along with all the other files a minimal RoR application would need. This secret usually is a 64 byte long random string and lives in railsapp/config/initializers/secret_token.rb. The simple problem is, that most developers are simply not aware of the confidentiality of this file, and in result they'll happly check it into Github or other online repositories."
+
+**** In Rails 2.3.xthis is stored in
+=config/environment.rb= 
+#+BEGIN_SRC ruby
+config.action_controller.session = {
+         :session_key => '_sis_session',
+         :secret      => 'blah-blah-blah....'
+}
+#+END_SRC
+** "How to exploit" summary
+1. With some luck - pass a parameter to a =find_by_*= method
+2. Make sure its a hash rather than a string
+3. Make sure its passing a hash where the keys are symbols rather than strings
+   1. With your knowledge of the session verification key, tamper with the cookie to set AuthLogic user_token to a symbol-key hash.
+** How much of a problem for MyNBCS at the moment:
+
+*The following does not include vendor/plugins usage of the methods*
+A quick scan of the app reveals the use of these dynamic find methods:
+*** grep =find_by_id=
+#+BEGIN_SRC bash
+hal@HAL9000:~/work/rails/hurricane/rails-sis$ grep -Rn "find_by_id" .
+./app/models/story.rb:73:    unless self.author_id? && self.author_type? && self.author_type.classify.constantize.find_by_id(self.author_id)
+./app/models/user.rb:349:      users = users.for_groups(Group.find_by_id(params[:group_id])) unless params[:group_id].blank?
+./app/models/user.rb:353:    users = users.for_cohorts(Cohort.find_by_id(params[:cohort_id])) unless params[:cohort_id].blank?
+./app/controllers/cards_controller.rb:50:        user_ids = User.for_groups(Group.find_by_id(params[:group_id])).collect{|u| u.id}
+./app/controllers/cards_controller.rb:53:          user_ids = User.for_cohorts(Cohort.find_by_id(params[:cohort_id])).collect{|u| u.id}
+./app/controllers/alerts_controller.rb:99:      @alert = @user.alerts.find_by_id(params[:id])
+#+END_SRC
+*** grep =find_by_=
+#+BEGIN_SRC bash
+hal@HAL9000:~/work/rails/hurricane/rails-sis$ grep -Rn "find_by_" .
+./management_scripts/tc_student_courses_import.rb:38:  user = User.find_by_schoolpro_id(tc_student_course['school_num'])
+./management_scripts/generate_moodle_export_csv.rb:105:    student_role = EnrolmentRole.find_by_code('student')
+./management_scripts/fix-course-levels-WR86532.rb:19:course = Course.find_by_name('5 Creative Arts')
+./management_scripts/fix-course-levels-WR86532.rb:21:bad_level = Level.find_by_name('Year 9')
+./management_scripts/fix-WR93481.rb:13:Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/fix-WR93481.rb:40:  groupids = Group.find_by_sql('select id from groups where academic_year_id=14').map{|g| g.id}
+./management_scripts/sp_student_process.rb:20:  Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_student_process.rb:45:  default_cohort_id = Cohort.find_by_graduating_year(9999).id
+./management_scripts/sp_student_process.rb:53:  nbcs_school = School.find_by_short_name('NBCS')
+./management_scripts/sp_student_process.rb:85:    user = User.find_by_schoolpro_id(sp_student_hashed[:schoolpro_id])
+./management_scripts/hurrimoodle.rb:137:        student_role = EnrolmentRole.find_by_code('student')
+./management_scripts/sp_subject_process.rb:11:Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_subject_process.rb:28:course_type = CourseType.find_by_permalink('subject')
+./management_scripts/sp_subject_process.rb:70:  course = Course.find_by_schoolpro_id(sp_course_hash[:schoolpro_id])
+./management_scripts/sp_class_process.rb:38:Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_class_process.rb:55:enrolment_role = EnrolmentRole.find_by_code('teacher')
+./management_scripts/sp_class_process.rb:88:#   t = User.staff.find_by_schoolpro_id(sp_group['Teacher_school_num'])
+./management_scripts/sp_class_process.rb:95:      t = User.staff.find_by_schoolpro_id(j.to_s)
+./management_scripts/sp_class_process.rb:102:  course = Course.find_by_schoolpro_id(course_id)
+./management_scripts/sp_class_process.rb:126:  group = course.groups.find_by_schoolpro_id(sp_group_hashed[:schoolpro_id])
+./management_scripts/sp_class_process.rb:144:     teacher = User.staff.find_by_schoolpro_id(sp_teacher_hashed[:schoolpro_id])
+./management_scripts/sp_class_process.rb:185:  t = User.staff.find_by_schoolpro_id(teacher_school_num)
+./management_scripts/sp_class_process.rb:222:      g = Group.find_by_schoolpro_id(c.to_s)
+./management_scripts/sp_class_process.rb:228:      e = Enrolment.find_by_group_id_and_user_id(g.id, t.id)
+./management_scripts/sp_class_process.rb:239:      g = Group.find_by_schoolpro_id(c.to_s)
+./management_scripts/sp_class_process.rb:247:      enrolment_to_activate = Enrolment.find_by_group_id_and_user_id(g.id, t.id)
+./management_scripts/sp_parent_process.rb:68:child_type = RelationshipType.find_by_code('child')
+./management_scripts/sp_parent_process.rb:69:parent_type = RelationshipType.find_by_code('parent')
+./management_scripts/sp_parent_process.rb:96:  Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_parent_process.rb:137:    student = User.students.find_by_schoolpro_id(sp_data['student_school_num'])
+./management_scripts/sp_parent_process.rb:161:      parent = User.find_by_schoolpro_id(sp_parent_hash[:schoolpro_id])
+./management_scripts/sp_parent_process.rb:277:          contact_card = parent.contact_cards.find_by_where('General details')
+./management_scripts/sp_parent_process.rb:307:    parent = User.find_by_schoolpro_id(p.split(':').last)
+./management_scripts/sp_parent_process.rb:308:    student = User.find_by_schoolpro_id(p.split(':').first) 
+./management_scripts/check_enrolment_expiry.rb:29:Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/run_generate_level_summary.rb:28:    pp self.reduce(report_cycle,0,[Level.find_by_name('Year 6')])
+./management_scripts/run_generate_level_summary.rb:66:    self.run 12,'/tmp',0,[Level.find_by_name('Year 6')]
+./management_scripts/sp_enrolment_process.rb:19:Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_enrolment_process.rb:54:enrolment_role = EnrolmentRole.find_by_code('student')
+./management_scripts/sp_enrolment_process.rb:80:  student = User.students.find_by_schoolpro_id(sp_enrolment['school_num'])
+./management_scripts/sp_enrolment_process.rb:81:  group = Group.find_by_schoolpro_id(sp_enrolment['ClassID'])
+./management_scripts/sp_enrolment_process.rb:122:  enrolment = student.enrolments.find_by_group_id_and_enrolment_role_id(group.id, enrolment_role.id)
+./management_scripts/sp_enrolment_process.rb:175:  s = User.students.find_by_schoolpro_id(student_school_pro)
+./management_scripts/sp_enrolment_process.rb:198:      g = Group.find_by_schoolpro_id(c)
+./management_scripts/sp_enrolment_process.rb:204:      e = Enrolment.find_by_group_id_and_user_id(g.id, s.id)
+./management_scripts/sp_enrolment_process.rb:217:      g = Group.find_by_schoolpro_id(c)
+./management_scripts/fix-group-enrolment-WR86530.rb:67:admin = User.find_by_login('catadmin')
+./management_scripts/fix-group-enrolment-WR86530.rb:71:u = User.find_by_login('14lp')
+./management_scripts/sp_comments_process.rb:20:  m = AlertCategory.find_by_name(category_name)
+./management_scripts/sp_comments_process.rb:59:  level = cat.alert_levels.find_by_value(level_value)
+./management_scripts/sp_comments_process.rb:138:  Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_comments_process.rb:155:  nbcs_school = School.find_by_short_name('NBCS')
+./management_scripts/sp_comments_process.rb:189:    reporter = User.find_by_login('catadmin')
+./management_scripts/sp_comments_process.rb:214:    user = User.find_by_schoolpro_id(schoolpro_id)
+./management_scripts/sp_comments_process.rb:224:    alert = Alert.find_by_sp_comment_id(commentID)
+./management_scripts/sp_staff_process.rb:18:  Authorization.current_user = User.find_by_login('catadmin')
+./management_scripts/sp_staff_process.rb:35:  nbcs_school = School.find_by_short_name('NBCS')
+./management_scripts/sp_staff_process.rb:73:    user = User.find_by_schoolpro_id(sp_staff_hash[:schoolpro_id])
+./management_scripts/sp_staff_process.rb:129:      if !sp_staff_contact_hash[:mobile].blank? && user.contact_cards.find_by_mobile(sp_staff_contact_hash[:mobile]).nil? then
+./db/fixtures/retired/05_cohorts.rb:14:  c.current_level = Level.find_by_schoolpro_code(grade_code) if grade_code
+./db/fixtures/retired/30_care_management.rb:5:admin_user = User.find_by_login('catadmin')
+./db/fixtures/retired/30_care_management.rb:22:  if i_type = IncidentType.find_by_name(ic[:incident_type])
+./db/fixtures/retired/30_care_management.rb:31:admin_user = User.find_by_login('catadmin')
+./db/fixtures/retired/12_relationships.rb:14:r1 = RelationshipType.find_by_code('parent')
+./db/fixtures/retired/12_relationships.rb:15:r2 = RelationshipType.find_by_code('child')
+./db/fixtures/retired/50_campuses.rb:5:Authorization.current_user = User.find_by_login('catadmin')
+./db/fixtures/retired/10_users.rb:9:u = User.find_by_login("catadmin")
+./db/fixtures/retired/10_users.rb:20:  if role = Role.find_by_code("admin")
+./db/fixtures/retired/01_core.rb:43:    level = Level.find_by_schoolpro_code(lev.to_s)
+./db/migrate/20110322034814_add_warning_learning_level_to_alert_levels.rb:10:    level.alert_category = AlertCategory.find_by_name('Learning')
+./db/migrate/20110322034814_add_warning_learning_level_to_alert_levels.rb:18:    AlertLevel.find_by_name('Warning Learning Level 1').destroy
+./db/migrate/20120229231750_add_alert_types.rb:93:    contact = AlertCategory.find_by_name('Contact')
+./db/migrate/20120229231750_add_alert_types.rb:96:    general = AlertCategory.find_by_name('General')
+./db/migrate/20090508044402_add_schools_to_staff_and_students.rb:5:    Authorization.current_user = User.find_by_login('catadmin')
+./features/support/paths.rb:49:    #     user_profile_path(User.find_by_login($1))
+./features/support/env.rb:13:Authorization.current_user = User.find_by_login('catadmin')
+./features/step_definitions/alerts_steps.rb:3:  Alert.make(:user => @student, :alert_level => alert_category.alert_levels.find_by_value(level))
+./stories/steps/user_steps.rb:33:    @user = User.find_by_login(login)
+./stories/steps/user_steps.rb:114:  @user = User.find_by_login(user_params['login'])
+./stories/steps/user_steps.rb:144:  @user = User.find_by_login(user_params['login'])
+./spec/blueprints.rb:149:  enrolment_role { EnrolmentRole.find_by_code('student') || EnrolmentRole.make }
+./spec/blueprints_helper.rb:7:  user.role_objs << (Role.find_by_code('admin') || Role.make(:admin))
+./spec/blueprints_helper.rb:75:  ac = AlertCategory.find_by_name(name) || AlertCategory.make(:name => name)
+./spec/blueprints_helper.rb:77:    level = ac.alert_levels.find_by_value(i) || AlertLevel.make(:alert_category => ac, :value => i)    
+./spec/models/card_spec.rb:120:    @student = User.find_by_ldap_source('student')
+./lib/ldap_conn.rb:47:    current_user = User.find_by_sp_user_id(full_user_hash[:sp_user_id])
+./lib/ldap_conn.rb:56:#    user = User.find_by_sp_user_id(user_hash[:sp_user_id])
+./lib/ldap.rb:168:    #    current_user = User.find_by_sp_user_id(full_user_hash[:sp_user_id])
+./lib/authenticated_system.rb:131:      user = cookies[:auth_token] && User.find_by_remember_token(cookies[:auth_token])
+./lib/tasks/delayed_job_status.rake:38:    user = User.find_by_login('catadmin')
+./lib/tasks/delayed_job_status.rake:39:    #user = User.find_by_login('14la')  # To test NotificationJob suppresses student emails.
+./config/authorization_rules.rb:243:                                             CardCategory.find_by_name('Commendation')
+./app/helpers/incidents_helper.rb:5:      IncidentIncidentCategory.find_by_incident_category_id(ci.to_i).destroy
+./app/models/staff_profile.rb:45:      for_enrolment_role(EnrolmentRole.find_by_code('teacher'))
+./app/models/timetable_course.rb:10:    #Course.find_by_short_name(self.code)
+./app/models/timetable_course.rb:11:    Course.for_level(self.level).find_by_short_name(self.code)
+./app/models/timetable_course.rb:15:    Group.find_by_short_name(self.code)
+./app/models/group_report.rb:60:    @crcc ||= self.group.course.campus_report_cycle_courses.find_by_campus_report_cycle_id(crc.id) 
+./app/models/group_report.rb:163:        crc = report_cycle.campus_report_cycles.find_by_campus_id(user.student_campus.id)
+./app/models/group_report.rb:165:        crcc = crc.campus_report_cycle_courses.find_by_course_id(self.group.course_id)
+./app/models/story.rb:73:    unless self.author_id? && self.author_type? && self.author_type.classify.constantize.find_by_id(self.author_id)
+./app/models/enrolment.rb:164:    if self.enrolment_role == EnrolmentRole.find_by_code('teacher')
+./app/models/report_cycle.rb:64:      crc = self.campus_report_cycles.find_by_campus_id(campus.id)
+./app/models/report_cycle.rb:80:    Enrolment.for_enrolment_role(EnrolmentRole.find_by_code('student')).
+./app/models/group.rb:147:    student_role_id = EnrolmentRole.find_by_code('student').id
+./app/models/group.rb:152:    enrolment_role = EnrolmentRole.find_by_code('student')
+./app/models/group.rb:170:    teacher_role_id = EnrolmentRole.find_by_code('teacher').id
+./app/models/group.rb:175:    teacher_role_id = EnrolmentRole.find_by_code('teacher').id
+./app/models/group.rb:181:    teacher_role = EnrolmentRole.find_by_code('teacher')
+./app/models/group.rb:186:    teacher_role = EnrolmentRole.find_by_code('teacher')
+./app/models/group.rb:190:  def self.find_by_timechart_code(code)
+./app/models/student_profile.rb:56:      for_enrolment_role(EnrolmentRole.find_by_code('student')).
+./app/models/student_profile.rb:71:      for_enrolment_role(EnrolmentRole.find_by_code('student')).
+./app/models/student_profile.rb:88:      crc = report_cycle.campus_report_cycles.find_by_campus_id(self.campus.id)
+./app/models/student_profile.rb:96:      crc = report_cycle.campus_report_cycles.find_by_campus_id(self.campus.id)
+./app/models/academic_year.rb:96:      l = Level.find_by_name(level_name)
+./app/models/academic_year.rb:197:            gsr = GroupStudentReport.find_by_student_and_group_and_report_cycle(student.id,group_id,rc.id)
+./app/models/card_category.rb:39:  COMMENDATION = CardCategory.find_by_name_and_moderation_required("Commendation", true)
+./app/models/student_report.rb:225:      for_enrolment_role(EnrolmentRole.find_by_code('student')).
+./app/models/user.rb:349:      users = users.for_groups(Group.find_by_id(params[:group_id])) unless params[:group_id].blank?
+./app/models/user.rb:353:    users = users.for_cohorts(Cohort.find_by_id(params[:cohort_id])) unless params[:cohort_id].blank?
+./app/models/user.rb:501:    find_by_sql('SELECT DISTINCT users.* FROM users
+./app/models/user.rb:1249:    while User.find_by_login(new_login)
+./app/models/user.rb:1283:    User.find_by_sql("SELECT DISTINCT(state) FROM users").collect{|u| u.state}
+./app/models/group_student_report.rb:82:      collect{|g| g.group_reports.find_by_report_cycle_id(self.report_cycle) }.compact.
+./app/models/group_student_report.rb:238:  def self.find_by_student_and_group_and_report_cycle( student_id , group_id , report_cycle_id )
+./app/models/card.rb:337:          card_card_action = CardCardAction.find_by_card_id_and_card_action_id(self.id, card_action.id)
+./app/models/card.rb:438:                  raise ActiveRecord::Rollback unless CardCardAction.find_by_card_id_and_card_action_id(self.id, attributes['card_action_id']).update_attributes(attributes)
+./app/models/card.rb:442:              raise ActiveRecord::Rollback unless CardCardAction.find_by_card_id_and_card_action_id(self.id, other_action.id).update_attributes(:completed_in_card_id => n_subcard.id, :completed => true)
+./app/models/card.rb:493:            user_card = UserCard.find_by_user_id_and_role(duc.id, method.to_s.singularize)
+./app/models/card.rb:515:          story = Story.find_by_user_id_and_author_type_and_author_id(student.user.id, self.class.name.to_s, self.id)
+./app/models/card.rb:531:        stories_to_delete = self.stories - self.students.map{|student| Story.find_by_user_id_and_author_type_and_author_id(student.user.id, self.class.name.to_s, self.id)}
+./app/views/cards/_form.html.erb:162:	            <% cca = CardCardAction.find_by_card_id_and_card_action_id(@card.id, card_card_action.object.card_action_id) %>
+./app/views/cards/_form.html.erb:176:			  <% cca = CardCardAction.find_by_card_id_and_card_action_id(@card.id, card_action.id) %>
+./app/views/cards/_form.html.erb:186:		  	<% cca = (@card.card_action_other.blank? ? nil : CardCardAction.find_by_card_id_and_card_action_id(@card.id, @card.card_action_other.id)) %>
+./app/views/report_cycles/_action_panel.html.erb:3:        <% crc = report_cycle.campus_report_cycles.find_by_campus_id(current_user.campus.id) # must exist if the above conds pass %>
+./app/views/report_cycles/_action_panel.html.erb:9:          <% student_report = current_user.student_profile.student_reports.find_by_campus_report_cycle_id(crc.id) %>
+./app/views/group_reports/index.html.erb:16:        <%= render :partial => 'group_report', :locals => {:group_report => group.group_reports.find_by_report_cycle_id(@report_cycle.id), :group => group} %>
+./app/views/group_reports/index.html.erb:28:        <% group_report = group.group_reports.find_by_report_cycle_id(@report_cycle.id) %>
+./app/views/student_reports/_group_student_reports.html.erb:90:                <% target = gsr.report_elements.targets.find_by_report_question_id(question.id) %>
+./app/views/student_reports/_group_student_reports.html.erb:105:                <% rating = gsr.report_elements.ratings.find_by_report_question_id(question.id) %>
+./app/views/student_reports/_group_student_reports_external.html.erb:29:                <% target = gsr.report_elements.targets.find_by_report_question_id(question.id) %>
+./app/views/student_reports/_group_student_reports_external.html.erb:44:                <% rating = gsr.report_elements.ratings.find_by_report_question_id(question.id) %>
+./app/views/report_targets/index.html.erb:29:      <% current_target = @user.report_targets.find_by_report_cycle_id_and_group_id_and_report_question_id(@report_cycle.id, @group.id, report_question.id) %>
+./app/views/report_targets/index.html.erb:40:            <% checked =  @user.report_targets.find_by_report_cycle_id_and_group_id_and_report_question_id_and_report_scale_level_id(@report_cycle.id, @group.id, report_question.id, report_scale_level.id).present?  %>
+./app/views/users/_timetable.html.erb:6:         <% group = groups.find_by_timechart_code(lesson.timetable_course.code) %>
+./app/views/users/_report_cycle.html.erb:9:        <% crc = report_cycle.campus_report_cycles.find_by_campus_id(@user.campus.id) # must exist if the above conds pass %>
+./app/views/users/_report_cycle.html.erb:15:        <% student_report = @user.student_profile.student_reports.find_by_campus_report_cycle_id(crc.id) %>
+./app/controllers/report_targets_controller.rb:21:        target = @user.report_targets.find_by_report_cycle_id_and_group_id_and_report_question_id(@report_cycle.id, @group.id, report_question.id)
+./app/controllers/course_types_controller.rb:17:    @course_type = CourseType.find_by_permalink(params[:id])
+./app/controllers/course_types_controller.rb:38:    @course_type = CourseType.find_by_permalink(params[:id])
+./app/controllers/course_types_controller.rb:61:    @course_type = CourseType.find_by_permalink(params[:id])
+./app/controllers/course_types_controller.rb:78:    @course_type = CourseType.find_by_permalink(params[:id])
+./app/controllers/groups_controller.rb:21:    student_role = EnrolmentRole.find_by_code('student')
+./app/controllers/groups_controller.rb:22:    teacher_role = EnrolmentRole.find_by_code('teacher')
+./app/controllers/cards_controller.rb:50:        user_ids = User.for_groups(Group.find_by_id(params[:group_id])).collect{|u| u.id}
+./app/controllers/cards_controller.rb:53:          user_ids = User.for_cohorts(Cohort.find_by_id(params[:cohort_id])).collect{|u| u.id}
+./app/controllers/courses_controller.rb:37:      @groups = @course.groups.for_academic_year(AcademicYear.find_by_short_name(params[:academic_year])).paginate(:page => params[:page])
+./app/controllers/courses_controller.rb:53:    @course.course_type = CourseType.find_by_permalink(params[:course_type])
+./app/controllers/courses_controller.rb:132:    @course_type = CourseType.find_by_permalink(params[:course_type]) unless params[:course_type].nil?
+./app/controllers/pages_controller.rb:20:    @page = Page.find_by_permalink(params[:id])
+./app/controllers/pages_controller.rb:42:    @page = Page.find_by_permalink(params[:id])
+./app/controllers/pages_controller.rb:65:    @page = Page.find_by_permalink(params[:id])
+./app/controllers/pages_controller.rb:82:    @page = Page.find_by_permalink(params[:id])
+./app/controllers/users_controller.rb:171:    @user = User.find_by_activation_code(params[:activation_code]) unless params[:activation_code].blank?
+./app/controllers/users_controller.rb:184:    @user = User.find_by_activation_code(params[:activation_code]) unless params[:activation_code].blank?
+./app/controllers/alerts_controller.rb:99:      @alert = @user.alerts.find_by_id(params[:id])
+#+END_SRC
+
+
+** Fixing This
+1. Upgrade to the latest Rails 3.x version.
+   - This solves everything, you don’t need to do anything else. =“find_by_*”= has been patched so that the first parameter may not be an options hash.
+2. Ensure that you only pass strings or integers to “find_by_*” methods, e.g. =find_by_name(params[:name].to_s)=.
+   - This requires changing all code, /including third party code/.
+   - Not recommended as we’ll likely overlook things.
+   - If you upgrade Rails, you don’t need to do this.
+3. Keep your session secret a secret.
+   - There may be other exploits depending on how our application uses =find_by_*= methods 
+4. Some horrible localised monkey patch of Active Record?
+   - Avoid the rest of upgrade but merely dynamically change Active Record - either in Rails setup code or with git patch
+
+** Cost
+1. Cost as described previously for upgrading
+   - a full Rails 3 upgrade approximately 1 month
+2. Not terribly labour intensive in terms of updating Catalyst generated code - about a day.
+   - However not really practical in terms of third party code - =vendor/plugins= and gems
+3. This is the default and thus doesn't require doing anything.
+   - However, although unlikely, other issues may exist where the app calls an ActiveRecord dynamic finder on a hash with symbol keys, depending on what the appis doing. Would need some scrutiny to check up on this.
+     - About a day for our code or less though third party code makes this a bit more complicated.
+4. Not huge. A couple of days to be reasonably careful but could do in a day probably. 
+   - /Ugly/ solution. Effectively forking Rails.
+
+** Bottom Line
+ - This is not an immediate threat because our application is not hosted on a public repository and our secret cookie session verification key is thus not publically accessible.
+ - There may be other exploitable options due to the way ActiveRecord dynamic finders work but this is the main one and it requires knowledge of the session verification key (and for the application to use AuthLogic).
+
+
+* I created a new student user for testing
+** Bruce Banner
+Preferred Name: Bruce
+First Name: Bruce
+Last Name: Banner
+Login: brucebanner
+LDAP source: student
+password: gammaguy
+Born: Feb 16 1997
+Email: bruce@desertbase.gov
+External Student ID: banner
+and another with a proper email address
+
+** Thor Odinson
+Preferred Name: Tho
+First Name: Thor
+Last Name: Odinson
+Login: odinson
+External Student ID: thorboy
+LDAP source: 
+password: forasgard
+Born: Jan 4 1962
+Email: hal@catalyst-au.net
+External Student ID: banner
+
+* I edited a students password so i can log in to their stuff
+First Name: Tamsin 
+Last Name: Broster
+Login: 12tbr
+External Student ID: 14815
+Password: gammaguy
+
+ - Password changes dont seem to do anything
+
+ - didnt work....
+ - sucks
+** Heres the output of development .log - bit weird
+#+BEGIN_VERSE
+//-HAL - 'NORMAL' FAILURE
+Processing SessionsController#create (for 192.168.124.169 at 2012-12-14 14:21:58) [POST]
+ I, [2012-12-14T14:21:58.283225 #4014]  INFO -- :   Parameters: {"password"=>"[FILTERED]", "authenticity_token"=>"7/YBYS6VQN6qYEmVSOu1DAevxqFY8pT79V3zPLbF9Z4=", "controller"=>"sessions", "login"=>"12tbr_hal", "action"=>"create",       "commit"=>"Log in"}
+ I, [2012-12-14T14:21:58.286287 #4014]  INFO -- : [AUTH] Login requested for login:12tbr_hal
+ I, [2012-12-14T14:21:58.286331 #4014]  INFO -- : [AUTH] trying internal auth...
+ D, [2012-12-14T14:21:58.288154 #4014] DEBUG -- : User Load (1.4ms)  SELECT * FROM "users" WHERE ("users"."login" = '12tbr_hal') AND (users.state = 'active') ORDER BY last_name, first_name LIMIT 1
+ I, [2012-12-14T14:21:58.291643 #4014]  INFO -- : [AUTH] internal refused; trying ldap auth...
+ D, [2012-12-14T14:21:58.294364 #4014] DEBUG -- : CACHE (0.0ms)  SELECT * FROM "users" WHERE ("users"."login" = '12tbr_hal') AND (users.state = 'active') ORDER BY last_name, first_name LIMIT 1
+ W, [2012-12-14T14:22:19.289811 #4014]  WARN -- : [AUTH][FAIL] Refusing login for user login:12tbr_hal
+ W, [2012-12-14T14:22:19.295764 #4014]  WARN -- : Failed login for '12tbr_hal' from 192.168.124.169 at Fri Dec 14 03:22:19 GMT 2012
+ I, [2012-12-14T14:22:19.297125 #4014]  INFO -- : Rendering template within layouts/login
+ I, [2012-12-14T14:22:19.297460 #4014]  INFO -- : Rendering sessions/new
+ D, [2012-12-14T14:22:19.305946 #4014] DEBUG -- : Rendered layouts/common/_ie6 (0.1ms)
+ D, [2012-12-14T14:22:19.305994 #4014] DEBUG -- : Rendered layouts/common/_head (5.8ms)
+ D, [2012-12-14T14:22:19.306205 #4014] DEBUG -- : Rendered layouts/common/_rails_env (0.0ms)
+ D, [2012-12-14T14:22:19.306820 #4014] DEBUG -- : Rendered layouts/common/_footer (0.4ms)
+ I, [2012-12-14T14:22:19.306976 #4014]  INFO -- : Completed in 21024ms (View: 11, DB: 2) | 200 OK [http://hurricane-dev/session]
+ W, [2012-12-14T14:28:18.936514 #4014]  WARN -- : DEPRECATION WARNING: Giving :session_key to SessionStore is deprecated, please use :key instead. (called from new at /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.14/lib/            action_controller/middleware_stack.rb:72)
+ D, [2012-12-14T14:28:18.944034 #4014] DEBUG -- : SQL (0.1ms)  SET client_min_messages TO 'panic'
+ D, [2012-12-14T14:28:18.944254 #4014] DEBUG -- : SQL (0.1ms)  SET standard_conforming_strings = on
+ D, [2012-12-14T14:28:18.944433 #4014] DEBUG -- : SQL (0.1ms)  SET client_min_messages TO 'notice'
+ I, [2012-12-14T14:28:19.203397 #4014]  INFO -- : 
+ 
+//-HAL - 'REALLY BAD' FAILURE
+ Processing SessionsController#create (for 192.168.124.169 at 2012-12-14 14:28:19) [POST]
+ I, [2012-12-14T14:28:19.203511 #4014]  INFO -- :   Parameters: {"password"=>"[FILTERED]", "authenticity_token"=>"7/YBYS6VQN6qYEmVSOu1DAevxqFY8pT79V3zPLbF9Z4=", "controller"=>"sessions", "login"=>"12tbr_hal", "action"=>"create",       "commit"=>"Log in"}
+ I, [2012-12-14T14:28:19.206417 #4014]  INFO -- : [AUTH] Login requested for login:12tbr_hal
+ I, [2012-12-14T14:28:19.206458 #4014]  INFO -- : [AUTH] trying internal auth...
+ F, [2012-12-14T14:28:19.440851 #4014] FATAL -- : 
+ NameError (undefined local variable or method `params' for #<Class:0x13345bf8>):
+   /usr/local/lib/ruby/gems/1.8/gems/mislav-will_paginate-2.2.3/lib/will_paginate/finder.rb:164:in `method_missing'
+   app/models/user.rb:365:in `authenticate'
+   app/controllers/sessions_controller.rb:31:in `create'
+   passenger (3.0.18) lib/phusion_passenger/rack/request_handler.rb:96:in `process_request'
+   passenger (3.0.18) lib/phusion_passenger/abstract_request_handler.rb:516:in `accept_and_process_next_request'
+   passenger (3.0.18) lib/phusion_passenger/abstract_request_handler.rb:274:in `main_loop'
+   passenger (3.0.18) lib/phusion_passenger/classic_rails/application_spawner.rb:321:in `start_request_handler'
+   passenger (3.0.18) lib/phusion_passenger/classic_rails/application_spawner.rb:275:in `send'
+#+END_VERSE
+** Nevermind thst heres why it didnt work
+
+
+* LDAP and logging in with students
+I changed a students password in my local database for testing purposes but could not log in.
+
+*The reason* - login is done via LDAP
+
+I will let Liuba explain. Liuba?
+#+BEGIN_VERSE
+<liuba> hal: I think for students logins the system should be using ldap, so if you change it in your database - it is invalid... is there any particular reason why you are not using dev/staging password? Have a look at app/models/user.rb in the authenticate method, I haven't updated my git repo for a while but the dev/staging password in my repo at the moment is 'taenk40Y'
+#+BEGIN_VERSE
+
+So there you have it - the password =taenk40Y= will log you in to *any* students profile/account. 
+
+Awesome!
+
+
+* W/R 203064  MyNBCS Enrolments with Moodle Broken
+Ok so check out this page:
+: https://mynbcs.nsw.edu.au/courses/487
+i.e. This is the output of 
+: {:controller=>"courses", :action=>"show"}
+
+
+** In =courses/show.html.erb= we get
+#+BEGIN_SRC web
+<% if @course.current? && !@course.moodle_short_names.blank? && @course.do_moodle? %>
+  <% @course.moodle_short_names_array.each do |moodle_short_name| %>
+  <div class="button_holder">
+    <%= link_to("#{moodle_short_name} page at #{@course.moodle_site.upcase}", "http://#{MOODLE_CONFIG[@course.moodle_site]["url"]}/jump/course.php?course_name=#{moodle_short_name}", :class => 'link_button') %>
+    &nbsp;
+    <%= link_to("Grades page at #{moodle_short_name}, #{@course.moodle_site.upcase}", "http://#{MOODLE_CONFIG[@course.moodle_site]["url"]}/jump/course.php?course_name=#{moodle_short_name}&grader=1", :class => 'link_button') %>
+    <%= link_to("My grades at #{moodle_short_name}, #{@course.moodle_site.upcase}", "http://#{MOODLE_CONFIG[@course.moodle_site]["url"]}/jump/course.php?course_name=#{moodle_short_name}&usergrades=1", :class => 'link_button') %>
+  </div>
+  <% end %>
+<% end %>
+#+END_SRC
+
+=courses_controller#show= is
+#+BEGIN_SRC ruby
+  def show
+    @course = Course.find(params[:id])
+    @course_type = @course.course_type
+    if params[:academic_year]
+      @groups = @course.groups.for_academic_year(AcademicYear.find_by_short_name(params[:academic_year])).paginate(:page => params[:page])
+    else
+      @groups = @course.groups.for_academic_years(AcademicYear.current).paginate(:page => params[:page])
+    end
+#+END_SRC
+
+So first test:
+: if @course.current? && !@course.moodle_short_names.blank? && @course.do_moodle?
+
+** In MyNBCS database, querying the courses table for course.id = 487
+#+BEGIN_VERSE
+mynbcs-rails-dev=# select * from courses where id=487;
+-[ RECORD 1 ]------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+id                 | 487
+name               | 11 Online Preliminary Software Design & Development
+short_name         | 11SDD-OL
+description        | Software Design and Development enhances the students knowledge, understanding, skills and values and the ability  to systematically solve problems through various software creation approaches. The aim is to promote flexible, intellectual, collaborative, social and ethical growth in students as they design software to meet the needs of users.
+position           | 487
+course_type_id     | 1
+do_moodle          | t
+moodle_site        | hsconline
+moodle_short_names | Y11 SDD 12, Y12 SDD 13
+schoolpro_id       | 2775
+schoolpro_visible  | t
+state              | 
+created_at         | 2009-01-24 05:44:50.054641
+updated_at         | 2012-09-21 02:47:24.554401
+care_group_course  | f
+#+END_VERSE
+
+** Looking at the source for page
+: https://mynbcs.nsw.edu.au/courses/487
+We can see that the links generated are pretty weird
+#+BEGIN_SRC web
+  <div class="button_holder">
+    <a href="http://hsconline.nsw.edu.au/jump/course.php?course_name=Y11 SDD 12" class="link_button">Y11 SDD 12 page at HSCONLINE</a>
+    &nbsp;
+    <a href="http://hsconline.nsw.edu.au/jump/course.php?course_name=Y11 SDD 12&amp;grader=1" class="link_button">Grades page at Y11 SDD 12, HSCONLINE</a>
+    <a href="http://hsconline.nsw.edu.au/jump/course.php?course_name=Y11 SDD 12&amp;usergrades=1" class="link_button">My grades at Y11 SDD 12, HSCONLINE</a>
+  </div>
+  
+  <div class="button_holder">
+    <a href="http://hsconline.nsw.edu.au/jump/course.php?course_name=Y12 SDD 13" class="link_button">Y12 SDD 13 page at HSCONLINE</a>
+    &nbsp;
+    <a href="http://hsconline.nsw.edu.au/jump/course.php?course_name=Y12 SDD 13&amp;grader=1" class="link_button">Grades page at Y12 SDD 13, HSCONLINE</a>
+    <a href="http://hsconline.nsw.edu.au/jump/course.php?course_name=Y12 SDD 13&amp;usergrades=1" class="link_button">My grades at Y12 SDD 13, HSCONLINE</a>
+  </div>
+#+END_SRC
+
+But the URL in moodle for Year 12 2012/2013 on =HSC-LearnOnline= for course =Y12 SDD 13= is:
+: http://hsconline.nsw.edu.au/course/view.php?id=617
+
+While the URL for Year 11 2012 aka =Y11 SDD 12= (same short Moodle code as the other one) is:
+: http://hsconline.nsw.edu.au/course/view.php?id=555
+
+** OK - on sopater (staging) logged into database =nbcs-hsconline-moodle-m2=
+: sudo su postgres -c "psql nbcs-hsconline-moodle-m2"
+#+BEGIN_VERSE
+nbcs-hsconline-moodle-m2=# select id, shortname, fullname from mdl_course WHERE id = 617;
+-[ RECORD 1 ]------------------------------------------
+id        | 617
+shortname | Y12 SDD 13
+fullname  | HSC Software Design & Development 2012/2013
+#+END_VERSE
+#+BEGIN_VERSE
+nbcs-hsconline-moodle-m2=# select id, shortname, fullname from mdl_course WHERE id = 555;
+-[ RECORD 1 ]-----------------------------------------------
+id        | 555
+shortname | Y11 SDD 12
+fullname  | Preliminary Software Design and Development 2012
+#+END_VERSE
+
+The field "idnumber" is not filled in for either record.
+
+
+* WR 203113 - Hiding Course Info from Students - To be Reversed when school starts
+Simple change to =app/view/user/show.html.erb= - check if student and dont display block of html if true
+
+** Testing on Production - Finding any students who actually are enrolled in current courses
+Courses only show up if they are active
+e.g.
+: @user.enrolments.active
+
+On philemon:
+: sudo script/console production
+
+: User.find(11069).enrolments.select { |en| en.active? }.any?
+
+This will find all students who have active enrolments for testing:
+
+: User.all.select { |u| u.enrolments.select { |en| en.active? }.any? }.collect { |u| u.id}
+
+*** works - it gives:
+#+BEGIN_VERSE
+[4942, 4441, 4003, 3939, 2496, 5421, 20753, 3756, 3757, 20171, 4994, 5126, 20851, 5422, 20650, 22341, 3622, 1628, 5188, 3854, 3779, 18554, 3840, 17275, 3839, 19631, 2969, 4625, 2913, 2914, 4665, 5381, 2680, 19436, 22344, 3147, 5380, 20308, 19013, 17654, 4835, 4834, 3898, 18883, 2166, 17010, 20838, 3572, 4118, 2643, 1967, 3821, 4073, 3800, 1683, 19050, 17520, 21814, 21086, 4940, 4939, 4938, 16995, 20065, 5428, 16994, 5429, 20928, 4001, 5387, 22489, 3600, 19616, 19753, 21767, 5011, 4349, 20692, 5433, 17658, 18182, 5283, 3247, 16834, 16835, 4738, 5045, 17626, 17627, 2948, 2947, 2936, 4104, 21165, 21164, 16964, 18995, 20804, 3251, 11089, 1777, 3380, 2233, 17570, 17569, 20009, 21620, 20047, 19177, 3921, 3906, 3922, 17003, 19345, 20884, 16812, 3055, 19463, 5299, 18599, 18598, 4668, 19, 18155, 17934, 5253, 22419, 1824, 4749, 16989, 5173, 16988, 17602, 21100, 5324, 21344, 3127, 21961, 2806, 3749, 17963, 21443, 3257, 2636, 17324, 3211, 22423, 18778, 18777, 5303, 20963, 3563, 3440, 18769, 4440, 16975, 16976, 5447, 17518, 3548, 5448, 17964, 21456, 5145, 17406, 17315, 18621, 5354, 22031, 2674, 17001, 1881, 22575, 2519, 3009, 22590, 18590, 1840, 5449, 3897, 11086, 19633, 5301, 4246, 20363, 1935, 4842, 22452, 5453, 5454, 17962, 4268, 22492, 17414, 22451, 2039, 18462, 19027, 19028, 5057, 5196, 17660, 17659, 17774, 5259, 18616, 18619, 18779, 2640, 1699, 3610, 21274, 5460, 17389, 17746, 18300, 5058, 5059, 17522, 17523, 11085, 5040, 2112, 2113, 3226, 20127, 17851, 5358, 3709, 5464, 18734, 3710, 22459, 4283, 4284, 20323, 20540, 20559, 18941, 2802, 1734, 17772, 16857, 4847, 4465, 22425, 17258, 5468, 3846, 2185, 5469, 3347, 17618, 3393, 4529, 5361, 17024, 5251, 3739, 3713, 4729, 4730, 323, 5376, 17811, 20027, 22343, 22548, 17770, 3923, 3924, 3998, 3999, 17622, 17621, 18791, 18790, 17858, 17468, 18768, 5415, 18666, 22071, 3289, 2830, 22491, 5136, 5137, 3006, 21386, 3957, 20362, 20361, 20360, 18836, 16965, 16962, 20961, 18993, 22553, 18122, 19598, 5396, 5397, 3862, 21099, 17741, 4877, 17965, 4132, 18153, 17021, 4241, 17020, 1773, 18395, 5475, 17334, 5051, 5246, 5245, 3310, 3311, 4178, 22322, 20433, 3109, 3132, 3131, 4793, 5104, 5105, 4280, 5479, 4005, 4083, 4084, 19634, 16890, 4886, 17857, 18391, 16958, 5143, 3116, 21854, 1996, 20825, 21873, 4070, 4071, 17702, 17703, 17701, 1789, 18593, 20584, 4063, 22051, 4062, 17318, 17708, 17966, 8, 7, 22169, 20571, 18083, 4363, 3463, 18864, 19526, 20305, 20306, 22509, 22324, 5490, 444, 2291, 2292, 22137, 1901, 1918, 17713, 22513, 1832, 17, 3817, 4144, 4145, 20746, 4059, 4057, 20937, 18393, 4933, 3658, 3657, 3079, 3080, 20786, 20784, 17548, 17549, 5003, 5254, 5228, 3946, 18886, 22373, 17917, 2269, 21653, 21654, 21436, 4376, 20106, 2251, 3424, 19804, 17971, 17613, 4257, 2672, 4985, 21011, 4163, 20572, 22328, 16992, 4679, 22062, 2718, 2719, 22157, 4924, 16861, 16860, 4341, 4932, 22596, 4096, 17970, 17277, 21119, 540, 5500, 22605, 19163, 17782, 5261, 5262, 5260, 17510, 22388, 4803, 4478, 563, 22460, 21083, 4409, 20015, 4410, 21458, 20516, 22154, 22156, 22155, 3716, 22161, 4775, 20354, 20927, 4857, 4856, 2905, 2906, 4848, 5346, 17338, 17004, 18869, 18877, 17012, 4783, 20195, 20194, 20542, 1640, 18458, 4823, 20568, 3872, 3873, 17541, 5508, 5510, 22594, 19147, 19146, 4418, 2733, 2387, 3207, 20181, 18150, 18161, 1821, 20654, 17417, 17639, 5388, 19962, 22342, 22458, 3785, 17748, 4875, 3035, 1870, 20854, 5522, 18731, 20805, 3656, 3885, 22595, 17514, 22327, 20738, 4872, 4873, 633, 2941, 17832, 17831, 22547, 22107, 19444, 19445, 19937, 20224, 4558, 18730, 18396, 17565, 17645, 4197, 17407, 17533, 17628, 3608, 4908, 5150, 4918, 4917, 18123, 19325, 19326, 2722, 17625, 2972, 2971, 2973, 16841, 17629, 5528, 4180, 13212, 1820, 1809, 18979, 20750, 20549, 20550, 666, 3706, 3967, 17940, 19611, 18595, 18596, 5399, 2031, 2289, 18750, 4302, 4301, 3632, 19892, 19891, 19893, 1833, 18186, 17948, 17949, 3861, 3719, 3718, 5123, 5122, 3374, 3488, 4928, 18792, 2712, 2711, 2714, 5530, 21448, 5360, 5270, 3354, 3994, 3993, 18925, 18926, 22032, 18733, 5272, 22603, 17589, 4850, 17813, 4903, 22081, 22079, 22375, 20882, 20300, 21036, 1868, 1869, 3331, 4832, 3187, 5537, 5197, 5202, 5198, 5538, 19705, 5095, 20136, 17663, 22421, 1805, 4967, 2577, 2576, 1948, 2949, 4281, 2480, 2479, 20958, 4660, 21005, 20083, 5544, 4960, 4818, 4817, 2458, 2457, 2456, 21038, 20295, 18551, 22420, 18989, 22450, 4644, 20997, 20366, 3727, 4054, 4053, 5545, 22326, 5547, 19778, 4294, 4293, 19878, 19809, 21298, 1680, 3646, 20745, 20594, 2541, 5182, 4146, 3896, 4025, 1624, 4483, 17566, 5256, 21185, 3655, 5039, 3654, 1625, 4900, 16972, 17681, 17680, 1781, 2851, 22416, 17704, 5153, 5552, 3362, 17938, 22346, 20752, 18146, 5417, 17006, 2513, 3936, 21073, 5009, 5555, 5556, 22417, 4391, 3940, 21874, 21936, 4017, 4018, 5138, 19928, 20160, 5389, 873, 2405, 1626, 1686, 5562, 4479, 1803, 22191, 4499, 16824, 18654, 18655, 22273, 19070, 19069, 4215, 17467, 17466, 1647, 1612, 18301, 22510, 22453, 3865, 17918, 21109, 17586, 1936, 18394, 2739, 21414, 5564, 20024, 20996, 4137, 4463, 4654, 2518, 2517, 4273, 17862, 17863, 18815, 19433, 18461, 5086, 16969, 16970, 19671, 19608, 17661, 4121, 4122, 2447, 940, 4396, 20788, 4910, 21764, 4786, 4785, 17017, 17016, 3687, 11070, 19599, 4320, 19215, 21014, 20396, 20397, 4678, 3810, 18793, 21459, 5293, 4002, 20217, 22325, 20827, 3990, 2483, 19101, 19848, 20573, 3259, 22112, 2383, 2384, 21071, 4532, 4520, 19053, 19208, 20695, 4528, 4466, 3238, 3237, 5328, 20797, 17476, 4640, 21085, 3838, 4642, 3837, 4739, 4740, 16865, 18132, 20121, 5047, 5046, 5048, 21040, 5580, 21160, 19873, 22192, 3702, 22323, 20661, 5581, 5320, 18751, 16952, 2148, 3849, 22427, 4502, 5125, 21104, 4535, 20880, 4051, 1665, 3201, 4796, 4050, 3370, 3371, 18007, 18006, 18005, 4758, 3814, 3813, 17525, 17524, 1966, 2701, 1866, 2219, 3308, 4406, 4947, 4366, 4365, 4393, 20232, 4085, 2723, 3470, 5595, 22345, 18646, 21752, 20923, 16804, 4385, 18923, 2771, 3956, 20894, 19573, 22347, 4868, 16806, 2469, 4736, 4737, 16808, 22592, 22376, 3125, 21297, 4201, 3742, 2582, 2581, 4534, 18839, 1115, 2836, 17706, 22349, 4183, 17707, 19740, 20272, 17458, 20159, 20744, 19451, 19450, 20751, 19851, 17273, 4487, 18097, 18721, 18177, 4248, 4319, 2018, 16966, 16967, 16968, 18873, 5135, 3841, 18129, 17919, 4867, 5142, 16950, 3951, 4963, 17501, 21230, 5141, 3609, 4386, 3763, 18784, 3762, 4909, 4922, 21321, 21295, 16951, 4494, 11071, 5605, 3942, 3969, 3970, 3920, 17972, 19773, 18944, 5129, 5127, 19142, 19143, 3276, 1839, 18901, 16866, 16872, 17973, 4488, 22351, 4090, 1177, 3197, 17597, 17596, 17675, 20010, 16823, 17464, 5607, 3978, 3977, 17257, 4664, 20574, 20552, 19161, 19162, 3666, 2514, 1192, 22422, 19447, 21417, 20148, 19605, 18689, 4400, 16949, 4399, 4430, 5344, 21935, 21933, 17630, 22486, 5609, 4862, 4866, 22483, 5611, 17619, 17620, 22512, 22454, 2460, 4827, 3520, 3521, 17737, 17738, 3624, 3623, 1932, 19956, 19955, 18881, 19803, 19802, 22487, 20971, 4250, 4251, 2654, 2655, 4402, 4403, 4401, 4530, 20353, 19344, 5355, 4503, 5264, 5265, 19575, 19574, 2417, 2419, 5617, 20840, 19093, 1259, 3519, 3631, 3630, 3910, 18534, 20691, 20808, 18533, 17655, 18147, 4655, 17764, 17765, 20264, 20263, 16859, 17469, 3271, 5621, 22152, 17714, 22153, 1621, 20656, 17683, 17684, 4750, 22424, 19164, 5623, 18948, 20850, 18306, 18947, 21394, 21985, 22511, 20280, 20279, 3722, 3721, 3138, 2489, 18297, 2310, 3751, 3145, 5322, 2688, 22377, 2687, 1326, 1788, 3439, 3437, 18072, 17742, 18173, 16900, 18174, 18438, 18437, 20659, 5151, 2276, 21013, 4929, 4930, 16822, 3471, 3915, 3229, 5148, 22456, 22139, 17924, 17387, 5637, 17388, 22429, 22378, 12, 18492, 22166, 3113, 4871, 18003, 4124, 4123, 18385, 3093, 3092, 4686, 21927, 1829, 1830, 16999, 4977, 20806, 20690, 18062, 3904, 3903, 4140, 19953, 19952, 4141, 17393, 17394, 20564, 20563, 4914, 17771, 20657, 4998, 4837, 5649, 4997, 21816, 22455, 5653, 4869, 5154, 1639, 1687, 4504, 1688, 22591, 19453, 21852, 17612, 4429, 5655, 22350, 19879, 20147, 4292, 4086, 4911, 4680, 4300, 3360, 3361, 22033, 20541, 20922, 18535, 20039, 4496, 4538, 4500, 5201, 22554, 19961, 2509, 20828, 17023, 4718, 18388, 18389, 20785, 4674, 4159, 3397, 5294, 17817, 3611, 4719, 4720, 3932, 4357, 4456, 5016, 20895, 22016, 20926, 5668, 5669, 3819, 1495, 2155, 5101, 4556, 5159, 5157, 4555, 5160, 5204, 4968, 3351, 21277, 19869, 4951, 4651, 17716, 17717, 5181, 5144, 5180, 2618, 1627, 16891, 17649, 17974, 20016, 5517, 15, 14, 3217, 3218, 20530, 19959, 19960, 19452, 4210, 18895, 4437, 19715, 4438, 22485, 22042, 17478, 4408, 4209, 4519, 17955, 5343, 5319, 4445, 22488, 4444, 19807, 19806, 4359, 4806, 2224, 5675, 17975, 17915, 5012, 4475, 17646, 2434, 2435, 4723, 22457, 3963, 3962, 3961, 4390, 4157, 4931, 5679, 5681, 17335, 18863, 1565, 22593, 5033, 5031, 5030, 5684, 18649, 18746, 18747, 3231, 5088, 20299, 20498, 17508, 17509, 17747, 4972, 4473, 4501, 22348, 5093, 5092, 5091, 16888, 4714, 2337, 2265, 2266, 20515, 17543, 17544, 20962, 18435, 5664]
+#+END_VERSE
+
+
+
+
+*** I am going to test 
+Leon Abe-Weatherhead
+id: 4942
+login: 14la
+external student id: 13726
+LDAP source: student
+email: 14la@student.nbcs.nsw.edu.au

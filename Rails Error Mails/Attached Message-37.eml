@@ -1,0 +1,248 @@
+Return-Path: <deploy@mynbcs.nsw.edu.au>
+X-Original-To: hurricane-app@catalyst.net.nz
+Delivered-To: danb@catalyst-au.net
+Received: from localhost (localhost [127.0.0.1])
+	by mail.catalyst.net.nz (Postfix) with ESMTP id 42BD632CAE
+	for <hurricane-app@catalyst.net.nz>; Wed, 24 Oct 2012 15:43:01 +1300 (NZDT)
+X-Virus-Scanned: Debian amavisd-new at catalyst.net.nz
+Received: from mail.catalyst.net.nz ([127.0.0.1])
+	by localhost (bertrand.catalyst.net.nz [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id vIa2RGfaYAAZ for <hurricane-app@catalyst.net.nz>;
+	Wed, 24 Oct 2012 15:42:58 +1300 (NZDT)
+Received: from smtp.catalyst-au.net (sabre120.anchor.net.au [202.4.229.177])
+	by mail.catalyst.net.nz (Postfix) with ESMTP id 4B57B32C97
+	for <hurricane-app@catalyst.net.nz>; Wed, 24 Oct 2012 15:42:58 +1300 (NZDT)
+Received: from philemon.nbcs.catalyst.net.nz (unknown [103.4.85.51])
+	by smtp.catalyst-au.net (Postfix) with ESMTPS id 0DB4322915
+	for <hurricane-app@catalyst.net.nz>; Wed, 24 Oct 2012 13:42:58 +1100 (EST)
+Received: from deploy by philemon.nbcs.catalyst.net.nz with local (Exim 4.71)
+	(envelope-from <deploy@mynbcs.nsw.edu.au>)
+	id 1TQqvq-0003xz-03
+	for hurricane-app@catalyst.net.nz; Wed, 24 Oct 2012 13:42:58 +1100
+Message-Id: <E1TQqvq-0003xz-03@philemon.nbcs.catalyst.net.nz>
+Date: Wed, 24 Oct 2012 13:42:57 +1100
+From: Hurricane App <hurricane-app@catalyst.net.nz>
+To: hurricane-app@catalyst.net.nz
+Subject: [MyNBCS Live Errors] cards#create (NoMethodError) "undefined method `additional' for nil:NilClass"
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+A NoMethodError occurred in cards#create:
+
+  undefined method `additional' for nil:NilClass
+  [RAILS_ROOT]/app/models/card_card_action.rb:7
+
+-------------------------------
+Request:
+-------------------------------
+
+  * URL       : https://mynbcs.nsw.edu.au/cards
+  * IP address: 10.20.0.68
+  * Parameters: {"commit"=>"Save", "card_participants_group_id"=>"", "action"=>"create", "authenticity_token"=>"6eEtQbNklZSMivlZiMMjyvvavEwZ1/VWnSyS+MJFzAo=", "role"=>"staff", "card"=>{"card_action_other"=>{"name"=>"", "id"=>""}, "title"=>"Foul/Abusive Language", "card_category_id"=>"21", "card_card_actions_attributes"=>{"6"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "11"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "7"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "12"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "8"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "13"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "9"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "14"=>{"card_action_id"=>"", "comp
+ leted"=>
+ "0", "card_id"=>"", "completed_in_card_id"=>""}, "15"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "0"=>{"card_action_id"=>"on", "completed"=>"1", "card_id"=>"", "completed_in_card_id"=>""}, "16"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "1"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "17"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "2"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "18"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "3"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "19"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "4"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}, "10"=>{"card_action_id"=>"", "com
+ pleted"=
+ >"0", "card_id"=>"", "completed_in_card_id"=>""}, "5"=>{"card_action_id"=>"", "completed"=>"0", "card_id"=>"", "completed_in_card_id"=>""}}, "notes"=>"Ross was warned once about swearing and, within 10 minutes, swore again loudly. I wrote this incident in his diary.", "review_notifiable"=>"hrappell@nbcs.nsw.edu.au", "occurred_at"=>"October 23, 2012", "highly_confidential"=>"0", "reporter_id"=>"20574", "parent_category_id"=>"4", "card_action_ids"=>[""], "students_attributes"=>{"0"=>{"role"=>"student", "user_id"=>"4928"}}, "review_date"=>""}, "card_participants_course_id"=>"", "controller"=>"cards", "card_participants_cohort_id"=>""}
+  * Rails root: /app/mynbcs/releases/20121003031454
+
+-------------------------------
+Session:
+-------------------------------
+
+  * session id: nil
+  * data: nil
+
+-------------------------------
+Environment:
+-------------------------------
+
+  * CONTENT_LENGTH                              : 13974
+  * CONTENT_TYPE                                : multipart/form-data; boundary=----WebKitFormBoundaryLPZguLaKxqfLuDWQ
+  * DOCUMENT_ROOT                               : /app/mynbcs/current/public
+  * HTTPS                                       : on
+  * HTTP_ACCEPT                                 : text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+  * HTTP_ACCEPT_CHARSET                         : ISO-8859-1,utf-8;q=0.7,*;q=0.3
+  * HTTP_ACCEPT_ENCODING                        : gzip,deflate,sdch
+  * HTTP_ACCEPT_LANGUAGE                        : en-US,en;q=0.8
+  * HTTP_CACHE_CONTROL                          : max-age=0
+  * HTTP_CONNECTION                             : keep-alive
+  * HTTP_COOKIE                                 : auth_token=; __utma=38424767.673315004.1327623326.1351032170.1351043621.144; __utmc=38424767; __utmz=38424767.1344912395.109.6.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); _sis_session=BAh7CjoQY2FyZF9zZWFyY2h7EDoNa2V5d29yZHMwOglwYWdlaQY6FWFjdGlvbl9jb21wbGV0ZWQwOg1ncm91cF9pZDA6G29jY3VycmVkX2F0X3NpbmNlX2RhdGUwOhxvY2N1cnJlZF9hdF9iZWZvcmVfZGF0ZTA6F3BhcmVudF9jYXRlZ29yeV9pZDA6DmNvaG9ydF9pZDA6GWNhcmRfc3ViY2F0ZWdvcnlfaWRzMDoOYWN0aW9uX2lkMDoMdXNlcl9pZDA6EF9jc3JmX3Rva2VuIjE2ZUV0UWJOa2xaU01pdmxaaU1Nanl2dmF2RXdaMS9WV25TeVMrTUpGekFvPToPc2Vzc2lvbl9pZCIlYWVmNzJmYWE3MWUyNzM2MzM2YmM4MzVjMDJlYmQ3M2YiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA7EGkCXlA%3D--edd7edbd3f135782e901175bb0660148c8deda8b
+  * HTTP_HOST                                   : mynbcs.nsw.edu.au
+  * HTTP_ORIGIN                                 : https://mynbcs.nsw.edu.au
+  * HTTP_REFERER                                : https://mynbcs.nsw.edu.au/cards
+  * HTTP_USER_AGENT                             : Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4
+  * PATH_INFO                                   : /cards
+  * QUERY_STRING                                : 
+  * REMOTE_ADDR                                 : 10.20.0.68
+  * REMOTE_PORT                                 : 50009
+  * REQUEST_METHOD                              : POST
+  * REQUEST_URI                                 : /cards
+  * SCRIPT_NAME                                 : 
+  * SCRIPT_URI                                  : https://mynbcs.nsw.edu.au/cards
+  * SCRIPT_URL                                  : /cards
+  * SERVER_ADDR                                 : 10.0.0.50
+  * SERVER_ADMIN                                : [no address given]
+  * SERVER_NAME                                 : mynbcs.nsw.edu.au
+  * SERVER_PORT                                 : 443
+  * SERVER_PROTOCOL                             : HTTP/1.1
+  * SERVER_SOFTWARE                             : Apache/2.2.14 (Ubuntu)
+  * SSL_TLS_SNI                                 : mynbcs.nsw.edu.au
+  * _                                           : _
+  * action_controller.request.path_parameters   : actioncreatecontrollercards
+  * action_controller.request.query_parameters  : 
+  * action_controller.request.request_parameters: commitSavecard_participants_group_idrolestaffauthenticity_token6eEtQbNklZSMivlZiMMjyvvavEwZ1/VWnSyS+MJFzAo=cardcard_action_othernameidcard_category_id21titleFoul/Abusive LanguagenotesRoss was warned once about swearing and, within 10 minutes, swore again loudly. I wrote this incident in his diary.card_card_actions_attributes11card_action_idcompleted0card_idcompleted_in_card_id6card_action_idcompleted0card_idcompleted_in_card_id12card_action_idcompleted0card_idcompleted_in_card_id7card_action_idcompleted0card_idcompleted_in_card_id13card_action_idcompleted0card_idcompleted_in_card_id8card_action_idcompleted0card_idcompleted_in_card_id14card_action_idcompleted0card_idcompleted_in_card_id9card_action_idcompleted0card_idcompleted_in_card_id15card_action_idcompleted0card_idcompleted_in_card_id16card_action_idcompleted0card_idcompleted_in_card_id0card_action_idoncompleted1card_idcompleted_in_card_id17card_action_idcompleted0card_idc
+ ompleted
+ _in_card_id1card_action_idcompleted0card_idcompleted_in_card_id18card_action_idcompleted0card_idcompleted_in_card_id2card_action_idcompleted0card_idcompleted_in_card_id19card_action_idcompleted0card_idcompleted_in_card_id3card_action_idcompleted0card_idcompleted_in_card_id10card_action_idcompleted0card_idcompleted_in_card_id4card_action_idcompleted0card_idcompleted_in_card_id5card_action_idcompleted0card_idcompleted_in_card_idoccurred_atOctober 23, 2012review_notifiablehrappell@nbcs.nsw.edu.auhighly_confidential0reporter_id20574parent_category_id4review_datestudents_attributes0rolestudentuser_id4928card_action_idscard_participants_course_idcard_participants_cohort_id
+  * action_controller.rescue.request            : #<ActionController::Request:0x8691240>
+  * action_controller.rescue.response           : #<ActionController::Response:0x868bea8>
+  * rack.errors                                 : #<IO:0xdd39c0>
+  * rack.input                                  : #<PhusionPassenger::Utils::RewindableInput:0x8786e98>
+  * rack.multiprocess                           : true
+  * rack.multithread                            : false
+  * rack.request.cookie_hash                    : __utma38424767.673315004.1327623326.1351032170.1351043621.144_sis_sessionBAh7CjoQY2FyZF9zZWFyY2h7EDoNa2V5d29yZHMwOglwYWdlaQY6FWFjdGlvbl9jb21wbGV0ZWQwOg1ncm91cF9pZDA6G29jY3VycmVkX2F0X3NpbmNlX2RhdGUwOhxvY2N1cnJlZF9hdF9iZWZvcmVfZGF0ZTA6F3BhcmVudF9jYXRlZ29yeV9pZDA6DmNvaG9ydF9pZDA6GWNhcmRfc3ViY2F0ZWdvcnlfaWRzMDoOYWN0aW9uX2lkMDoMdXNlcl9pZDA6EF9jc3JmX3Rva2VuIjE2ZUV0UWJOa2xaU01pdmxaaU1Nanl2dmF2RXdaMS9WV25TeVMrTUpGekFvPToPc2Vzc2lvbl9pZCIlYWVmNzJmYWE3MWUyNzM2MzM2YmM4MzVjMDJlYmQ3M2YiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA7EGkCXlA=--edd7edbd3f135782e901175bb0660148c8deda8b__utmc38424767__utmz38424767.1344912395.109.6.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not provided)auth_token
+  * rack.request.cookie_string                  : auth_token=; __utma=38424767.673315004.1327623326.1351032170.1351043621.144; __utmc=38424767; __utmz=38424767.1344912395.109.6.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); _sis_session=BAh7CjoQY2FyZF9zZWFyY2h7EDoNa2V5d29yZHMwOglwYWdlaQY6FWFjdGlvbl9jb21wbGV0ZWQwOg1ncm91cF9pZDA6G29jY3VycmVkX2F0X3NpbmNlX2RhdGUwOhxvY2N1cnJlZF9hdF9iZWZvcmVfZGF0ZTA6F3BhcmVudF9jYXRlZ29yeV9pZDA6DmNvaG9ydF9pZDA6GWNhcmRfc3ViY2F0ZWdvcnlfaWRzMDoOYWN0aW9uX2lkMDoMdXNlcl9pZDA6EF9jc3JmX3Rva2VuIjE2ZUV0UWJOa2xaU01pdmxaaU1Nanl2dmF2RXdaMS9WV25TeVMrTUpGekFvPToPc2Vzc2lvbl9pZCIlYWVmNzJmYWE3MWUyNzM2MzM2YmM4MzVjMDJlYmQ3M2YiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA7EGkCXlA%3D--edd7edbd3f135782e901175bb0660148c8deda8b
+  * rack.request.form_hash                      : commitSavecard_participants_group_idrolestaffauthenticity_token6eEtQbNklZSMivlZiMMjyvvavEwZ1/VWnSyS+MJFzAo=cardcard_action_othernameidtitleFoul/Abusive Languagecard_category_id21card_card_actions_attributes11card_action_idcompleted0card_idcompleted_in_card_id6card_action_idcompleted0card_idcompleted_in_card_id12card_action_idcompleted0card_idcompleted_in_card_id7card_action_idcompleted0card_idcompleted_in_card_id13card_action_idcompleted0card_idcompleted_in_card_id8card_action_idcompleted0card_idcompleted_in_card_id14card_action_idcompleted0card_idcompleted_in_card_id9card_action_idcompleted0card_idcompleted_in_card_id15card_action_idcompleted0card_idcompleted_in_card_id16card_action_idcompleted0card_idcompleted_in_card_id0card_action_idoncompleted1card_idcompleted_in_card_id17card_action_idcompleted0card_idcompleted_in_card_id1card_action_idcompleted0card_idcompleted_in_card_id18card_action_idcompleted0card_idcompleted_in_car
+ d_id2car
+ d_action_idcompleted0card_idcompleted_in_card_id19card_action_idcompleted0card_idcompleted_in_card_id3card_action_idcompleted0card_idcompleted_in_card_id10card_action_idcompleted0card_idcompleted_in_card_id4card_action_idcompleted0card_idcompleted_in_card_id5card_action_idcompleted0card_idcompleted_in_card_idnotesRoss was warned once about swearing and, within 10 minutes, swore again loudly. I wrote this incident in his diary.review_notifiablehrappell@nbcs.nsw.edu.auoccurred_atOctober 23, 2012highly_confidential0reporter_id20574parent_category_id4card_action_idsstudents_attributes0rolestudentuser_id4928review_datecard_participants_course_idcard_participants_cohort_id
+  * rack.request.form_input                     : #<PhusionPassenger::Utils::RewindableInput:0x8786e98>
+  * rack.request.query_hash                     : 
+  * rack.request.query_string                   : 
+  * rack.run_once                               : false
+  * rack.session                                : card_searchkeywordsgroup_idaction_completedpage1occurred_at_since_dateparent_category_idoccurred_at_before_datecard_subcategory_idscohort_idaction_iduser_id_csrf_token6eEtQbNklZSMivlZiMMjyvvavEwZ1/VWnSyS+MJFzAo=session_idaef72faa71e2736336bc835c02ebd73fflashuser_id20574
+  * rack.session.options                        : key_session_idhttponlytruepath/domainidaef72faa71e2736336bc835c02ebd73fexpire_after
+  * rack.url_scheme                             : https
+  * rack.version                                : 10
+  
+  * Process: 14627
+  * Server : philemon
+
+-------------------------------
+Backtrace:
+-------------------------------
+
+  [RAILS_ROOT]/app/models/card_card_action.rb:7
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:182:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:182:in `evaluate_method'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:196:in `should_run_callback?'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:180:in `any?'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:196:in `each'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:196:in `any?'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:196:in `should_run_callback?'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:166:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:90:in `run'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:90:in `each'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:90:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:90:in `run'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:276:in `run_callbacks'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/validations.rb:1098:in `valid_without_callbacks?'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/callbacks.rb:315:in `valid?'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/autosave_association.rb:249:in `association_valid?'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/autosave_association.rb:240:in `validate_collection_association'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/associations/association_collection.rb:369:in `method_missing_without_paginate'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/associations/association_proxy.rb:219:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/associations/association_proxy.rb:219:in `each'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/associations/association_proxy.rb:219:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/associations/association_proxy.rb:219:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/associations/association_collection.rb:369:in `method_missing_without_paginate'
+  /usr/local/lib/ruby/gems/1.8/gems/mislav-will_paginate-2.2.3/lib/will_paginate/finder.rb:164:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/autosave_association.rb:240:in `validate_collection_association'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/autosave_association.rb:173:in `validate_associated_records_for_card_card_actions'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:180:in `evaluate_method'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:180:in `evaluate_method'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:180:in `instance_eval'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:180:in `evaluate_method'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:166:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:90:in `run'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:90:in `each'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:90:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:90:in `run'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:276:in `run_callbacks'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/validations.rb:1098:in `valid_without_callbacks?'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/callbacks.rb:315:in `valid?'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/validations.rb:1077:in `save_without_dirty'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/dirty.rb:79:in `save_without_transactions'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/transactions.rb:229:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/transactions.rb:229:in `with_transaction_returning_status'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/database_statements.rb:136:in `transaction'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/transactions.rb:182:in `transaction'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/transactions.rb:228:in `with_transaction_returning_status'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/transactions.rb:196:in `save'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/transactions.rb:208:in `rollback_active_record_state!'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/transactions.rb:196:in `save'
+  [RAILS_ROOT]/app/models/card.rb:404:in `save_with_nested_attributes'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/database_statements.rb:136:in `transaction'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/transactions.rb:182:in `transaction'
+  [RAILS_ROOT]/app/models/card.rb:386:in `save_with_nested_attributes'
+  [RAILS_ROOT]/app/controllers/cards_controller.rb:136:in `create'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/mime_responds.rb:106:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/mime_responds.rb:106:in `respond_to'
+  [RAILS_ROOT]/app/controllers/cards_controller.rb:135:in `create'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:1331:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:1331:in `perform_action_without_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:617:in `call_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:638:in `run_before_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:206:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:206:in `around_proc'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:182:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:182:in `evaluate_method'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:184:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:635:in `run_before_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:615:in `call_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:610:in `perform_action_without_benchmark'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/benchmarking.rb:68:in `perform_action_without_rescue'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/core_ext/benchmark.rb:17:in `ms'
+  /usr/local/lib/ruby/1.8/benchmark.rb:308:in `realtime'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/core_ext/benchmark.rb:17:in `ms'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/benchmarking.rb:68:in `perform_action_without_rescue'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/rescue.rb:160:in `perform_action_without_flash'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/flash.rb:146:in `perform_action'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:532:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:532:in `process_without_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:606:in `process'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:391:in `process'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:386:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/routing/route_set.rb:437:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:87:in `dispatch'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:121:in `_call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:130:in `build_middleware_stack'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:29:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:29:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/query_cache.rb:34:in `cache'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:9:in `cache'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:28:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:361:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/haml-3.0.13/lib/sass/plugin/rack.rb:41:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/head.rb:9:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/methodoverride.rb:24:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/params_parser.rb:15:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/session/cookie_store.rb:93:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/failsafe.rb:26:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:106:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/rack/request_handler.rb:92:in `process_request'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_request_handler.rb:207:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:441:in `start_request_handler'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:381:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/utils.rb:252:in `safe_fork'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:377:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:163:in `start'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:222:in `start'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:253:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:126:in `lookup_or_add'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:247:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:80:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:246:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:145:in `spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:278:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/bin/passenger-spawn-server:61
+
+

@@ -1,0 +1,106 @@
+* How things are now
+** Current core environment
+ - We are on Rails 2.3.14 and Ruby 1.8.7
+ - There will be no more work done on either of these branches
+ - The Ruby/Rails world has moved on to Ruby 1.9 and Rails 3
+
+** Current Status with gems and Third Party code
+ - We have some old gems and we have some very old plugins.
+ - Plugins are no longer supported in Rails 3.
+ - Most have been updated since the apps release and many (but not all) of the plugins have been converted to gems.
+
+** General state of app
+ - large
+ - poorly documented
+ - Not many people who know it well
+ - Probably a bit too promiscuous with some faddish gems and DSLs
+   - Makes it harder to understand and upgrade
+
+* Biggest Upgrade Problems
+** What gems/plugins are we actually using?
+Its almost impossible to tell which gems/plugins are presently being used by the app without
+ - an extensive test suite
+   - (we dont have this)
+ - manually inspecting the entire thing
+   - time-consuming
+** Plug-ins suck for upgrading
+ - plugins are inherently harder to mange than gems
+   - no dependencies or even version info in many cases
+** Some plugins are heavily coupled with vital properties of the app such as security
+ - declarative-authorization, restful-authentication etc
+ - when things go wrong they may go really wrong
+** No way to know the subtle effects of changing 3rd Party Code
+ - without an extensive test suite
+ - or just to dive in and do it
+** Poor Documentation
+ - Again we arent quite sure how this works
+
+* What we just did
+** Upgraded Rails 1.8.7 Enterprise Edition from 2009 to 2012
+ -  Bug, performance, security improvements
+** Moved from Rails 2.3.4 to Rails 2.3.14
+ - We now have deprecation warnings for a lot of features that arent supported in Rails 3
+**  Upgraded rake to rake 9.0
+ - Similarly this gives us deprecation warnings for major changes that break after rake 10.0
+
+* What we should do?
+** Nothing?
+*** Pros
+ - Cheap
+ - low risk in short term
+ - At present the app works well enough with some occasional troubling bugs.
+ - Will probably continue to do /reasonably/ well so with maintenace for the near  future
+*** Cons
+ - long term dangers
+   - the longer we leave any updates the harder it becomes to make the leap.
+   - Rails 2.3 to 3 is a step but Rails 4 is coming next year
+*** At the least... 
+  - a few days of bug fixing is recommendable
+** "Half-Measure"
+*** Pros
+ - less risk
+ - less "make or break"
+*** Cons
+ - its a half-measure
+   - benefits may not fully materialize if a future upgrade does not take place
+*** Make some basic changes
+**** Use bundler to manage gems and plugins
+  - Its a Rails 3 necessity/standard
+    - Makes the app amenable to maintenace by rails devs
+  - Can be used to "pseudo-convert" plugins to gems
+  - Probably gets us halfways to a working Rails 3 upgrade
+  - Helps lock in versions and eliminate gem dependecy headaches.
+**** Get rid of deprecated features
+ - The recent upgardes help with this
+**** If not Bundler - eliminate/upgrade the oldest, most suspicious plugins
+ - There are other methods to quickly "upgrade" plugins
+** Full Rails 3 upgrade
+*** Pros
+ - The usual benefits of being in synch with the outside world
+ - Managing Rails 3 apps is easier 
+ - Future upgrades less painful
+   - the long term viability of the site benefits
+*** Cons
+ - Risky in terms of time and cost
+ - The app is large and not well understood by the current team
+*** What needs to be done for Rails 3
+   - Get rid of vendor plugins
+     - There are some /relatively/ low-effort ways to do this but its difficult to estimate how long this will take
+   - Some structural reshuffling
+     - Rails 3 has different way of managing javascript, css etc - asset pipeline
+
+* How long
+** ?
+ - Very dificult to say but....
+** A full Rails 3 upgrade
+ - probably about a month
+** Making things a bit more sane
+ - approximately 10-14 days?
+** The Minimum
+ - a few days to a week perhaps to patch some bugs
+
+* Final Thoughts
+** At the end of the day it depends how badly we/they want to upgrade
+ - Personally i would probably recommend the "half measure"
+   - try to elminate/update the worst 3rd party code without commiting to a full upgrade.
+

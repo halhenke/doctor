@@ -1,0 +1,195 @@
+Return-Path: <deploy@mynbcs.nsw.edu.au>
+X-Original-To: hurricane-app@catalyst.net.nz
+Delivered-To: danb@catalyst-au.net
+Received: from localhost (localhost [127.0.0.1])
+	by mail.catalyst.net.nz (Postfix) with ESMTP id 2D8E632C23
+	for <hurricane-app@catalyst.net.nz>; Fri, 15 Jun 2012 00:29:38 +1200 (NZST)
+X-Virus-Scanned: Debian amavisd-new at catalyst.net.nz
+Received: from mail.catalyst.net.nz ([127.0.0.1])
+	by localhost (bertrand.catalyst.net.nz [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id VHdotpGoxOdl for <hurricane-app@catalyst.net.nz>;
+	Fri, 15 Jun 2012 00:29:36 +1200 (NZST)
+Received: from JAMES.master.local (unknown [103.4.85.51])
+	by mail.catalyst.net.nz (Postfix) with ESMTPS id 9C89432C1C
+	for <hurricane-app@catalyst.net.nz>; Fri, 15 Jun 2012 00:29:36 +1200 (NZST)
+Received: from philemon.nbcs.catalyst.net.nz ([10.0.0.50]) by JAMES.master.local with Microsoft SMTPSVC(7.5.7601.17514);
+	 Thu, 14 Jun 2012 22:29:35 +1000
+Received: from deploy by philemon.nbcs.catalyst.net.nz with local (Exim 4.71)
+	(envelope-from <deploy@mynbcs.nsw.edu.au>)
+	id 1Sf9B9-0000bS-Qx
+	for hurricane-app@catalyst.net.nz; Thu, 14 Jun 2012 22:29:35 +1000
+Message-Id: <E1Sf9B9-0000bS-Qx@philemon.nbcs.catalyst.net.nz>
+Date: Thu, 14 Jun 2012 22:29:35 +1000
+From: Hurricane App <hurricane-app@catalyst.net.nz>
+To: hurricane-app@catalyst.net.nz
+Subject: [MyNBCS Live Errors] student_reports#bulk_actions (ActionView::MissingTemplate) "Missing template student_reports/bulk_actions.erb in view path
+	themes/nbcs/views:app/views:vendor/plugins/declarative_authorization/app/views"
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+X-OriginalArrivalTime: 14 Jun 2012 12:29:35.0812 (UTC) FILETIME=[5BD08840:01CD4A29]
+
+A ActionView::MissingTemplate occurred in student_reports#bulk_actions:
+
+  Missing template student_reports/bulk_actions.erb in view path themes/nbcs/views:app/views:vendor/plugins/declarative_authorization/app/views
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_view/paths.rb:66:in `find_template'
+
+-------------------------------
+Request:
+-------------------------------
+
+  * URL       : https://mynbcs.nsw.edu.au/student_reports/bulk_actions?care_group=7323&report_cycle=19
+  * IP address: 192.168.0.21
+  * Parameters: {"student_report_id"=>["20358", "20791", "20360", "20613", "20361", "20366", "20367", "20989", "20642", "20796", "20920", "20373"], "action"=>"bulk_actions", "authenticity_token"=>"c7RkSFDxCvh/5A8DhRN11SzY6WunUH84y7SpB63Xz8I=", "care_group"=>"7323", "bulk_action"=>"MG comments", "controller"=>"student_reports", "report_cycle"=>"19"}
+  * Rails root: /app/mynbcs/releases/20120523072238
+
+-------------------------------
+Session:
+-------------------------------
+
+  * session id: nil
+  * data: nil
+
+-------------------------------
+Environment:
+-------------------------------
+
+  * CONTENT_LENGTH                              : 451
+  * CONTENT_TYPE                                : application/x-www-form-urlencoded
+  * DOCUMENT_ROOT                               : /app/mynbcs/current/public
+  * HTTPS                                       : on
+  * HTTP_ACCEPT                                 : text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+  * HTTP_ACCEPT_LANGUAGE                        : en-us
+  * HTTP_CONNECTION                             : Keep-Alive
+  * HTTP_COOKIE                                 : __utma=38424767.860486195.1337570531.1339668405.1339671199.23; __utmb=38424767.55.10.1339671199; __utmc=38424767; __utmz=38424767.1339124936.16.4.utmcsr=portal.nbcs.nsw.edu.au|utmccn=(referral)|utmcmd=referral|utmcct=/; _sis_session=BAh7CjoMdXNlcl9pZGkCZxU6EF9jc3JmX3Rva2VuIjFjN1JrU0ZEeEN2aC81QThEaFJOMTFTelk2V3VuVUg4NHk3U3BCNjNYejhJPToPc2Vzc2lvbl9pZCIlZmM4ZjU4YjBiODg4OTU4ZGM1MWM1NWY4ZjQ4Y2Q5Zjg6EGNhcmRfc2VhcmNoexA7ADA6DWtleXdvcmRzMDoJcGFnZWkGOg1ncm91cF9pZDA6FWFjdGlvbl9jb21wbGV0ZWQwOhtvY2N1cnJlZF9hdF9zaW5jZV9kYXRlMDoXcGFyZW50X2NhdGVnb3J5X2lkMDocb2NjdXJyZWRfYXRfYmVmb3JlX2RhdGUwOhljYXJkX3N1YmNhdGVnb3J5X2lkczA6DmNvaG9ydF9pZDA6DmFjdGlvbl9pZDAiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA%3D--03b362bc2cf6b058d16bc0d5268b878597febe40; auth_token=
+  * HTTP_HOST                                   : mynbcs.nsw.edu.au
+  * HTTP_ORIGIN                                 : https://mynbcs.nsw.edu.au
+  * HTTP_REFERER                                : https://mynbcs.nsw.edu.au/report_cycles/19/student_reports?care_group_id=7323
+  * HTTP_REVERSE_VIA                            : PETER
+  * HTTP_USER_AGENT                             : Mozilla/5.0 (iPad; CPU OS 5_1_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B206 Safari/7534.48.3
+  * PATH_INFO                                   : /student_reports/bulk_actions
+  * QUERY_STRING                                : care_group=7323&report_cycle=19
+  * REMOTE_ADDR                                 : 192.168.0.21
+  * REMOTE_PORT                                 : 54135
+  * REQUEST_METHOD                              : POST
+  * REQUEST_URI                                 : /student_reports/bulk_actions?care_group=7323&report_cycle=19
+  * SCRIPT_NAME                                 : 
+  * SCRIPT_URI                                  : https://mynbcs.nsw.edu.au/student_reports/bulk_actions
+  * SCRIPT_URL                                  : /student_reports/bulk_actions
+  * SERVER_ADDR                                 : 10.0.0.50
+  * SERVER_ADMIN                                : [no address given]
+  * SERVER_NAME                                 : mynbcs.nsw.edu.au
+  * SERVER_PORT                                 : 443
+  * SERVER_PROTOCOL                             : HTTP/1.1
+  * SERVER_SOFTWARE                             : Apache/2.2.14 (Ubuntu)
+  * _                                           : _
+  * action_controller.request.path_parameters   : actionbulk_actionscontrollerstudent_reports
+  * action_controller.request.query_parameters  : care_group7323report_cycle19
+  * action_controller.request.request_parameters: student_report_id203582079120360206132036120366203672098920642207962092020373authenticity_tokenc7RkSFDxCvh/5A8DhRN11SzY6WunUH84y7SpB63Xz8I=bulk_actionMG comments
+  * action_controller.rescue.request            : #<ActionController::Request:0x8a3b530>
+  * action_controller.rescue.response           : #<ActionController::Response:0x8a3aec8>
+  * rack.errors                                 : #<IO:0x14d09a8>
+  * rack.input                                  : #<PhusionPassenger::Utils::RewindableInput:0x8a48280>
+  * rack.multiprocess                           : true
+  * rack.multithread                            : false
+  * rack.request.cookie_hash                    : __utma38424767.860486195.1337570531.1339668405.1339671199.23_sis_sessionBAh7CjoMdXNlcl9pZGkCZxU6EF9jc3JmX3Rva2VuIjFjN1JrU0ZEeEN2aC81QThEaFJOMTFTelk2V3VuVUg4NHk3U3BCNjNYejhJPToPc2Vzc2lvbl9pZCIlZmM4ZjU4YjBiODg4OTU4ZGM1MWM1NWY4ZjQ4Y2Q5Zjg6EGNhcmRfc2VhcmNoexA7ADA6DWtleXdvcmRzMDoJcGFnZWkGOg1ncm91cF9pZDA6FWFjdGlvbl9jb21wbGV0ZWQwOhtvY2N1cnJlZF9hdF9zaW5jZV9kYXRlMDoXcGFyZW50X2NhdGVnb3J5X2lkMDocb2NjdXJyZWRfYXRfYmVmb3JlX2RhdGUwOhljYXJkX3N1YmNhdGVnb3J5X2lkczA6DmNvaG9ydF9pZDA6DmFjdGlvbl9pZDAiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA=--03b362bc2cf6b058d16bc0d5268b878597febe40__utmb38424767.55.10.1339671199__utmc38424767__utmz38424767.1339124936.16.4.utmcsr=portal.nbcs.nsw.edu.au|utmccn=(referral)|utmcmd=referral|utmcct=/auth_token
+  * rack.request.cookie_string                  : __utma=38424767.860486195.1337570531.1339668405.1339671199.23; __utmb=38424767.55.10.1339671199; __utmc=38424767; __utmz=38424767.1339124936.16.4.utmcsr=portal.nbcs.nsw.edu.au|utmccn=(referral)|utmcmd=referral|utmcct=/; _sis_session=BAh7CjoMdXNlcl9pZGkCZxU6EF9jc3JmX3Rva2VuIjFjN1JrU0ZEeEN2aC81QThEaFJOMTFTelk2V3VuVUg4NHk3U3BCNjNYejhJPToPc2Vzc2lvbl9pZCIlZmM4ZjU4YjBiODg4OTU4ZGM1MWM1NWY4ZjQ4Y2Q5Zjg6EGNhcmRfc2VhcmNoexA7ADA6DWtleXdvcmRzMDoJcGFnZWkGOg1ncm91cF9pZDA6FWFjdGlvbl9jb21wbGV0ZWQwOhtvY2N1cnJlZF9hdF9zaW5jZV9kYXRlMDoXcGFyZW50X2NhdGVnb3J5X2lkMDocb2NjdXJyZWRfYXRfYmVmb3JlX2RhdGUwOhljYXJkX3N1YmNhdGVnb3J5X2lkczA6DmNvaG9ydF9pZDA6DmFjdGlvbl9pZDAiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA%3D--03b362bc2cf6b058d16bc0d5268b878597febe40; auth_token=
+  * rack.request.form_hash                      : student_report_id203582079120360206132036120366203672098920642207962092020373authenticity_tokenc7RkSFDxCvh/5A8DhRN11SzY6WunUH84y7SpB63Xz8I=bulk_actionMG comments
+  * rack.request.form_input                     : #<PhusionPassenger::Utils::RewindableInput:0x8a48280>
+  * rack.request.form_vars                      : authenticity_token=c7RkSFDxCvh%2F5A8DhRN11SzY6WunUH84y7SpB63Xz8I%3D&bulk_action=MG+comments&student_report_id%5B%5D=20358&student_report_id%5B%5D=20791&student_report_id%5B%5D=20360&student_report_id%5B%5D=20613&student_report_id%5B%5D=20361&student_report_id%5B%5D=20366&student_report_id%5B%5D=20367&student_report_id%5B%5D=20989&student_report_id%5B%5D=20642&student_report_id%5B%5D=20796&student_report_id%5B%5D=20920&student_report_id%5B%5D=20373
+  * rack.request.query_hash                     : care_group7323report_cycle19
+  * rack.request.query_string                   : care_group=7323&report_cycle=19
+  * rack.run_once                               : false
+  * rack.session                                : user_id5479_csrf_tokenc7RkSFDxCvh/5A8DhRN11SzY6WunUH84y7SpB63Xz8I=session_idfc8f58b0b888958dc51c55f8f48cd9f8card_searchuser_idpage1keywordsaction_completedgroup_idoccurred_at_since_dateoccurred_at_before_dateparent_category_idcohort_idcard_subcategory_idsaction_idflash
+  * rack.session.options                        : key_session_idhttponlytruepath/domainidfc8f58b0b888958dc51c55f8f48cd9f8expire_after
+  * rack.url_scheme                             : https
+  * rack.version                                : 10
+  
+  * Process: 2302
+  * Server : philemon
+
+-------------------------------
+Backtrace:
+-------------------------------
+
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_view/paths.rb:66:in `find_template'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:1389:in `default_template'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:905:in `render_without_benchmark'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/benchmarking.rb:51:in `render'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/core_ext/benchmark.rb:17:in `ms'
+  /usr/local/lib/ruby/1.8/benchmark.rb:308:in `realtime'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/core_ext/benchmark.rb:17:in `ms'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/benchmarking.rb:51:in `render'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:1326:in `default_render'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:1332:in `perform_action_without_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:617:in `call_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:638:in `run_before_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:189:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:189:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:635:in `run_before_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:615:in `call_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:638:in `run_before_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:206:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:206:in `around_proc'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:182:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:182:in `evaluate_method'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:184:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:635:in `run_before_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:615:in `call_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:610:in `perform_action_without_benchmark'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/benchmarking.rb:68:in `perform_action_without_rescue'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/core_ext/benchmark.rb:17:in `ms'
+  /usr/local/lib/ruby/1.8/benchmark.rb:308:in `realtime'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/core_ext/benchmark.rb:17:in `ms'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/benchmarking.rb:68:in `perform_action_without_rescue'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/rescue.rb:160:in `perform_action_without_flash'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/flash.rb:146:in `perform_action'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:532:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:532:in `process_without_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:606:in `process'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:391:in `process'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:386:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/routing/route_set.rb:437:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:87:in `dispatch'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:121:in `_call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:130:in `build_middleware_stack'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:29:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:29:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/query_cache.rb:34:in `cache'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:9:in `cache'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:28:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:361:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/haml-3.0.13/lib/sass/plugin/rack.rb:41:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/head.rb:9:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/methodoverride.rb:24:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/params_parser.rb:15:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/session/cookie_store.rb:93:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/failsafe.rb:26:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:106:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/rack/request_handler.rb:92:in `process_request'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_request_handler.rb:207:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:441:in `start_request_handler'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:381:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/utils.rb:252:in `safe_fork'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:377:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:163:in `start'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:222:in `start'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:253:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:126:in `lookup_or_add'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:247:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:80:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:246:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:145:in `spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:278:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/bin/passenger-spawn-server:61
+
+

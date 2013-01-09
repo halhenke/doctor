@@ -1,0 +1,209 @@
+Return-Path: <deploy@mynbcs.nsw.edu.au>
+X-Original-To: hurricane-app@catalyst.net.nz
+Delivered-To: danb@catalyst-au.net
+Received: from localhost (localhost [127.0.0.1])
+	by mail.catalyst.net.nz (Postfix) with ESMTP id D4A1B330B6
+	for <hurricane-app@catalyst.net.nz>; Wed, 17 Oct 2012 15:07:43 +1300 (NZDT)
+X-Virus-Scanned: Debian amavisd-new at catalyst.net.nz
+Received: from mail.catalyst.net.nz ([127.0.0.1])
+	by localhost (bertrand.catalyst.net.nz [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id zaakgsyYw82J for <hurricane-app@catalyst.net.nz>;
+	Wed, 17 Oct 2012 15:07:42 +1300 (NZDT)
+Received: from smtp.catalyst-au.net (sabre120.anchor.net.au [202.4.229.177])
+	by mail.catalyst.net.nz (Postfix) with ESMTP id 90945330B9
+	for <hurricane-app@catalyst.net.nz>; Wed, 17 Oct 2012 15:07:40 +1300 (NZDT)
+Received: from philemon.nbcs.catalyst.net.nz (unknown [103.4.85.51])
+	by smtp.catalyst-au.net (Postfix) with ESMTPS id 688BC22E05
+	for <hurricane-app@catalyst.net.nz>; Wed, 17 Oct 2012 13:07:40 +1100 (EST)
+Received: from deploy by philemon.nbcs.catalyst.net.nz with local (Exim 4.71)
+	(envelope-from <deploy@mynbcs.nsw.edu.au>)
+	id 1TOJ2q-0001Ae-6E
+	for hurricane-app@catalyst.net.nz; Wed, 17 Oct 2012 13:07:40 +1100
+Message-Id: <E1TOJ2q-0001Ae-6E@philemon.nbcs.catalyst.net.nz>
+Date: Wed, 17 Oct 2012 13:07:39 +1100
+From: Hurricane App <hurricane-app@catalyst.net.nz>
+To: hurricane-app@catalyst.net.nz
+Subject: [MyNBCS Live Errors] student_reports#show (ActionView::TemplateError) "SIGTERM"
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+A ActionView::TemplateError occurred in student_reports#show:
+
+  SIGTERM
+  On line #57 of app/views/student_reports/_group_student_reports.html.erb
+
+    54:       <table class="resource compact" style="<%= "width:#{table_width}"-%>">
+    55:         <tr>
+    56:           <%- questions.each do |question| -%>
+    57:             <th <%= 'colspan="2"' if (gsr.show_targets? && !question.prevent_targets?) && (gsr.show_ratings? && (permitted_to?(:view_draft, :student_reports) || student_report.report_cycle.released_to_parents?)) %> style="<%= "width:#{col_width}"-%>">
+    58:               <%= question.title -%>
+    59:             </th>
+    60:           <%- end %>
+
+    app/models/campus_report_cycle_course.rb:55:in `show_targets?'
+    app/models/group_student_report.rb:135:in `try'
+    app/models/group_student_report.rb:135:in `show_targets?'
+    app/views/student_reports/_group_student_reports.html.erb:57
+    app/views/student_reports/_group_student_reports.html.erb:56:in `each'
+    app/views/student_reports/_group_student_reports.html.erb:56
+    app/views/student_reports/_group_student_reports.html.erb:51:in `each'
+    app/views/student_reports/_group_student_reports.html.erb:51
+    app/views/student_reports/_group_student_reports.html.erb:25
+    haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+    app/views/student_reports/_show_internal.html.erb:47
+    haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+    app/views/student_reports/show.html.erb:2
+    haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+    haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+    app/controllers/student_reports_controller.rb:50:in `show'
+    app/controllers/student_reports_controller.rb:45:in `show'
+    haml (3.0.13) rails/lib/sass/plugin/rack.rb:41:in `call'
+    passenger (2.2.15) lib/phusion_passenger/rack/request_handler.rb:92:in `process_request'
+    passenger (2.2.15) lib/phusion_passenger/abstract_request_handler.rb:207:in `main_loop'
+    passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:441:in `start_request_handler'
+    passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:381:in `handle_spawn_application'
+    passenger (2.2.15) lib/phusion_passenger/utils.rb:252:in `safe_fork'
+    passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:377:in `handle_spawn_application'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:163:in `start'
+    passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:222:in `start'
+    passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:253:in `spawn_rails_application'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:126:in `lookup_or_add'
+    passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:247:in `spawn_rails_application'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:80:in `synchronize'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+    passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:246:in `spawn_rails_application'
+    passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:145:in `spawn_application'
+    passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:278:in `handle_spawn_application'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+
+-------------------------------
+Request:
+-------------------------------
+
+  * URL       : https://mynbcs.nsw.edu.au/student_reports/23058
+  * IP address: 10.6.0.56
+  * Parameters: {"action"=>"show", "id"=>"23058", "controller"=>"student_reports"}
+  * Rails root: /app/mynbcs/releases/20121003031454
+
+-------------------------------
+Session:
+-------------------------------
+
+  * session id: nil
+  * data: nil
+
+-------------------------------
+Environment:
+-------------------------------
+
+  * DOCUMENT_ROOT                               : /app/mynbcs/current/public
+  * HTTPS                                       : on
+  * HTTP_ACCEPT                                 : text/html, application/xhtml+xml, */*
+  * HTTP_ACCEPT_ENCODING                        : gzip, deflate
+  * HTTP_ACCEPT_LANGUAGE                        : en-AU
+  * HTTP_CACHE_CONTROL                          : no-cache
+  * HTTP_CONNECTION                             : Keep-Alive
+  * HTTP_COOKIE                                 : _sis_session=BAh7CToQX2NzcmZfdG9rZW4iMWJJZnJHaW96ci8rcTNtYjR1UjZ3ZmFYS3N4OWpld1huMC9LTnVMMkpWVVE9Og9zZXNzaW9uX2lkIiU5NDY0NDc0MWY5YWUzZGJiNzA2OTljYTU4ZTk1YjY2OSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNoSGFzaHsGOgtub3RpY2UiK1N0dWRlbnQgcmVwb3J0IHdhcyBzdWNjZXNzZnVsbHkgc2F2ZWQuBjoKQHVzZWR7BjsIRjoMdXNlcl9pZGkCaUM%3D--a984f833e32bffdbc1baaaea6affda9fceb9100d; __utma=38424767.1456230579.1350438628.1350438628.1350438628.1; __utmb=38424767.14.10.1350438628; __utmc=38424767; __utmz=38424767.1350438628.1.1.utmcsr=portal.nbcs.nsw.edu.au|utmccn=(referral)|utmcmd=referral|utmcct=/; auth_token=
+  * HTTP_HOST                                   : mynbcs.nsw.edu.au
+  * HTTP_REFERER                                : https://mynbcs.nsw.edu.au/student_reports/23058/group_student_reports/group/7258/new
+  * HTTP_USER_AGENT                             : Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)
+  * PATH_INFO                                   : /student_reports/23058
+  * QUERY_STRING                                : 
+  * REMOTE_ADDR                                 : 10.6.0.56
+  * REMOTE_PORT                                 : 50689
+  * REQUEST_METHOD                              : GET
+  * REQUEST_URI                                 : /student_reports/23058
+  * SCRIPT_NAME                                 : 
+  * SCRIPT_URI                                  : https://mynbcs.nsw.edu.au/student_reports/23058
+  * SCRIPT_URL                                  : /student_reports/23058
+  * SERVER_ADDR                                 : 10.0.0.50
+  * SERVER_ADMIN                                : [no address given]
+  * SERVER_NAME                                 : mynbcs.nsw.edu.au
+  * SERVER_PORT                                 : 443
+  * SERVER_PROTOCOL                             : HTTP/1.1
+  * SERVER_SOFTWARE                             : Apache/2.2.14 (Ubuntu)
+  * SSL_TLS_SNI                                 : mynbcs.nsw.edu.au
+  * _                                           : _
+  * action_controller.request.path_parameters   : actionshowid23058controllerstudent_reports
+  * action_controller.request.query_parameters  : 
+  * action_controller.request.request_parameters: 
+  * action_controller.rescue.request            : #<ActionController::Request:0x7d136a0>
+  * action_controller.rescue.response           : #<ActionController::Response:0x7d132e0>
+  * rack.errors                                 : #<IO:0xa989b8>
+  * rack.input                                  : #<PhusionPassenger::Utils::RewindableInput:0x7d14398>
+  * rack.multiprocess                           : true
+  * rack.multithread                            : false
+  * rack.request.cookie_hash                    : _sis_sessionBAh7CToQX2NzcmZfdG9rZW4iMWJJZnJHaW96ci8rcTNtYjR1UjZ3ZmFYS3N4OWpld1huMC9LTnVMMkpWVVE9Og9zZXNzaW9uX2lkIiU5NDY0NDc0MWY5YWUzZGJiNzA2OTljYTU4ZTk1YjY2OSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNoSGFzaHsGOgtub3RpY2UiK1N0dWRlbnQgcmVwb3J0IHdhcyBzdWNjZXNzZnVsbHkgc2F2ZWQuBjoKQHVzZWR7BjsIRjoMdXNlcl9pZGkCaUM=--a984f833e32bffdbc1baaaea6affda9fceb9100d__utma38424767.1456230579.1350438628.1350438628.1350438628.1__utmb38424767.14.10.1350438628__utmc38424767__utmz38424767.1350438628.1.1.utmcsr=portal.nbcs.nsw.edu.au|utmccn=(referral)|utmcmd=referral|utmcct=/auth_token
+  * rack.request.cookie_string                  : _sis_session=BAh7CToQX2NzcmZfdG9rZW4iMWJJZnJHaW96ci8rcTNtYjR1UjZ3ZmFYS3N4OWpld1huMC9LTnVMMkpWVVE9Og9zZXNzaW9uX2lkIiU5NDY0NDc0MWY5YWUzZGJiNzA2OTljYTU4ZTk1YjY2OSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNoSGFzaHsGOgtub3RpY2UiK1N0dWRlbnQgcmVwb3J0IHdhcyBzdWNjZXNzZnVsbHkgc2F2ZWQuBjoKQHVzZWR7BjsIRjoMdXNlcl9pZGkCaUM%3D--a984f833e32bffdbc1baaaea6affda9fceb9100d; __utma=38424767.1456230579.1350438628.1350438628.1350438628.1; __utmb=38424767.14.10.1350438628; __utmc=38424767; __utmz=38424767.1350438628.1.1.utmcsr=portal.nbcs.nsw.edu.au|utmccn=(referral)|utmcmd=referral|utmcct=/; auth_token=
+  * rack.request.query_hash                     : 
+  * rack.request.query_string                   : 
+  * rack.run_once                               : false
+  * rack.session                                : _csrf_tokenbIfrGiozr/+q3mb4uR6wfaXKsx9jewXn0/KNuL2JVUQ=session_id94644741f9ae3dbb70699ca58e95b669flashnoticeStudent report was successfully saved.user_id17257
+  * rack.session.options                        : key_session_idhttponlytruepath/domainid94644741f9ae3dbb70699ca58e95b669expire_after
+  * rack.url_scheme                             : https
+  * rack.version                                : 10
+  
+  * Process: 2272
+  * Server : philemon
+
+-------------------------------
+Backtrace:
+-------------------------------
+
+  On line #57 of app/views/student_reports/_group_student_reports.html.erb
+  
+      54:       <table class="resource compact" style="<%= "width:#{table_width}"-%>">
+      55:         <tr>
+      56:           <%- questions.each do |question| -%>
+      57:             <th <%= 'colspan="2"' if (gsr.show_targets? && !question.prevent_targets?) && (gsr.show_ratings? && (permitted_to?(:view_draft, :student_reports) || student_report.report_cycle.released_to_parents?)) %> style="<%= "width:#{col_width}"-%>">
+      58:               <%= question.title -%>
+      59:             </th>
+      60:           <%- end %>
+  
+      app/models/campus_report_cycle_course.rb:55:in `show_targets?'
+      app/models/group_student_report.rb:135:in `try'
+      app/models/group_student_report.rb:135:in `show_targets?'
+      app/views/student_reports/_group_student_reports.html.erb:57
+      app/views/student_reports/_group_student_reports.html.erb:56:in `each'
+      app/views/student_reports/_group_student_reports.html.erb:56
+      app/views/student_reports/_group_student_reports.html.erb:51:in `each'
+      app/views/student_reports/_group_student_reports.html.erb:51
+      app/views/student_reports/_group_student_reports.html.erb:25
+      haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+      app/views/student_reports/_show_internal.html.erb:47
+      haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+      app/views/student_reports/show.html.erb:2
+      haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+      haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+      app/controllers/student_reports_controller.rb:50:in `show'
+      app/controllers/student_reports_controller.rb:45:in `show'
+      haml (3.0.13) rails/lib/sass/plugin/rack.rb:41:in `call'
+      passenger (2.2.15) lib/phusion_passenger/rack/request_handler.rb:92:in `process_request'
+      passenger (2.2.15) lib/phusion_passenger/abstract_request_handler.rb:207:in `main_loop'
+      passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:441:in `start_request_handler'
+      passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:381:in `handle_spawn_application'
+      passenger (2.2.15) lib/phusion_passenger/utils.rb:252:in `safe_fork'
+      passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:377:in `handle_spawn_application'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:163:in `start'
+      passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:222:in `start'
+      passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:253:in `spawn_rails_application'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:126:in `lookup_or_add'
+      passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:247:in `spawn_rails_application'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:80:in `synchronize'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+      passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:246:in `spawn_rails_application'
+      passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:145:in `spawn_application'
+      passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:278:in `handle_spawn_application'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+
+

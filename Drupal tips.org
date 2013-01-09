@@ -1,0 +1,24 @@
+* Forms
+* Nodes
+
+You can use the whole node api/ecosystem
+of node_info
+node_form
+node_insert
+node_update
+node_load
+node_view
+
+To manage what happens with your extra fields that arent part of the node => {:title =>"title", :body => "body"}
+thing
+
+OR.....
+
+You can just have
+node_info
+node_form
+and
+node_submit
+and in node_submit you call node_save to create a new node and then directly edit your other tables....
+
+node_theme or themes in general are apparently pretty cool ways to get everything looking good.

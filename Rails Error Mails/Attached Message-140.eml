@@ -1,0 +1,192 @@
+Return-Path: <deploy@mynbcs.nsw.edu.au>
+X-Original-To: hurricane-app@catalyst.net.nz
+Delivered-To: danb@catalyst-au.net
+Received: from localhost (localhost [127.0.0.1])
+	by mail.catalyst.net.nz (Postfix) with ESMTP id 38E4D32AB7
+	for <hurricane-app@catalyst.net.nz>; Fri, 11 May 2012 12:14:17 +1200 (NZST)
+X-Virus-Scanned: Debian amavisd-new at catalyst.net.nz
+Received: from mail.catalyst.net.nz ([127.0.0.1])
+	by localhost (bertrand.catalyst.net.nz [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id FYyWIPl-fkNY for <hurricane-app@catalyst.net.nz>;
+	Fri, 11 May 2012 12:14:16 +1200 (NZST)
+Received: from JAMES.master.local (unknown [103.4.85.51])
+	by mail.catalyst.net.nz (Postfix) with ESMTPS id 53B023263D
+	for <hurricane-app@catalyst.net.nz>; Fri, 11 May 2012 12:14:13 +1200 (NZST)
+Received: from philemon.nbcs.catalyst.net.nz ([10.0.0.50]) by JAMES.master.local with Microsoft SMTPSVC(7.5.7601.17514);
+	 Fri, 11 May 2012 10:14:12 +1000
+Received: from deploy by philemon.nbcs.catalyst.net.nz with local (Exim 4.71)
+	(envelope-from <deploy@mynbcs.nsw.edu.au>)
+	id 1SSdUq-00082x-Nx
+	for hurricane-app@catalyst.net.nz; Fri, 11 May 2012 10:14:12 +1000
+Message-Id: <E1SSdUq-00082x-Nx@philemon.nbcs.catalyst.net.nz>
+Date: Fri, 11 May 2012 10:14:12 +1000
+From: Hurricane App <hurricane-app@catalyst.net.nz>
+To: hurricane-app@catalyst.net.nz
+Subject: [MyNBCS Live Errors] groups#show (ActionView::TemplateError) "undefined method `full_name' for nil:NilClass"
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+X-OriginalArrivalTime: 11 May 2012 00:14:12.0896 (UTC) FILETIME=[FE765A00:01CD2F0A]
+
+A ActionView::TemplateError occurred in groups#show:
+
+  undefined method `full_name' for nil:NilClass
+  On line #25 of app/views/enrolments/_enrolment.html.erb
+
+    22:   </td>
+    23:     <td class="last">
+    24:       <% if enrolment.for_external_student? %>
+    25:         <%= "#{enrolment.supervisions.collect{|s| link_to(s.supervisor.full_name, user_path(s.supervisor))}.to_sentence} <br/>" if enrolment.supervisions%>
+    26:         <%= link_to("Set / change", edit_enrolment_path(enrolment), :class => 'edit_link') if permitted_to?(:update, enrolment) %>
+    27:       <% elsif enrolment.for_internal_student? %>
+    28:         <%= link_to(enrolment.user.student_profile.care_teacher.full_name, user_path(enrolment.user.student_profile.care_teacher)) if enrolment.user.student_profile.care_teacher %>
+
+    app/views/enrolments/_enrolment.html.erb:25
+    /usr/local/lib/ruby/gems/1.8/gems/mislav-will_paginate-2.2.3/lib/will_paginate/finder.rb:164:in `method_missing'
+    app/views/enrolments/_enrolment.html.erb:25
+    haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+    app/views/groups/show.html.erb:64
+    app/views/groups/show.html.erb:44
+    haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+    haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+    app/controllers/groups_controller.rb:26:in `show'
+    haml (3.0.13) rails/lib/sass/plugin/rack.rb:41:in `call'
+    passenger (2.2.15) lib/phusion_passenger/rack/request_handler.rb:92:in `process_request'
+    passenger (2.2.15) lib/phusion_passenger/abstract_request_handler.rb:207:in `main_loop'
+    passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:441:in `start_request_handler'
+    passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:381:in `handle_spawn_application'
+    passenger (2.2.15) lib/phusion_passenger/utils.rb:252:in `safe_fork'
+    passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:377:in `handle_spawn_application'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:163:in `start'
+    passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:222:in `start'
+    passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:253:in `spawn_rails_application'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:126:in `lookup_or_add'
+    passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:247:in `spawn_rails_application'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:80:in `synchronize'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+    passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:246:in `spawn_rails_application'
+    passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:145:in `spawn_application'
+    passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:278:in `handle_spawn_application'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+    passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+
+-------------------------------
+Request:
+-------------------------------
+
+  * URL       : https://myscil.nsw.edu.au/groups/6976?page=3
+  * IP address: 10.12.0.54
+  * Parameters: {"action"=>"show", "id"=>"6976", "page"=>"3", "controller"=>"groups"}
+  * Rails root: /app/mynbcs/releases/20120508075739
+
+-------------------------------
+Session:
+-------------------------------
+
+  * session id: nil
+  * data: nil
+
+-------------------------------
+Environment:
+-------------------------------
+
+  * DOCUMENT_ROOT                               : /app/mynbcs/current/public
+  * HTTPS                                       : on
+  * HTTP_ACCEPT                                 : text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+  * HTTP_ACCEPT_ENCODING                        : gzip, deflate
+  * HTTP_ACCEPT_LANGUAGE                        : en-gb,en;q=0.5
+  * HTTP_CONNECTION                             : keep-alive
+  * HTTP_COOKIE                                 : __utma=130294931.1450941557.1319439200.1336608505.1336695229.9; __utmz=130294931.1319674716.3.3.utmcsr=hsconline.nsw.edu.au|utmccn=(referral)|utmcmd=referral|utmcct=/course/view.php; _sis_session=BAh7CToMdXNlcl9pZGkCkBU6EF9jc3JmX3Rva2VuIjFKYWlSd0QwTDRKSlp5c2JEQmhwVzU2eUEzSTJ1aUQ3bXFValhFOURGNVg0PToPc2Vzc2lvbl9pZCIlYmI5YWIzNGRiY2EwMDEwNTE3N2Q5ZTI5NTgzODgzN2YiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA%3D--70ddbf4d2d712020ebc37f54f6a8cbd99151e90b; __utmb=130294931.6.10.1336695229; __utmc=130294931; auth_token=
+  * HTTP_HOST                                   : myscil.nsw.edu.au
+  * HTTP_REFERER                                : https://myscil.nsw.edu.au/groups/6976
+  * HTTP_USER_AGENT                             : Mozilla/5.0 (Windows NT 6.1; rv:12.0) Gecko/20100101 Firefox/12.0
+  * PATH_INFO                                   : /groups/6976
+  * QUERY_STRING                                : page=3
+  * REMOTE_ADDR                                 : 10.12.0.54
+  * REMOTE_PORT                                 : 57679
+  * REQUEST_METHOD                              : GET
+  * REQUEST_URI                                 : /groups/6976?page=3
+  * SCRIPT_NAME                                 : 
+  * SCRIPT_URI                                  : https://myscil.nsw.edu.au/groups/6976
+  * SCRIPT_URL                                  : /groups/6976
+  * SERVER_ADDR                                 : 10.0.0.49
+  * SERVER_ADMIN                                : [no address given]
+  * SERVER_NAME                                 : myscil.nsw.edu.au
+  * SERVER_PORT                                 : 443
+  * SERVER_PROTOCOL                             : HTTP/1.1
+  * SERVER_SOFTWARE                             : Apache/2.2.14 (Ubuntu)
+  * SSL_TLS_SNI                                 : myscil.nsw.edu.au
+  * _                                           : _
+  * action_controller.request.path_parameters   : actionshowid6976controllergroups
+  * action_controller.request.query_parameters  : page3
+  * action_controller.request.request_parameters: 
+  * action_controller.rescue.request            : #<ActionController::Request:0x8cd3068>
+  * action_controller.rescue.response           : #<ActionController::Response:0x8cd2d98>
+  * rack.errors                                 : #<IO:0x1a419a0>
+  * rack.input                                  : #<PhusionPassenger::Utils::RewindableInput:0x8cd3d60>
+  * rack.multiprocess                           : true
+  * rack.multithread                            : false
+  * rack.request.cookie_hash                    : __utma130294931.1450941557.1319439200.1336608505.1336695229.9_sis_sessionBAh7CToMdXNlcl9pZGkCkBU6EF9jc3JmX3Rva2VuIjFKYWlSd0QwTDRKSlp5c2JEQmhwVzU2eUEzSTJ1aUQ3bXFValhFOURGNVg0PToPc2Vzc2lvbl9pZCIlYmI5YWIzNGRiY2EwMDEwNTE3N2Q5ZTI5NTgzODgzN2YiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA=--70ddbf4d2d712020ebc37f54f6a8cbd99151e90b__utmb130294931.6.10.1336695229__utmc130294931__utmz130294931.1319674716.3.3.utmcsr=hsconline.nsw.edu.au|utmccn=(referral)|utmcmd=referral|utmcct=/course/view.phpauth_token
+  * rack.request.cookie_string                  : __utma=130294931.1450941557.1319439200.1336608505.1336695229.9; __utmz=130294931.1319674716.3.3.utmcsr=hsconline.nsw.edu.au|utmccn=(referral)|utmcmd=referral|utmcct=/course/view.php; _sis_session=BAh7CToMdXNlcl9pZGkCkBU6EF9jc3JmX3Rva2VuIjFKYWlSd0QwTDRKSlp5c2JEQmhwVzU2eUEzSTJ1aUQ3bXFValhFOURGNVg0PToPc2Vzc2lvbl9pZCIlYmI5YWIzNGRiY2EwMDEwNTE3N2Q5ZTI5NTgzODgzN2YiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA%3D--70ddbf4d2d712020ebc37f54f6a8cbd99151e90b; __utmb=130294931.6.10.1336695229; __utmc=130294931; auth_token=
+  * rack.request.query_hash                     : page3
+  * rack.request.query_string                   : page=3
+  * rack.run_once                               : false
+  * rack.session                                : user_id5520_csrf_tokenJaiRwD0L4JJZysbDBhpW56yA3I2uiD7mqUjXE9DF5X4=session_idbb9ab34dbca00105177d9e295838837fflash
+  * rack.session.options                        : key_session_idhttponlytruepath/domainidbb9ab34dbca00105177d9e295838837fexpire_after
+  * rack.url_scheme                             : https
+  * rack.version                                : 10
+  
+  * Process: 29021
+  * Server : philemon
+
+-------------------------------
+Backtrace:
+-------------------------------
+
+  On line #25 of app/views/enrolments/_enrolment.html.erb
+  
+      22:   </td>
+      23:     <td class="last">
+      24:       <% if enrolment.for_external_student? %>
+      25:         <%= "#{enrolment.supervisions.collect{|s| link_to(s.supervisor.full_name, user_path(s.supervisor))}.to_sentence} <br/>" if enrolment.supervisions%>
+      26:         <%= link_to("Set / change", edit_enrolment_path(enrolment), :class => 'edit_link') if permitted_to?(:update, enrolment) %>
+      27:       <% elsif enrolment.for_internal_student? %>
+      28:         <%= link_to(enrolment.user.student_profile.care_teacher.full_name, user_path(enrolment.user.student_profile.care_teacher)) if enrolment.user.student_profile.care_teacher %>
+  
+      app/views/enrolments/_enrolment.html.erb:25
+      /usr/local/lib/ruby/gems/1.8/gems/mislav-will_paginate-2.2.3/lib/will_paginate/finder.rb:164:in `method_missing'
+      app/views/enrolments/_enrolment.html.erb:25
+      haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+      app/views/groups/show.html.erb:64
+      app/views/groups/show.html.erb:44
+      haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+      haml (3.0.13) rails/lib/haml/helpers/action_view_mods.rb:13:in `render'
+      app/controllers/groups_controller.rb:26:in `show'
+      haml (3.0.13) rails/lib/sass/plugin/rack.rb:41:in `call'
+      passenger (2.2.15) lib/phusion_passenger/rack/request_handler.rb:92:in `process_request'
+      passenger (2.2.15) lib/phusion_passenger/abstract_request_handler.rb:207:in `main_loop'
+      passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:441:in `start_request_handler'
+      passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:381:in `handle_spawn_application'
+      passenger (2.2.15) lib/phusion_passenger/utils.rb:252:in `safe_fork'
+      passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:377:in `handle_spawn_application'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:163:in `start'
+      passenger (2.2.15) lib/phusion_passenger/railz/application_spawner.rb:222:in `start'
+      passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:253:in `spawn_rails_application'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:126:in `lookup_or_add'
+      passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:247:in `spawn_rails_application'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:80:in `synchronize'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+      passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:246:in `spawn_rails_application'
+      passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:145:in `spawn_application'
+      passenger (2.2.15) lib/phusion_passenger/spawn_manager.rb:278:in `handle_spawn_application'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+      passenger (2.2.15) lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+
+

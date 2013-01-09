@@ -1,0 +1,321 @@
+#+TITLE: My Notes On Moodle & Devving It
+*Also see [[file:My%20Moodle-23%20Notes.org][My Notes on My Sample Moodle 2.3 Site]]*
+
+* Setting Up
+ - Pretty damn similar to Drupal
+ - Prob want to have logs in a specific directory e.g.
+: sudo mkdir /var/log/sitelogs/moodle-site-oua
+ - Grant group ownership to =www-data= and grant write permissions to group
+: sudo chown :www-data /var/log/sitelogs/moodle-site-oua
+: sudo chmod g+w /var/log/sitelogs/moodle-site-oua
+ - Also have "Data Directory" set to somewhere like 
+: sudo mkdir /var/lib/sitedata/moodle-site-oua
+ - Grant group ownership to =www-data= and grant write permissions to group
+:  sudo chown :www-data /var/lib/sitedata/moodle-site-oua
+ - Set up a user in postgres
+ - Set up a database in postgres
+ - Grant permissions on the database to that user
+ - Make the root of your Moodle installation writable by Moodle so your config file can be stored
+: sudo chown :www-data /home/hal/work/moodle/moodle-site-oua
+: sudo chmod g+w /home/hal/work/moodle/moodle-site-oua
+* HowTo
+** Internal functions for getting user data
+From grep:\\
+=$user = get_complete_user_data("username", "w3cvalidator")=
+=./lib/navigationlib.php:2223:            $user = $DB->get_record_sql($sql, array('userid' => (int)$user, 'contextlevel' => CONTEXT_USER), MUST_EXIST);=
+=./lib/navigationlib.php:2223:            $user = $DB->get_record_sql($sql, array('userid' => (int)$user, 'contextlevel' => CONTEXT_USER), MUST_EXIST);=
+=./lib/moodlelib.php:3976:    if (!$user = $DB->get_record('user', array('id'=>$user->id))) {=
+=./lib/moodlelib.php:4126:    if ($user = get_complete_user_data('username', $username, $CFG->mnet_localhost_id)) {=
+http://phpxref.com/xref/moodle/_functions/get_complete_user_data.html
+
+* Database stuff
+** "Data Manipulation API" vs "Data Definition API" usage
+*All Moodle 2.x stuff*
+** Data Manipulation API
+ - Manipulating data in the schema
+ - Methods belonging to =$DB= e.g.
+   - =$DB->get_record('user', array('id'=>'1'));=
+ - Parameters are strings - not XMLDB objects e.g.
+   - =$DB->update_record($table, $dataobject, $bulk=false)= can be called as
+   - =$DB->update_record('user', 'drupal_name')=
+** Data Definition API
+ - Defining the schema
+ - Methods belonging to =$dbman ~  $DB->get_manager()= e.g.
+   - =$dbman->field_exists($table, $field)=
+ - Parameters are XMLDB objects - not strings e.g.
+   - =$dbman->add_field($table, $field, $continue=true, $feedback=true)= must be called something like:
+#+BEGIN_SRC php
+  $table = new xmldb_table('user');
+  $field = new xmldb_field('drupal_name', XMLDB_TYPE_TEXT, 'small', null, null, null, null, 'username');
+  if (!$dbman->field_exists($table, $field)){
+    $dbman->add_field($table, $field);
+#+END_SRC php
+** Initial Definitions/Schema - with XMLDB
+XMLDB stores the database definition in an XML format that can be used to install Moodle on any database. Everywhere in Moodle now uses XMLDB.\\
+The XMLDB database definition is stored in the file db/install.xml. You can use a built-in XMLDB editor to create or edit any install.xml files.\\
+** Altering the Database/Schema - Moodle API
+ - Moodle functions for manipulating the database seem to be in ~lib/datalib.php~
+ - Actually maybe in ~./lib/dml/moodle_database.php~
+
+*** Online Docs
+Hmmm at any rate check here [[http://docs.moodle.org/dev/Data_definition_API][Data definition API]] \\
+And here [[http://docs.moodle.org/dev/XMLDB_editor][XMLDB editor]] \\
+DataManipulation API: http://docs.moodle.org/dev/Data_manipulation_API \\
+Here are API docs on =xmldb_field()= function for example: http://phpdocs.moodle.org/HEAD/default/xmldb_field.html
+*** xmldb_field()
+Constructor:\\
+ =xmldb_field __construct ( $name, [ $type = null], [ $precision = null], [ $unsigned = null], [ $notnull = null], [ $sequence = null], [ $default = null], [ $previous = null])=
+ - In this case the $previous parameter tells it which field in the table the new field should be placed after.
+
+** *Actually* for best examples of how to do this 
+check ~lib/db/upgrade.php~ where Moodle upgrades itself using XMLDB objects and proper functions. e.g.
+#+BEGIN_SRC php
+    if ($oldversion < 2012050300.03) {
+
+        // Define field coursedisplay to be added to course
+        $table = new xmldb_table('course');
+        $field = new xmldb_field('coursedisplay', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'completionnotify');
+
+        // Conditionally launch add field coursedisplay
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+#+END_SRC php
+** grep get_record
+#+BEGIN_SRC bash
+hal@HAL9000:~/work/test-sites/my-moodle-23$ grep -Rc "function get_record" . | grep -v :0
+grep: ./config.php: Permission denied                                                                                                                                                                                                     
+./mod/quiz/report/statistics/tests/statistics_test.php:1                                                                                                                                                                                  
+grep: ./local/drupal_name/.#version.php: No such file or directory                                                                                                                                                                        
+./question/category_class.php:1                                                                                                                                                                                                           
+./lib/completion/data_object.php:1
+./lib/listlib.php:1
+./lib/filelib.php:1
+./lib/grade/grade_object.php:1
+./lib/dml/mssql_native_moodle_database.php:4
+./lib/dml/moodle_database.php:26
+./lib/dml/sqlsrv_native_moodle_database.php:4
+./lib/dml/pdo_moodle_database.php:4
+./lib/dml/tests/dml_test.php:2
+./lib/dml/oci_native_moodle_database.php:5
+./lib/dml/mysqli_native_moodle_database.php:5
+./lib/dml/pgsql_native_moodle_database.php:4
+#+END_SRC bash
+
+* Change Database Stuff With A Module
+ - Use a local Module
+ - You may have to use an install.xml definition....but you seem to be able to do it imperitavely in code
+ - However if you use xml/xmldb declarative definition Moodle will automatically undo the changes upon uninstallation of your plugin.
+ - Otherwise you will have to create an uninstall.php script yourself to do this.
+
+** Using the Data definition API functions (e.g. =$dbman->table_exists($table)= etc)
+ - The tables and fields must be proper XMLDB objects created such as this:
+#+BEGIN_SRC php
+  $table = new xmldb_table('user');
+  $field = new xmldb_field('drupal_name', XMLDB_TYPE_TEXT, 'small', null, null, null, null, 'username');
+#+END_SRC php
+ - i.e. you cant just add a field to a  table like this:
+#+BEGIN_SRC php
+  if (!$dbman->field_exists('user', $field))
+    $dbman->add_field('user', $field);
+#+END_SRC php
+
+*** Limitations & Advantages of install.xml
+ - It automatically installs and deletes tables at installation and uninstallation of a module
+ - You cant actually alter an existing table.....
+ - so this didnt work at all:
+#+BEGIN_SRC xml
+    <TABLE NAME="user" COMMENT="Hope this adds a field to the moodle user table. Hmmmmm." PREVIOUS="hulk_take_two">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="drupal_name"/>
+        <FIELD NAME="drupal_name" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="For storing any drupal screen names." PREVIOUS="id"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>  
+#+END_SRC xml
+* Turn on Error Reporting
+ - Perhaps with something on Admin portion of site
+ - or just add something like:
+#+BEGIN_SRC php
+$CFG->debug = 6143; 
+$CFG->debugdisplay = 1;
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+//error_reporting(E_ALL | E_STRICT);
+#+END_SRC php
+ - to your config.php file
+* Installing a module
+ - Go to Admin Notification page
+ - It will tell you about the thing
+ - If you just go straight to Plugin->Management it wont give you the option to install
+
+* Logging errors
+=file_put_contents(file,data,mode,context)=
+or just =print_r=
+=mixed print_r ( mixed $expression [, bool $return = false ] )=
+or append to some local file....
+* Brendans code to add stuff to the database
+
+Adds key value info about users etc IIRC was going to get it to store drupal screennames rather than in a new column in the user table.
+
+#+BEGIN_SRC php
+$field = new Object();
+$field->required    = "1";
+$field->visible     = "1";
+$field->signup      = "1";
+$sortorder = 1;
+
+$field->sortorder   = $sortorder++;
+$field->shortname   = "drupal_name";
+$field->name        = "drupal_screen_name";
+$field->datatype    = "text";
+$field->description = "";
+$field->required    = "1";
+$field->param1      = "1920";
+$field->param2      = "2020";
+upsert_record('user', 'shortname', $field);
+
+
+function upsert_record($table, $key, $data){
+
+	$keyval = $data->$key;
+#	echo "Table '$table' Key '$key' Keyval '$keyval' \n";
+
+	$record = get_record($table, $key, $keyval);
+	// add some stuff right merge
+	$merged = (object) array_merge((array) $record, (array) $data);
+#	echo "RECORD\n";
+#	var_dump($record);
+#	echo "DATA\n";
+#	var_dump($data);
+#	echo "MERGED\n";
+#	var_dump($merged);
+	if ($record){
+#		echo "UPDATE\n";
+		if(!update_record($table, $merged)){
+			echo "Error updating $table! ";
+			var_dump($record);
+		}
+		return $merged->id;
+	} else {
+#		echo "INSERT\n";
+		$id = insert_record($table, $merged, true);
+		if(!$id){
+			echo "Error inserting $table! ";
+			var_dump($record);
+		}
+		return $id;
+	}
+}
+#+END_SRC php
+
+* Troubleshooting/Debugging Tips
+** If you get a =plugin_install_exception= (?) when trying to install a block/plugin
+Check that you have
+#+BEGIN_SRC php
+<?php
+#+END_SRC
+on the first line of every file in your plugin/block...
+
+** Couldn't get iframes to open the right URL
+If i had an iframe on my my Moodle page - URL
+: http://my-moodle-23/my/
+and the iframe was 
+#+BEGIN_SRC php
+     $twit_string = '<iframe src=”http://my-moodle-23/blocks/twitter_feed/twitter.html” frameborder=”0″ height=”420″ width=”100%”></iframe>';
+#+END_SRC
+It would link to the URL
+: http://my-moodle-23/my/%E2%80%9Dhttp://my-moodle-23/blocks/twitter_feed/twitter.html%E2%80%9D
+i.e.
+: http://my-moodle-23/my/”http://my-moodle-23/blocks/twitter_feed/twitter.html”
+instead of 
+: http://my-moodle-23/blocks/twitter_feed/twitter.html
+
+Seems it was to do with the weird quotation marks i had picked up from somewhere....\\
+i.e. this worked
+#+BEGIN_SRC php
+     $twit_string = '<iframe src="http://my-moodle-23/blocks/twitter_feed/twitter.html" frameborder=”0″ height=”420″ width=”100%”></iframe>';
+#+END_SRC
+
+** Fiddle with debug settings to display error messages and also check the logs
+
+** If you want to quickly dump an array to the output as a string use 'serialize'
+: serialize($rs)
+** Some of the Moodle methods which return arrays from the database do not return arrays indexed by any sane method
+#+BEGIN_SRC
+       $query = 'select u.id as id, firstname, lastname, picture, imagealt, email from mdl_role_assignments as a, mdl_user as u where contextid=' . $context->id . ' and roleid=5 and a.userid=u.id;';
+    $rs = $DB->get_records_sql( $query ); 
+    foreach ($rs as $key=>$value)
+	echo $key . ", ";
+#+END_SRC
+This outputs
+: 7, 3, 6, 5, 4
+instead of 
+: 0, 1, 2, 3, 4
+
+** Style/display changes wont show up
+ - If you cant see changes you have made, particularly if you have added a =styles.css= file to a block then you may want to [[*Clearing%20Purging%20the%20cache][Clear the cache]] 
+* Javascript Stuff
+** Script sources being linked to with double forward slashes
+If something has the format 
+#+BEGIN_SRC HTML
+ <script type="text/javascript" src="//platform.twitter.com/widgets.js"></script> 
+#+END_SRC
+its because the double forward slash =//= is necessary to indicate that should load from another site
+
+* My local OUA Site
+** Login
+Username: hal
+Password: Moodle-4-Life
+** Users
+darklord
+Sith-Number-2
+-------
+bundmeister
+NotGuilty!99
+-------
+bestprez
+Air-Force-1
+-------
+genghis
+Mongol-8-r
+-------
+randomguy
+4theHellOfIt!
+-------
+** The "Enrolled Students Block" job
+Got a lot of code from here:
+http://moodlever.blogspot.com.au/2011/01/how-to-get-student-list-of-course.html
+
+* Rendering HTML
+** The OUTPUT global/ API
+Moodle has convenience methods for outputting HTML a la Rails
+: <%= link_to %>
+
+ - Before Moodle 2.0 i think this all used to happen with the use of the =$OUTPUT= global/module
+#+BEGIN_SRC php
+global $OUTPUT; 
+echo $OUTPUT->user_picture($r, array('size' => 50, 'courseid'=>$COURSE->id)); 
+#+END_SRC
+ - Now though I think you are supposed to get/set the OUTPUT not from the global =$OUTPUT= variable but like so
+#+BEGIN_SRC php
+global $PAGE; // If necessary.
+$wsoutput = $PAGE->theme->get_renderer('mod_workshop', $PAGE);
+echo $wsoutput->manual_allocation_interface($workshop, $allocationdata);
+#+END_SRC
+
+** The PAGE global/API
+#+BEGIN_VERSE
+For every page request Moodle sets up a couple of global structures that you will likely need. $DB the database object, and $CFG which stores configuration are two that you are likely already aware of. $PAGE is the focus of this article, it is a moodle_page instance that stores all of the information and is used by the output library $OUTPUT when displaying the page.
+It's important to note the difference between $PAGE and $OUTPUT, $PAGE is for setting up the page and $OUTPUT is for displaying the page. $PAGE contains lots of logic and magic, $OUTPUT is purely about display and does little more than produce HTML.
+#+END_VERSE
+
+
+* Clearing/Purging the cache
+Go to 
+: Site Administration -> Development -> Purge all caches
+e.g.
+http://moodle-site-oua/admin/purgecaches.php
+and Purge

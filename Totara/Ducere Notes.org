@@ -1,0 +1,48 @@
+* Setup process
+** Begin
+ - Create a new branch from a Moodle repo
+ - Use/install =dh-make-moodle=
+
+** Put on staging
+ - scp onto caldara 
+=scp ../moodle-site-ducere-training-totara_2.2.5-2_a* caldara:/repo-stage=
+ - Install on bordon
+ =sudo apt-get update=
+ =sudo apt-get install moodle-site-ducere-training-totara=
+ - Go through the installation screen
+ - setup pg database on other host (=carses=)
+** Reaching the site - DNS
+ - Dont have DNS setup yet so need to hack our /etc/hosts file (again)
+ - bordon is 192.168.124.35 and ServerName on bordon is ducere-training.catalyst-au.net so:
+=192.168.124.35 ducere-training.catalyst-au.net=
+ - Go through installation script on site
+ - request DNS setup
+* Login
+** My local Dev site
+cat-admin
+Totara-2012
+** On Bordon
+cat-admin
+tah-Sai3X
+* Staging
+ - hosted on 
+bordon
+ - postrges host
+carse
+ - postgres dbname
+ducere-training-totara-moodle
+ - user/role
+ducere-training-totara-moodle
+ - db password 
+Iuto7pie
+ - db password salt
+kee3GeoG
+ - site URL
+http://ducere-training.catalyst-au.net
+
+* Making an admin user for the client
+First Name: Nigel
+Surname: Young
+Email: nigel.young@kineo.co.nz
+Username: ducere-admin
+Password: Ducere-2012

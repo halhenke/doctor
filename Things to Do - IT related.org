@@ -1,0 +1,61 @@
+* TODO emacs
+Also see [[file:emacs%20knowledge.org::*TO%20DO][Emacs Knowledge: TO DO]]
+** TODO Learn Mode creation
+** TODO Change Org-Mode Bindings & Add functions
+ - want to keep some of the easy alt and shift bindings though
+ - make easy =start-unordered-list= binding and =create-source-code-block-on-region= (similar to my comment region|line function)
+** TODO Change Outline-Minor-Mode Bindings
+ - Make something halfway sensible
+ - It doesnt matter so much if it overrides other bindings
+   - its a code introspection mode - not code modification
+ - probably tie it into org-mode bindings
+   - i.e. TAB will show or hide something etc
+** TODO Get a Better Multi-Mode
+ - minmamo mode sucks
+** TODO 
+* TODO vim
+** Define some reasonably sane sesttings/customisations
+ - especially some that are emacs compatible
+   - swicth between windows?
+     - ~\C-w arrow~ to ~\C ...something... Arrow~ (cant use ~\C \Super Arrow~ as this switches terminal tabs in Konsole)
+   - back and forwards in buffers
+     - =Tab= & =Shift Tab= to =<Command-<= & =<Command->=
+   - get =alt left= and =right= going to =back= and =word= in insert mode
+
+* TODO linux
+** TODO learn cronjobs
+** TODO learn about POSIX filesystem/inode stuff 
+that Alex/Brendan/Edward were talking about the other night
+** TODO get git bash completion going
+** TODO Different distro? BSD?
+* TODO OS X
+** TODO Get some linux features on to a Mac
+ - Alt Drag and Alt Resize
+   - apparently possible with some plugin
+* TODO Catalyst
+** TODO Add stuff to my user package
+ - .inputrc
+ - .bashrc_local
+   - or equiv (may be non-catalyst system)
+ - install script for the awesome vim thing
+** TODO learn some irc stuff
+ - get some commands
+ - user name
+ - other channels
+** TODO kill Alex
+* TODO Health
+** TODO Get antioxidants - or not 
+** TODO 5 minute exercise 
+** TODO Methylphenidate alternatives
+* TODO Personal
+** TODO Find snus
+** TODO Get charity
+** TODO Best Camera?
+** TODO Presents
+** TODO iPhone or Smasung
+** TODO iPad Mini? Android Tablet?
+* TODO Online Services/Tech Products
+** TODO Spotify? GrooveShark?
+** TODO Github Private?
+** TODO Git Paid Tool as pr Bruno?
+

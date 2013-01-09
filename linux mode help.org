@@ -1,0 +1,1189 @@
+# -*- coding: utf-8 -*-
+* Basic routine for getting access to a server
+ - get someone to add your user package to the server
+   - =sudo apt-get install hal-catalyst=
+ - have them add you to the sudo/admin group or whatever
+   - (you prob need this)
+ - get the password file from your home directory
+   - =scp hal@hostname:password.txt.gpg .=
+ - get your password
+   - =gpg -d password.txt.gpg=
+ - login
+   - =ssh -A hostname=
+ - change your password to something familiar
+   - =passwd generated_password new_password=
+* Desktop Configuration
+Use:
+: $ dconf-editor
+to change many hidden/non-obvious settings in Linux\/Debian\/Ubuntu
+Also: 
+Settings->Keyboard->Shortcut
+AND
+Settings->Keyboard Layout
+for various weird things
+
+* Quickly add your .inputrc file to another server
+From ~ directory
+=scp .inputrc krb01.catalyst-au.net:=
+* Package Management
+** dpkg and subsidiary/related commands
+*dpkg*
+ - dpkg-deb
+ - dpkg-query
+ - dselect
+ - deb
+ - deb-control
+ - dpkg.cfg
+ - dpkg-reconfigure
+
+
+** Update Package List
+$ apt-get update
+
+** Search for package
+e.g. port search package
+$ apt-cache search package
+OR to match against/search only the package names
+$ apt-cache search -n package
+
+** Info on package
+e.g. port info package
+$ apt-cache show package
+or more detail
+$ apt-cache showpkg package
+
+** Package Dependencies
+apt-cache depends sbcl
+
+** Show installed packages
+e.g. port installed | grep python
+$ dpkg --get-selections | grep python
+OR
+$ dpkg -l
+
+** Show available packages
+$ apt-cache pkgnames
+
+** Show which version of a package is installed
+e.g. port installed | grep python
+$ dpkg -l | grep package
+
+** Show which packages a package needs that arent yet installed
+
+
+Show which package dependecies our SYSTEM currently has unfulfilled
+$ apt-cache unmet package
+
+Show where files from a package are installed
+$ dpkg-query -L bash-completion
+
+Reconfigure package
+$ dpkg-reconfigure packagename
+
+** Show Contents of a package
+*** A package in the cache
+use apt-file 
+ - (probably needs to be installed and updated)
+*** A  local .deb package 
+dpkg-deb -c package.deb
+
+** Show changelog for a package (installed)
+apt-listchanges 
+or 
+*This seems like a bit of a bitch*
+cat /usr/share/doc/somepackage/changelog.Debian.gz
+
+** Adding a package ppa with add-apt-repository 
+The following line will add a file in directory =/etc/apt/sources.list.d/=:
+: sudo add-apt-repository ppa:doctormo/wacom-plus
+The resulting file is: 
+#+BEGIN_SRC bash
+hal@HAL9000:~/work/test-sites/my-moodle-23$ cat /etc/apt/sources.list.d/doctormo-wacom-plus-precise.list 
+deb http://ppa.launchpad.net/doctormo/wacom-plus/ubuntu precise main
+deb-src http://ppa.launchpad.net/doctormo/wacom-plus/ubuntu precise main
+#+END_SRC
+
+* Setting up emacs24 when only emacs23 is in the cache/thing
+First get all the dependencies of emacs 23 and then i think i just installed 24 to /usr/local
+
+Alternatively this guy has a repository where he has snapshots of later builds
+#+BEGIN_SRC bash
+sudo add-apt-repository ppa:cassou/emacs
+sudo apt-get update
+sudo apt-get install emacs-snapshot
+emacs-snapshot
+#+END_SRC bash
+
+* Vim
+** Cool & Useful Commands
+reload the .vimrc (=so= is equivallent to =source=)
+: :so $MYVIMRC
+** Setting Up Vim
+*** Two choices
+This
+https://github.com/spf13/spf13-vim
+Or
+this:
+https://github.com/amix/vimrc.git
+
+I installed amix on HAL9000
+might try spf13 on Hurricane box
+
+**** Evaluation
+Ugh spf13 has numbers package that needs Vim 7.3 - problem given we have 7.2
+
+_Later_: Yeah spf13 is *shit*, at least with the vim 7.3 setup. In contrast amix works awesome
+even over ssh i'm going to uninstall spf13 on hal-rails-box and go with amix....
+
+Actually since this vim setup stires everything in ~/.spf13-vim-3 and creates the symlinks:
+#+BEGIN_SRC
+lrwxrwxrwx  1 hal  hal     29 2012-11-26 12:55 .vimrc -> /home/hal/.spf13-vim-3/.vimrc
+lrwxrwxrwx  1 hal  hal     37 2012-11-26 12:55 .vimrc.bundles -> /home/hal/.spf13-vim-3/.vimrc.bundles
+lrwxrwxrwx  1 hal  hal     42 2012-11-26 12:55 .vimrc.bundles.fork -> /home/hal/.spf13-vim-3/.vimrc.bundles.fork
+lrwxrwxrwx  1 hal  hal     34 2012-11-26 12:55 .vimrc.fork -> /home/hal/.spf13-vim-3/.vimrc.fork
+#+END_SRC
+I will just remove the sym-links for now and run my other installation script with a simple:
+#+BEGIN_SRC bash
+git clone git://github.com/amix/vimrc.git ~/.vim_runtime
+sh ~/.vim_runtime/install_awesome_vimrc.sh
+#+END_SRC bash
+
+* Server/Apache Management
+** Getting rid of the "Could not reliably determine the server's fully qualified domain name" error 
+Add the following to =/etc/apache2/apache2.conf= 
+#+BEGIN_SRC conf
+# HAL - trying to get rid of 
+# "apache2: Could not reliably determine the server's fully qualified domain name" error...
+ServerName HALserver
+#+END_SRC
+** Restart the server
+$ sudo /etc/init.d/apache2 restart
+OR
+$ service apache2 reload
+OR
+$ apache2ctl restart
+
+other useful stuff maybe:
+check and modify which apache modules are available and enabled
+$ a2enmod
+copies a site from available to enabled directory of apache:
+$ a2ensite drupal-cat-au-website.conf  
+
+User name that runs apache etc is set in:
+/etc/apache2/envvars
+
+However are we restarting
+/etc/init.d/apache2
+OR
+ /usr/sbin/apache2
+
+** Available/Enabled Sites
+
+I edited the apache2 file:
+/etc/apache2/sites-available/default
+adding:
+    Alias /hal/ "/home/hal/work/"
+    <Directory "/home/hal/work/">
+        Options Indexes MultiViews FollowSymLinks
+        AllowOverride None
+        Order deny,allow
+        Deny from all
+        Allow from 127.0.0.0/255.0.0.0 ::1/128
+    </Directory>
+so that i can access my /home/hal/work folder at the URL:
+http://localhost/hal/
+
+Later we added
+a file:
+drupal-cat-au-website.conf 
+to the directory:
+/etc/apache2/sites-available
+This specified some site specific error/access logging in a new directory/file
+/var/log/sitelogs/drupal-site-cat-au-website/
+did:
+$ chgrp www-data /var/log/sitelogs/drupal-site-cat-au-website/
+$ chmod g+w /var/log/sitelogs/drupal-site-cat-au-website/
+$ a2ensite drupal-cat-au-website.conf 
+
+** Hosts file
+Also have to add the line:
+127.0.0.1 d.catalyst-au.net
+to /etc/hosts where d.catalyst-au.net is the SeverName from drupal-cat-au-website.conf 
+
+q
+
+** Apache on Debian uses a Non-Standard Configuration
+See here:
+http://www.control-escape.com/web/configuring-apache2-debian.html
+
+* Postgres Setup
+
+First grant yourself superuser privileges:
+sudo -su postgres createuser yourname
+
+list databases
+$ psql -l
+
+Then login with 
+psql -d databasename
+
+
+Databases live in
+/var/lib/postgresql/9.1/main/
+Configuration lives in
+/etc/postgresql/9.1/main/
+Log files live in:
+/var/log/postgres
+
+sudo -u postgres 
+
+Create Database and then
+psql databasename < data_base_dump
+
+Restart postgres with
+sudo /etc/init.d/postgresql restart
+
+Also - 
+in pg_hba.conf under: 
+# IPv4 local connections:
+we changed:
+host    all             all             127.0.0.1/32            md5
+to:
+host    all             all             127.0.0.1/32            trust
+
+which meant we dont have to provide passwords for local connections (in drush at least)
+
+
+* Git
+** Tags 
+- are like alternate names, references.
+Must be unique on both remote and local branches
+** Show all files in a commit
+$ git ls-tree --name-only -r 5ff6ef6dccd7f57d30c2bcc9c3fb203a25930e12
+
+** Show changes between specific commits
+*** General form between arbitrary commits
+=git diff commit_sha1..commit_sha1=
+*** Show diffs from the last commit\
+=git diff HEAD..HEAD^=\\
+This is equivalent\\
+=git diff ..HEAD^=
+** Generate a patch file from the diff of two commits
+=git diff -p commit_sha1..commit_sha1 > output_file.patch=
+** Show all changes in a committ
+$ git diff-tree --name-only -r <commit-ish>
+
+** Merging from  a specific tag
+$ git merge tag
+
+** Show all branches that match a given pattern
+git branch --list pattern
+e.g.
+$ git branch --list *green*
+> * mdl19-greenmedicine
+** Show log on remote branch
+$ git log -2 origin/mdl19-greenmedicine
+** List all files in a branch (recursively)
+git ls-tree -r branch
+
+git ls-tree -r branch | wc -l
+
+git diff --name-only updates_2012_11-core-upgrade upstream/6.x |wc -l
+** How to tell if you can or cant do a forced push
+$ git remote -v
+if repository has an ssh protocol prefix such as:
+origin  git+ssh://git.catalyst.net.nz/git/private/moodle-r2.git (fetch)
+origin  git+ssh://git.catalyst.net.nz/git/private/moodle-r2.git (push)
+then you wont be allowed to do git push origin my_branch -f
+** What bevan did:
+git branch updates_2012_11-core-upgrade
+git checkout updates_2012_11-core-upgrade
+git checkout upstream/catalyst-6.x
+git checkout -b catalyst-6.x
+git pull upstream catalyst-6.x
+git checkout updates_2012_11-core-upgrade
+git merge catalyst-6.x
+
+What i did:
+git branch updates_2012_11-core-upgrade
+git checkout updates_2012_11-core-upgrade
+git merge upstream/catalyst-6.x
+
+
+
+Querying Drupal node_type table
+SELECT type, name, module, has_title, title_label, has_body, body_label, custom, modified, locked, orig_type FROM node_type;
+** Problems
+
+*** Git wont add files from a directory
+
+If you add a folder containing a git repository to your git repository the contents of that folder will 
+by default be invisible to git and it will not add them even if you add the enclosing directory.
+
+To get out of this:
+
+rename the folder a couple of times
+or more properly
+$ git rm --cached  /path/to/directory
+
+** Recovering from a bad git commit
+** The naughty way
+
+WARNING this will lose all your latest changes you have done also...
+
+Find the last good commit you did
+checkout that branch
+: git checkout 6gfgsgdhsghjghjgsy78798
+do 
+: git clean -fd 
+to delete later commits (i think)
+do 
+: git branch -D updates_2012_11
+To delete the current branchx
+create a new branch
+: git branch  updates_2012_11
+checkout that branch
+: git checkout  updates_2012_11
+Now heres the really bad bit:
+: git push origin updates_2012_11 -f
+This will force the upstream branch to match the local branch and get rid of later commits
+Its only OK if you are the only one working on that branch.
+
+Now you have to start from the beginning and redo the changes
+
+
+* Drupal Setup With Postgres - FRESH INSTALL
+
+Important last step - Grant all:
+
+CREATE DATABASE drupaldb;
+CREATE USER drupalapp WITH PASSWORD 'lapurd';
+GRANT ALL ON DATABASE drupalbd TO drupalapp;
+
+But also - if you have already set $db_url in settings.php
+then drupal assumes the site is already setup and tries to read the presumably empty database
+See: 
+http://drupal.org/node/965028
+So you have to go to your_site_root_url/install.php
+to call the setup explicitly
+** Do you have the PHP postgres driver?
+
+Need the php postgres driver
+$ sudo apt-get install php5-pgsql
+
+php log in:
+...
+* Logging into A Drupal Site as admin
+
+Go to
+
+domain-name/user/login
+
+and input the info gained as described in section
+\\do org-mode inner link here\\
+* Drush
+
+** Upgrading modules
+Use 
+$ drush dl modulename 
+rather than 
+$ drush pm-updatecode modulename
+as the latter does a lot more stuff we dont necessarily want.
+
+** Drush Problems
+
+You should make sure you have the Catalyst version.
+The one from git is more recent than the one from the Catalyst stable/unstable repository
+
+If you get the error 
+"No valid version control or backup engine found (the --version-control option was set to "git")"
+Then you are probably not working in a git repository
+ - if you didnt clone it somewhere then just 'git ini't
+
+*** version number fuck up
+See also [internal link]
+Drush will ask you if you want to bump (and tag) the package
+Inside your site directory there will be a .debian directory with a changelog file
+i.e.
+.debian/changelog
+You can edit this and manually change the version number.
+drush will then build the package with this version number 
+AND you dont have to bump when you do 
+$ drush dh-make
+* Drupal Deployment
+See here:
+https://wiki.wgtn.cat-it.co.nz/wiki/Catalyst_Australia_Pty_Ltd/Catalyst_Australia_Debian_repository
+
+Finish changes.
+Run drush dh-make-drupal
+This will make a package to install on the server and a changelist
+
+** Staging Deployment
+
+First - merge changes into master branch
+
+You then have to put this package AND the changelist in the staging environment
+$ scp drupal-site-cat-au-website_20121112-1_all.deb caldara:/repo-stage
+$ scp drupal-site-cat-au-website_20121112-1_amd64.changes caldara:/repo-stage
+
+Now we put it on the staging server, in this case 'bordon'
+
+$ ssh bordon
+*** If this is your first time logging on to this machine/you have not reset your password
+This server then generates a gpg password file which we can use to get a onetime password for this session.
+Copy the contents of this file to our own machine 
+$ cat password.txt.gpg
+and grab everything e.g.:
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+hQEMAzGI0LlowIRAAQf8DZfx4DeJld7cYpy/1mAbsFUnDuU6h1uvwV8bs8/jz1NX
+659cOLfRD0FfrouQswOcY8FkH+TMympjFkNPXz4I/nD2YWsw6Bcr2+FpOYfqGhRB
+sY6S3BXthnEsmKHRWICpuBDPt3qntIxL5XESu1Qy2OY4F2yh58vikXfA3sweShfg
+sERIAKteE56AOp3AlBfi+84Ksg+T5EghTNrCS0SBNHFzY/AIriVig1ghx5vmhiSV
+gnTVVN7v2PiTw3dsQDq6XMkdQACDKUE9d7MuDMwsMYWXclSdt37uMfG8oby22/om
+OJov3goKal7c8TIiszRNP8/BYKiQ4qpYzU438TjZ2tLABAFRQXj7Gd0VCTGVaJkp
+kM4IZv0316Btfq6XQxMSB7pfCGN2BlJrxAnyrxxYOdro59+SAcjCBLScIHUVNCyv
+BMdx66F49Hc8Fu+EJzCpDwWal9a/xmUsf6lVmAfdd2ndph5S2vGdC3h0QFUr51Cg
+XKiilCLWqAa2lyd2AGSJTxDCt7QHk/A8uE1gHsFM8utp/Z2tyFEVG+aRr85HfqhU
+eJkgnHL8jxyat0bk3Qs7vbiOnl0pHR1NrXB3JVp9KSKBkQrxzGk=
+=ydW7
+-----END PGP MESSAGE-----
+
+and save it in a local file (any name will do e.g. password_tmp.txt)
+Then:
+$ gpg -d password_tmp.txt
+Enter secret phrase and we now have a shell password to work on bordon.
+If we want to set something more permanentwe can use this to change our password for bordon via the command:
+$ passwd
+
+*** Otherwise...
+
+We then run 
+$ sudo apt-get update
+presumably so that we can see that the package is available from the staging area.
+
+This will automatically replace the old drupal-site-cat-au-website package with the new one.
+
+And then:
+$ apt-cache search cat-au
+to get the name
+$ sudo apt-get install drupal-site-cat-au-website 
+Just to be careful update the database:
+$ drush updatedb
+and clear the cache
+$ drush cc all
+
+To check it out (become root):
+$ sudo -s
+$ cd /var/www/drupal-site-cat-au-website/
+$ ls -lta
+
+There is a gpg thing which gi
+?? - Not sure what happened here
+
+** Production Deployment
+
+Again example is in terms of Catalyst-au website
+
+Not documented well but the host in this case is the load balanced server 'Flotsam' and 'Jetsam'
+So this time we 
+$ scp drupal-site-cat-au-website_20121112-1_all.deb caldara:/repo-prod
+$ scp drupal-site-cat-au-website_20121112-1_amd64.changes caldara:/repo-prod
+
+This puts the package on a server/repo that we can then deploy from/apt-get from on Flotsam & Jetsam
+
+Because there are two servers we use cssh instead of ssh
+$ cssh flotsam&jetsam
+(as sudo)
+$ apt-get install drupal-site-cat-au-website #install the package
+$ cd /var/www/drupal-site-cat-au-website # change to the doc root
+$ drush en -y environment_indicator #enable the module
+$ drush vset environment_indicator_enabled 2 #set the module to integrate with the environment module
+$ drush cc all #clear the cache for good measure
+set the permissions for access environment indicator for all roles see: http://s.catalyst-au.net/admin/user/permissions
+$ drush update-db
+* Below relates by example to the Catalyst Australian website: cat-au-website
+
+Site was "stored" in two parts - a git repository with the drupal code/directory structure: 
+: $ git clone git+ssh://gitprivate.catalyst.net.nz/git/private/drupal/cat-au-website.git cat-au-website
+and a 
+pg_dump backup of the postgres database on the machine vedra:
+: root@vedra://data/rsync/cabotage/var/backups/pg/pg-9.0-main/current/pg-catalyst_website-2012-11-06-220105.pgdump
+To get this database from vedra i  logged into vedra as root:
+: $ ssh vedra
+
+Sites are deployed onto the machine "bordon"
+into the 
+: /var/www/drupal-site-cat-au-website
+I copied the =sites/default/settings.php= file from here to my machine and made a couple of changes:
+changed:
+: $conf["archimedes_site_environment"] = "staging";
+to:
+: $conf["archimedes_site_environment"] = "development";
+had to change the database settings:
+: $db_url["default"] = "pgsql://catalyst_website:Eu4mee5hAuk1pa7v@db-host/catalyst_website";
+to:
+: $db_url["default"] = "pgsql://catalyst_website:Eu4mee5hAuk1pa7v@localhost/hal/cat-au-website/";
+
+Also - so that the site cannot write to its own directory/self:
+I created a directory
+: /var/lib/sitedata/cat-au-drupal/files/ (could be anywhere)
+and then created a symlink to it 
+: sites/default/files -> /var/lib/sitedata/cat-au-drupal/files/
+
+
+** Drupal Update Module Procedure:
+1 Login as admin
+2 Go to available updates
+3 Click on Download for an outdated module (Yellow/Red) sorted by urgency (Red first)
+4 Save in some tmp directory
+5 cd to site directory/sites/all/modules
+6 Find directory where module is - 
+Could be: 
+contrib/
+patched/
+custom/
+or, if older project, everything in the one directory
+BE CAREFUL IF IT IS A MODULE IN PATCHED - you willl have to apply patches again or modify/ignore patches if module no longer needs them.
+otherwise:
+7 tar -xvf ~/directory_where_tgz_is_downloaded/old-module.tgz    in_parent_directory_of_old-module
+will update/replace old module.
+8 Create a new branch 
+8 Commit changes per module (easier to use git bisect to trace the problem if an update breaks the site)
+9 Push new branch to remote repo before your machine dies....
+10 If all is cool - deploy via API1 method described here:
+https://wiki.wgtn.cat-it.co.nz/wiki/Drupal/Getting_Started#For_API_1
+Wiki is wrong -  
+$options['dh-project'] = 'cat-au-website';
+is set in drushrc.local.php and not drushrc.php
+However API-1 method still seems to apply to Drupal 6 sites - at least thre are no 6.x versions of debuild
+only 7.x-1.0 and 7.x-2.0
+
+I did
+$ sudo apt-get install apache2-mpm-itk
+which removed:
+apache2-mpm-prefork
+may want to reverse this situation later.....
+
+* Getting Important Passwords
+
+$ ssh turing
+then use:
+$ pview -d sydney catalyst-au.net
+where sydney is a group and catalyst-au-net is a search term IIRC
+This returns a format
+catalyst-au drupal site - email_address
+
+
+
+
+* Editing files on remote machines from EMACS via TRAMP
+
+Emacs will work the same on remote machines as when you are editing a file as root on the local machine.
+As long as the hostname is in /etc/hosts and the machine unnderstands the scpc protocol 
+(means you can do stuff without constantly using password as in scp) then you go
+C-x C-f /user@host:/path/to/file
+
+*Important* - You will probably be asked for your passphrase as well as/instead of the password
+Make sure you dont muck this up too much as you wont get in!
+
+* The sudoers file
+root ALL=(ALL) ALL
+This line means: The root user can execute from ALL terminals, acting as ALL (any) users, and run ALL (any) command.
+hal     ALL=NOPASSWD: ALL
+Means you wont be asked for a password either....
+http://www.garron.me/linux/visudo-command-sudoers-file-sudo-default-editor.html
+
+* Editing files as root or another user on the local machine using TRAMP
+
+Slightly different syntax here
+C-x C-f /sudo:root@localhost:/path/to/whatever
+or just:
+C-x C-f /sudo:hal@localhost:/path/to/whatever
+
+* scp doesn't work if your .bashrc_local or other files produce output
+You will have to remove any messages such as 
+echo "bash_profile called..."
+or anything that causes errors because a $TERM is not defined.
+Perhaps can put them in conditional blocks
+
+See:
+http://www.unix.com/aix/136087-scp-not-working-while-ssh-works.html
+http://apple.stackexchange.com/questions/13802/why-does-echo-in-etc-bashrc-cause-scp-to-hang
+
+Might have to think more carefullly about what i put in each script - login/interactive etc
+
+* Dont Plug your iPhone into USB *WITH PERSONAL HOTSPOT ENABLED*
+
+It would add weird connectors to ifconfig
+i.e. i had more than just eth0 and lo
+(which is what i should have)
+i.e. type
+=$ ifconfig=
+and you'll get something like:
+** eth0      Link encap:Ethernet  HWaddr 54:e6:fc:84:f9:20  
+          inet addr:192.168.124.169  Bcast:192.168.125.255  Mask:255.255.254.0
+          inet6 addr: fe80::56e6:fcff:fe84:f920/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:4849688 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:3749770 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:3335296075 (3.3 GB)  TX bytes:1329359683 (1.3 GB)
+          Interrupt:16 Base address:0xe000 
+
+** eth1      Link encap:Ethernet  HWaddr 6c:62:6d:3a:87:f3  
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+          Interrupt:52 Base address:0x4000 
+
+** eth2      Link encap:Ethernet  HWaddr 7e:c5:37:73:52:f6  
+          inet addr:172.20.10.4  Bcast:172.20.10.15  Mask:255.255.255.240
+          inet6 addr: fe80::7cc5:37ff:fe73:52f6/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:1573 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1915 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:919187 (919.1 KB)  TX bytes:271977 (271.9 KB)
+
+** lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:188718 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:188718 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:71600564 (71.6 MB)  TX bytes:71600564 (71.6 MB)
+
+** When you should have just eth0 and lo
+
+** Getting rid of them
+=sudo ifconfig eth1 down=
+
+** AMMENDED - seems harmless...
+...as long as Personal Hotspot is not enabled
+
+* Things I learned Trying to Speed up KDE
+
+** How to restart kwin
+
+Press
+Alt+F2
+Type
+kwin --replace&
+cick run
+
+** How to restart Xorg (without logging out)
+$ sudo service gdm restart
+
+** $ free -m
+total       used       free     shared    buffers     cached
+Mem:          7967       6094       1873          0         62        936
+-/+ buffers/cache:       5095       2872
+Swap:         8170          0       8170
+
+
+** Turn the swap off
+$ sudo swapoff -a
+and on
+$ sudo swapon -a
+
+** Look at the "swappiness"
+$ cat /proc/sys/vm/swappiness 
+
+** See here:
+http://forum.kde.org/viewtopic.php?f=66&t=85803
+We edit the system file:
+/etc/sysctl.conf
+adding the following lines:
+# HAL - trying to make KDE snappier
+vm.swappiness=20
+vm.vfs_cache_pressure=50
+
+** This thread is the greatest:
+http://forum.kde.org/viewtopic.php?f=66&t=85803&sid=ee5334e50b6b877d1b5e644b07f355ad&start=15
+possible causes:
+ - akonadiserver / akonadi processes 
+ - Fixing the application which excessively spawns kio_trash would help also. 
+Grepping ~/.xsession-errors for " Killing update job for "trash:/"" may help reveal the culprit, with the KIO debugging area enabled. KRunner does this intensively.
+ - Nepomuk 
+ - the Oxygen widget style
+
+** Dealing With Akonadi
+The Akonadi server is launched automatically at login whenever any Akonadi-enabled application requests access to it.
+
+To disable the Akonadi subsystem, first, shut down the running Akonadi server from the control module or the command line:
+
+: akonadictl stop
+Now, edit the file ~/.config/akonadi/akonadiserverrc and change StartServer from true to false:
+
+StartServer=false
+The Akonadi server should no longer launch automatically on login.
+
+** A useful tool to accurately show memory growth over time
+exmap
+
+** Scripts for investigating memory problems:
+-----------------------------------------------------------------------------
+#!/bin/sh
+
+printf "%-6s %-9s %s\n" "PID" "Total" "Command"
+printf "%-6s %-9s %s\n" "---" "-----" "-------"
+
+for PID in `ps -e | /usr/bin/awk '$1 ~ /[0-9]+/ { print $1 }'`
+do
+CMD=`ps -o comm -p $PID | tail -1`
+# Avoid "pmap: cannot examine 0: system process"-type errors
+# by redirecting STDERR to /dev/null
+TOTAL=`pmap $PID 2>/dev/null | tail -1 | \
+/usr/bin/awk '{ print $2 }'`
+[ -n "$TOTAL" ] && printf "%-6s %-9s %s\n" "$PID" "$TOTAL" "$CMD"
+done | sort -n -k2 
+-----------------------------------------------------------------------------
+This little one liner is also good for snapshotting i.e. execute this at a particularly laggy moment if possible:
+$ ps -eo pcpu,%mem,cmd|sort -k2 -r
+
+
+** Latest Findings
+I set my swappiness to 20 and rebooted. Everything was fine for a couple of days even but now its back:
+High Xorg and Kwin usage
+NO SWAP though
+
+I deleted delete the folder /tmp/kde-hal/
+ - NOTHING happened.
+I deleted the folder /var/tmp/kdecache-hal
+ - maybe some change but pretty slight....
+ xorg and kwin still churning
+
+** Pretty sure its the NVIDIA/ drivers that are behind it all
+
+http://forum.kde.org/viewtopic.php?f=66&t=94861
+
+From here:
+http://askubuntu.com/a/23238/how-can-i-find-what-video-driver-is-in-use-on-my-system
+#+BEGIN_VERSE
+$ jockey-text -l
+xorg:nvidia_current - NVIDIA accelerated graphics driver (Proprietary, Enabled, In use)
+xorg:nvidia_current_updates - NVIDIA accelerated graphics driver (post-release updates) (Proprietary, Disabled, Not in use)
+xorg:nvidia_experimental_304 - NVIDIA accelerated graphics driver (**experimental** beta) (Proprietary, Disabled, Not in use)
+xorg:nvidia_experimental_310 - NVIDIA accelerated graphics driver (**experimental** beta) (Proprietary, Disabled, Not in use)
+#+END_VERSE
+
+or
+#+BEGIN_VERSE
+$ sudo lshw -c video
+  *-display               
+       description: VGA compatible controller
+       product: GF108 [GeForce GT 440]
+       vendor: NVIDIA Corporation
+       physical id: 0
+       bus info: pci@0000:01:00.0
+       version: a1
+       width: 64 bits
+       clock: 33MHz
+       capabilities: pm msi pciexpress vga_controller bus_master cap_list rom
+       configuration: driver=nvidia latency=0
+       resources: irq:16 memory:fa000000-faffffff memory:d0000000-d7ffffff memory:d8000000-d9ffffff ioport:e000(size=128) memory:fb000000-fb07ffff
+#+END_VERSE
+
+#+BEGIN_VERSE
+$ sudo modinfo nvidia
+ERROR: modinfo: could not find module nvidia
+#+END_VERSE
+
+#+BEGIN_VERSE
+$ dpkg -l | grep nvidia
+ii  libkwinnvidiahack4                     4:4.8.5-0ubuntu0.1                      library used by nvidia cards for the KDE window manager
+ii  nvidia-common                          1:0.2.44.2                              Find obsolete NVIDIA drivers
+ii  nvidia-current                         295.40-0ubuntu1.1                       NVIDIA binary Xorg driver, kernel module and VDPAU library
+ii  nvidia-settings                        295.33-0ubuntu1                         Tool of configuring the NVIDIA graphics driver
+#+END_VERSE
+
+** NVIDIA X Server Settings
+NVIDIA Driver Version: 295.40
+Server Version: 11.0
+
+Graphics Card/GPU: GeForce GT 440
+
+** Can reset swap/memory configuration at runtime
+using sysctl
+$ sysctl swappiness=10
+
+** Another Cool thread
+http://forum.kde.org/viewtopic.php?f=66&t=97736
+
+** Other Stuff
+http://pthreads.blogspot.com.au/2011/12/swappiness-and-dropcaches.html
+To free pagecache:
+=code=
+echo 1 > /proc/sys/vm/drop_caches
+=code=
+To free dentries and inodes:
+=code=
+echo 2 > /proc/sys/vm/drop_caches
+=code=
+To free pagecache, dentries and inodes:
+=code=
+echo 3 > /proc/sys/vm/drop_caches
+=code=
+
+** Arch_Linux on Performance
+https://wiki.archlinux.org/index.php/Maximizing_Performance
+
+** I'm going to install driconf
+Its something for tuning Graphics Card Performance...
+"Enabling HyperZ can drastically improve performance"
+sudo apt-get driconf
+
+** Latest Attempts to improve NVIDIA
+I mucked around with nvidia-settings and nvidia-xconfig - didnt seem to do anything...
+I then aded the following to the end of my 
+/etc/X11/xorg.conf 
+#+BEGIN_SRC conf-mode
+Section "Module"
+    Load "dbe"
+    Load "extmod"
+    Load "type1"
+    Load "freetype"
+    Load "glx"
+EndSection
+#+END_SRC conf-mode
+based on advie from:
+# http://forum.kde.org/viewtopic.php?f=66&t=94861
+
+
+* Network speed
+Not sure why but sometimes very slow and 
+=ifconfig=
+reveals
+something like
+#+BEGIN_SRC 
+eth0      Link encap:Ethernet  HWaddr 54:e6:fc:84:f9:20  
+          inet addr:192.168.124.169  Bcast:192.168.125.255  Mask:255.255.254.0
+          inet6 addr: fe80::56e6:fcff:fe84:f920/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:5355706 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:4124872 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:3750265994 (3.7 GB)  TX bytes:1365421940 (1.3 GB)
+          Interrupt:16 Base address:0xe000 
+
+eth1      Link encap:Ethernet  HWaddr 6c:62:6d:3a:87:f3  
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+          Interrupt:52 Base address:0x4000 
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:243000 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:243000 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:89351225 (89.3 MB)  TX bytes:89351225 (89.3 MB)
+#+END_SRC 
+
+when there should only be eth0 & lo
+In this case do:
+=sudo ifconfig eth1 down=
+to get rid of one of them...
+
+* Changing my machine name
+: sudo edit /etc/hostname
+and replaced 
+=catalyst-MS-7681=
+with 
+=HAL9000=
+
+also see 
+: man hostname
+for related info
+
+* Checking my distro version
+: $ cat /etc/issue
+
+Also, this:
+: $ uname -r
+does something - not sure what
+
+* Checking Hardware Drivers etc
+** lshw
+_List Hardware_
+** jockey-text
+_Text version of the Program Jockey_
+: sudo jockey-text -l 
+will list drivers and enabled/disabled status
+sudo jockey-text -e xorg:nvidia-185
+will enable the xorg:nvidia-185 driver
+** modinfo
+_Show info about a linux kernel module_
+Or look at /lib/modules
+
+** lsmod
+_Show the status of modules/drivers_
+
+
+* Upgrading NVIDIA drivers
+http://www.itworld.com/software/289579/install-nvidia-driver-30432-linux-mint-13-or-ubuntu-12041210
+#+BEGIN_SRC
+sudo apt-add-repository ppa:xorg-edgers/ppa
+sudo apt-get update
+sudo apt-get install nvidia-current nvidia-settings
+#+END_SRC
+Latest from NVIDIA site - 310.19
+One currently installed in my system - 295.40-0ubuntu1.1
+  
+* Setting up VirtualBox
+Get an iso disk image of the requested distribution
+
+They were found on caldara:
+scp caldara:/home/shared/isos/ubuntu-10.04-server-amd64.iso .
+
+** Tried to copy from Daniel
+I reinitialized the mac adress - this meant that the virtual machine thought a new PCI Card had ben put in and so it reassigned it to eth2 or something
+
+*** fstab
+Used to setup the link to my physical machine i think - we mount a directory as a file system
+
+*** /etc/sudoer ?
+Something that gave me permission to do stuff
+hal ALL = NOPASSWD:ALL
+
+** Network stuff
+Add self to =/etc/sudoers=
+Will have to install openssh-server
+: $ sudo apt-get install openssh-server
+
+Get your IP address from ifconfig
+Then you can scp from one machine to the other by
+: $ scp file user@ipadress:path
+or by adding their ipaddress to the local machines /etc/hosts file
+with
+: $ ipadress HAL9000
+: $ scp /etc/sudoers hal@HAL9000:/home/hal/work/rails/hurricane/dans_machine_settings/etc/
+This works both ways: you get their ip through ifconfig and add it to your hosts file and you can
+scp the other way.
+
+* Logging in from home
+With the browser:
+
+FoxyProxy for Firefox or similar for Chrome
+** Getting a site hosted on hal9000 to access from home/Airbook
+I think i had this going before...
+
+
+* TKS
+
+Run 
+tks -t week > 2012-11-12.tks
+To get a file with a template for the current week
+or 
+tks -t month > filename.tks
+to get the current month
+tks filename.tks
+will tell you problems without commmitting while:
+tks -c filename.tks
+will commit your file to the server.
+
+
+
+
+http://rubyenterpriseedition.googlecode.com/files/ruby-enterprise_1.8.7-2012.02_amd64_ubuntu10.04.deb
+http://rubyforge.org/frs/download.php/66163/ruby-enterprise_1.8.7-2009.10_amd64.deb
+
+
+* SSH Stuff
+** Adding my passphrase to my ssh shell settings
+used the command 
+ssh-add
+
+To make this work when you log into other machines
+I did ssh-add and then
+we created a file 
+~/.ssh/config
+that contained the following
+#+BEGIN_SRC 
+host *
+   2     forwardAgent yes
+#+END_SRC 
+
+** Getting ssh to forward your keys
+: shh -A you@wherever
+** Being able to launch graphical X programs from another machine on your local machine
+: shh -X you@wherever
+
+** Removing a key from your known_hosts file
+e.g. for caldara:
+ssh-keygen -f "/home/hal/.ssh/known_hosts" -R caldara
+
+
+* DONE Fucking annoying command line error in Konsole - FIXEDish
+
+Sometimes when i go back through history via up arrow part of the command gets "stuck" on the command line e.g.
+scp  mynbcs-rails201
+git remote add publi
+
+interesting that its the same number of characters.
+Due to .inputrc?
+Fiddling with prompt in .bashrc_local?
+Changing key commands in Konsole shortcuts?
+
+** SOLUTION
+Seems it had something to dow with my attempts to modify my prompt with colours and escape sequences 
+and shit that was probably not quite done properly
+
+
+
+* Extract a password from a password_tmp.txt file
+$ gpg -d pasword_tmp.txt
+
+* Generate a password
+=$ pwgen=
+
+* Building a debian package
+** Fucking up the version number and having to fix it
+Just say the version number doesnt bump
+
+Then edit the debian/changelog file and manually change the version number e.g.
+from
+moodle-site-greenmedicine (1.9.19.20120702-1ubuntu1) precise; urgency=low
+to
+moodle-site-greenmedicine (1.9.20.20120702-1ubuntu1) precise; urgency=low
+
+* Basic Moodle Upgrade Recipe
+1 Look up site in wiki
+2 Checkout branch from private remote 
+3 Identify the new version of Moodle from public repository or external source
+4 Merge it in
+5 Mark changes in the debian changelog
+ - Make sure you update the version number date when you do this - it will be used by debian to name the resulting package
+6 Add the modified debian/changelog to the git cache
+7 Commit the change locally 
+8 Push the change back to origin/private remote repo
+9 Find out the tag format from similar entries and tag your commit with the updated version, date and sub-number
+10 push this task back to the origin/private repo
+11 make the package
+12 Find out where staging lives and scp the package to the place where staging sources packages from
+13 ssh into Staging, upload the package list and install it
+
+* Some logins to various servers
+** St Ignatius staging
+ssh hal@cansius.riverview.nsw.edu.au
+** Roseville Staging
+Staging is on server rc-lms02 and production is on rc-lms01
+There is stuff that has to be added to your .ssh/config file
+because we are going through rc-lms01
+....
+Then
+ssh s.rosepod.roseville.nsw.edu.au
+** sopater
+get login from turing
+ssh catalyst@sopater
+and use password from pview
+use same password for sudo commands
+** durbin
+Durbin is dead. Durbin is now bordon
+ssh bordon
+
+** Learn MyNbcs Staging
+User
+catadmin1
+Password
+27FBL-jWmg
+
+
+* Logging into Moodle to do admin upgrades
+** To get passwords and usernames
+ssh turing
+pview -d sydney catadmin
+** The rest
+Go to staging or where-ever.
+Log in
+Go to notifications
+** Problems
+On one site - unitingworld - i had to edit 
+/var/www/moodle/config.php and fix the line
+$CFG->wwwroot   = 'http://s.unitingworld.elearning.catalyst-au.net';
+which had become set to 'http://' somehow
+
+
+
+* SSH & git valid paths
+From stackoverflow:
+A valid ssh URL should look like ssh://{user}@host.xz/path/to/repo.git 
+[[http://oliver.net.au/?p=174][Git remote ssh syAZ9ERLzpF991ntax]]
+The ‘git remote add’ command takes in a html URL like parameter for even SSH like:
+ssh://<user>@<host>/<path to git repo>/
+
+NOT the standard ssh scp syntax:
+ssh://<user>@<host>:<path to repo>/
+
+* HTTP basic Auth
+Seems to be something that prevents you accessing a web page without authorisation in the 
+header request i.e. before a login page or anything
+http://en.wikipedia.org/wiki/Basic_access_authentication
+
+* Adding someone to sudoers group/file
+you can edit /etc/sudoers file
+or do:
+visudo
+which does that directly
+
+* Changing someones group membership
+As root - adding me to group admin
+$ su root
+$ usermod -aG admin hal
+
+* Proxies and FoxyProxy
+Check all connections etc with 
+sudo netstat -anp | more
+
+With =OS X= its different - use =lsof= ?
+
+
+* nagios  - an internal system/daemon that checks on various servers and reports on their status/problemsx
+
+* Konsole
+** Keybindings
+Go To Configure Current Profile -> Input and then
+edit the current input list
+You can bind keys to pretty much any escape sequence....
+e.g.
+*** PageUp
+=Page Up -> \E[5~= 
+to 
+=Page Up -> ScrollPageUp=
+and
+=Page Down -> \E[6~=
+to 
+=Page Down -> ScrollPageDown=
+*However*
+Then PageUp and Down dont function interchangably with f & b when in man page etc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

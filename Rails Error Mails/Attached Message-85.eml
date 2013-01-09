@@ -1,0 +1,251 @@
+Return-Path: <deploy@mynbcs.nsw.edu.au>
+X-Original-To: hurricane-app@catalyst.net.nz
+Delivered-To: danb@catalyst-au.net
+Received: from localhost (localhost [127.0.0.1])
+	by mail.catalyst.net.nz (Postfix) with ESMTP id 5CEC732CDB
+	for <hurricane-app@catalyst.net.nz>; Sat, 16 Jun 2012 03:01:11 +1200 (NZST)
+X-Virus-Scanned: Debian amavisd-new at catalyst.net.nz
+Received: from mail.catalyst.net.nz ([127.0.0.1])
+	by localhost (bertrand.catalyst.net.nz [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id mH5s4RqeMaLM for <hurricane-app@catalyst.net.nz>;
+	Sat, 16 Jun 2012 03:01:09 +1200 (NZST)
+Received: from JAMES.master.local (unknown [103.4.85.51])
+	by mail.catalyst.net.nz (Postfix) with ESMTPS id 261B832CD4
+	for <hurricane-app@catalyst.net.nz>; Sat, 16 Jun 2012 03:01:09 +1200 (NZST)
+Received: from philemon.nbcs.catalyst.net.nz ([10.0.0.50]) by JAMES.master.local with Microsoft SMTPSVC(7.5.7601.17514);
+	 Sat, 16 Jun 2012 01:01:08 +1000
+Received: from deploy by philemon.nbcs.catalyst.net.nz with local (Exim 4.71)
+	(envelope-from <deploy@mynbcs.nsw.edu.au>)
+	id 1SfY1M-0000Qc-DB
+	for hurricane-app@catalyst.net.nz; Sat, 16 Jun 2012 01:01:08 +1000
+Message-Id: <E1SfY1M-0000Qc-DB@philemon.nbcs.catalyst.net.nz>
+Date: Sat, 16 Jun 2012 01:01:07 +1000
+From: Hurricane App <hurricane-app@catalyst.net.nz>
+To: hurricane-app@catalyst.net.nz
+Subject: [MyNBCS Live Errors] alerts#index (ActiveRecord::StatementInvalid) "PGError: ERROR:  invalid input syntax for type timestamp: \"jan 2012\"\nLINE 1: ...06-16 23:59:59.999999') AND
+	(alerts.created_at >= E'jan 2012...\n                                                             ^\n: SELECT \"alerts\".* FROM \"alerts\"   INNER JOIN \"users\" ON \"users\".id = \"alerts\".user_id
+	INNER JOIN \"student_profiles\" ON student_profiles.user_id = users.id  WHERE ((((alerts.created_at < '2012-06-16 23:59:59.999999') AND (alerts.created_at >= E'jan 2012')) AND (alerts.id IN (SELECT
+	DISTINCT ON (ac2.id, a2.user_id) a2.id FROM alerts a2\n                    INNER JOIN alert_levels al2 ON a2.alert_level_id = al2.id\n                    INNER JOIN alert_categories ac2 on
+	al2.alert_category_id = ac2.id\n                    ORDER BY ac2.id, a2.user_id, a2.created_at DESC))) AND (student_profiles.cohort_id = E'9'))  ORDER BY alerts.created_at DESC LIMIT 15 OFFSET 0"
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+X-OriginalArrivalTime: 15 Jun 2012 15:01:08.0243 (UTC) FILETIME=[B1BD2630:01CD4B07]
+
+A ActiveRecord::StatementInvalid occurred in alerts#index:
+
+  PGError: ERROR:  invalid input syntax for type timestamp: "jan 2012"
+LINE 1: ...06-16 23:59:59.999999') AND (alerts.created_at >= E'jan 2012...
+                                                             ^
+: SELECT "alerts".* FROM "alerts"   INNER JOIN "users" ON "users".id = "alerts".user_id  INNER JOIN "student_profiles" ON student_profiles.user_id = users.id  WHERE ((((alerts.created_at < '2012-06-16 23:59:59.999999') AND (alerts.created_at >= E'jan 2012')) AND (alerts.id IN (SELECT DISTINCT ON (ac2.id, a2.user_id) a2.id FROM alerts a2
+                    INNER JOIN alert_levels al2 ON a2.alert_level_id = al2.id
+                    INNER JOIN alert_categories ac2 on al2.alert_category_id = ac2.id
+                    ORDER BY ac2.id, a2.user_id, a2.created_at DESC))) AND (student_profiles.cohort_id = E'9'))  ORDER BY alerts.created_at DESC LIMIT 15 OFFSET 0
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract_adapter.rb:219:in `log'
+
+-------------------------------
+Request:
+-------------------------------
+
+  * URL       : https://mynbcs.nsw.edu.au/alerts?user_id=&cohort_id=9&set_since_date=jan+2012&set_before_date=June+16%2C+2012&current=1&commit=Find
+  * IP address: 192.168.0.21
+  * Parameters: {"commit"=>"Find", "current"=>"1", "action"=>"index", "page"=>1, "cohort_id"=>"9", "set_since_date"=>"jan 2012", "controller"=>"alerts", "set_before_date"=>"June 16, 2012"}
+  * Rails root: /app/mynbcs/releases/20120614123754
+
+-------------------------------
+Session:
+-------------------------------
+
+  * session id: nil
+  * data: nil
+
+-------------------------------
+Environment:
+-------------------------------
+
+  * DOCUMENT_ROOT                               : /app/mynbcs/current/public
+  * HTTPS                                       : on
+  * HTTP_ACCEPT                                 : image/gif, image/jpeg, image/pjpeg, image/pjpeg, application/x-shockwave-flash, application/x-silverlight, application/x-ms-application, application/x-ms-xbap, application/vnd.ms-xpsdocument, application/xaml+xml, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*
+  * HTTP_ACCEPT_LANGUAGE                        : en-au
+  * HTTP_CONNECTION                             : Keep-Alive
+  * HTTP_COOKIE                                 : __utma=38424767.1898132715.1339397947.1339763559.1339768536.4; __utmz=38424767.1339768536.4.3.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); __utmb=38424767.104.10.1339768536; _sis_session=BAh7CjoQX2NzcmZfdG9rZW4iMWZ6ajNUMmdZWVdSZ1E2YXRMRXZ0Mk82Mi9mKytvbkdEY21vWkprSjNLVzg9Og9zZXNzaW9uX2lkIiVkNTFhZTBhMDcwNjAxMWJjMzRjNzRlZmIxY2I4MDYwNzoRYWxlcnRfc2VhcmNoeww6F2FsZXJ0X2NhdGVnb3J5X2lkczA6CXBhZ2UiBjI6DGN1cnJlbnQiBjE6DmNvaG9ydF9pZCIGOToLbGV2ZWxzWwsiBjAiBjEiBjIiBjMiBjQiCVdMTDE6E3NldF9zaW5jZV9kYXRlIhJKdW5lIDE2LCAyMDExOhRzZXRfYmVmb3JlX2RhdGUiEkp1bmUgMTYsIDIwMTIiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA6DHVzZXJfaWRpAl4V--ac9bfc9727bda672d84c8a9e6d2ca779e259c8eb; __utmc=38424767; auth_token=
+  * HTTP_HOST                                   : mynbcs.nsw.edu.au
+  * HTTP_REFERER                                : https://mynbcs.nsw.edu.au/alerts?cohort_id=9&commit=Find&current=1&levels%5B%5D=0&levels%5B%5D=1&levels%5B%5D=2&levels%5B%5D=3&levels%5B%5D=4&levels%5B%5D=WLL1&page=2&set_before_date=June+16%2C+2012&set_since_date=June+16%2C+2011&show_all=1
+  * HTTP_REVERSE_VIA                            : PETER
+  * HTTP_USER_AGENT                             : Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; GTB7.3; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; .NET4.0E)
+  * PATH_INFO                                   : /alerts
+  * QUERY_STRING                                : user_id=&cohort_id=9&set_since_date=jan+2012&set_before_date=June+16%2C+2012&current=1&commit=Find
+  * REMOTE_ADDR                                 : 192.168.0.21
+  * REMOTE_PORT                                 : 14638
+  * REQUEST_METHOD                              : GET
+  * REQUEST_URI                                 : /alerts?user_id=&cohort_id=9&set_since_date=jan+2012&set_before_date=June+16%2C+2012&current=1&commit=Find
+  * SCRIPT_NAME                                 : 
+  * SCRIPT_URI                                  : https://mynbcs.nsw.edu.au/alerts
+  * SCRIPT_URL                                  : /alerts
+  * SERVER_ADDR                                 : 10.0.0.50
+  * SERVER_ADMIN                                : [no address given]
+  * SERVER_NAME                                 : mynbcs.nsw.edu.au
+  * SERVER_PORT                                 : 443
+  * SERVER_PROTOCOL                             : HTTP/1.1
+  * SERVER_SOFTWARE                             : Apache/2.2.14 (Ubuntu)
+  * _                                           : _
+  * action_controller.request.path_parameters   : actionindexcontrolleralerts
+  * action_controller.request.query_parameters  : commitFindcurrent1user_idset_since_datejan 2012cohort_id9set_before_dateJune 16, 2012
+  * action_controller.request.request_parameters: 
+  * action_controller.rescue.request            : #<ActionController::Request:0x79cb218>
+  * action_controller.rescue.response           : #<ActionController::Response:0x79caf48>
+  * rack.errors                                 : #<IO:0xbd99a8>
+  * rack.input                                  : #<PhusionPassenger::Utils::RewindableInput:0x79cbdf8>
+  * rack.multiprocess                           : true
+  * rack.multithread                            : false
+  * rack.request.cookie_hash                    : __utma38424767.1898132715.1339397947.1339763559.1339768536.4_sis_sessionBAh7CjoQX2NzcmZfdG9rZW4iMWZ6ajNUMmdZWVdSZ1E2YXRMRXZ0Mk82Mi9mKytvbkdEY21vWkprSjNLVzg9Og9zZXNzaW9uX2lkIiVkNTFhZTBhMDcwNjAxMWJjMzRjNzRlZmIxY2I4MDYwNzoRYWxlcnRfc2VhcmNoeww6F2FsZXJ0X2NhdGVnb3J5X2lkczA6CXBhZ2UiBjI6DGN1cnJlbnQiBjE6DmNvaG9ydF9pZCIGOToLbGV2ZWxzWwsiBjAiBjEiBjIiBjMiBjQiCVdMTDE6E3NldF9zaW5jZV9kYXRlIhJKdW5lIDE2LCAyMDExOhRzZXRfYmVmb3JlX2RhdGUiEkp1bmUgMTYsIDIwMTIiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA6DHVzZXJfaWRpAl4V--ac9bfc9727bda672d84c8a9e6d2ca779e259c8eb__utmb38424767.104.10.1339768536__utmc38424767__utmz38424767.1339768536.4.3.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not provided)auth_token
+  * rack.request.cookie_string                  : __utma=38424767.1898132715.1339397947.1339763559.1339768536.4; __utmz=38424767.1339768536.4.3.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); __utmb=38424767.104.10.1339768536; _sis_session=BAh7CjoQX2NzcmZfdG9rZW4iMWZ6ajNUMmdZWVdSZ1E2YXRMRXZ0Mk82Mi9mKytvbkdEY21vWkprSjNLVzg9Og9zZXNzaW9uX2lkIiVkNTFhZTBhMDcwNjAxMWJjMzRjNzRlZmIxY2I4MDYwNzoRYWxlcnRfc2VhcmNoeww6F2FsZXJ0X2NhdGVnb3J5X2lkczA6CXBhZ2UiBjI6DGN1cnJlbnQiBjE6DmNvaG9ydF9pZCIGOToLbGV2ZWxzWwsiBjAiBjEiBjIiBjMiBjQiCVdMTDE6E3NldF9zaW5jZV9kYXRlIhJKdW5lIDE2LCAyMDExOhRzZXRfYmVmb3JlX2RhdGUiEkp1bmUgMTYsIDIwMTIiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhhc2h7AAY6CkB1c2VkewA6DHVzZXJfaWRpAl4V--ac9bfc9727bda672d84c8a9e6d2ca779e259c8eb; __utmc=38424767; auth_token=
+  * rack.request.query_hash                     : commitFindcurrent1user_idset_since_datejan 2012cohort_id9set_before_dateJune 16, 2012
+  * rack.request.query_string                   : user_id=&cohort_id=9&set_since_date=jan+2012&set_before_date=June+16%2C+2012&current=1&commit=Find
+  * rack.run_once                               : false
+  * rack.session                                : _csrf_tokenfzj3T2gYYWRgQ6atLEvt2O62/f++onGDcmoZJkJ3KW8=session_idd51ae0a0706011bc34c74efb1cb80607alert_searchpage1alert_category_idscurrent1cohort_id9set_since_datejan 2012levelsset_before_dateJune 16, 2012flashuser_id5470
+  * rack.session.options                        : key_session_idhttponlytruepath/domainidd51ae0a0706011bc34c74efb1cb80607expire_after
+  * rack.url_scheme                             : https
+  * rack.version                                : 10
+  
+  * Process: 1040
+  * Server : philemon
+
+-------------------------------
+Backtrace:
+-------------------------------
+
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract_adapter.rb:219:in `log'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/postgresql_adapter.rb:550:in `execute'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/postgresql_adapter.rb:1037:in `select_raw'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/postgresql_adapter.rb:1024:in `select'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/database_statements.rb:7:in `select_all_without_query_cache'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/query_cache.rb:60:in `select_all'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/query_cache.rb:81:in `cache_sql'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/query_cache.rb:60:in `select_all'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/base.rb:661:in `find_by_sql'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/base.rb:1548:in `find_every'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/base.rb:615:in `find'
+  /usr/local/lib/ruby/gems/1.8/gems/mislav-will_paginate-2.2.3/lib/will_paginate/finder.rb:82:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/mislav-will_paginate-2.2.3/lib/will_paginate/finder.rb:82:in `paginate'
+  /usr/local/lib/ruby/gems/1.8/gems/mislav-will_paginate-2.2.3/lib/will_paginate/collection.rb:87:in `create'
+  /usr/local/lib/ruby/gems/1.8/gems/mislav-will_paginate-2.2.3/lib/will_paginate/finder.rb:76:in `paginate'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:181:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:181:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/base.rb:2143:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:174:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:181:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:181:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/base.rb:2143:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:174:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:181:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:181:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/base.rb:2143:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:174:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:181:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:181:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/base.rb:2143:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:174:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:181:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:181:in `method_missing'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/base.rb:2143:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:113:in `with_scope'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/named_scope.rb:174:in `method_missing'
+  [RAILS_ROOT]/app/controllers/alerts_controller.rb:51:in `index'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:1331:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:1331:in `perform_action_without_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:617:in `call_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:638:in `run_before_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:206:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:206:in `around_proc'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:182:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/callbacks.rb:182:in `evaluate_method'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:184:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:635:in `run_before_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:615:in `call_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:610:in `perform_action_without_benchmark'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/benchmarking.rb:68:in `perform_action_without_rescue'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/core_ext/benchmark.rb:17:in `ms'
+  /usr/local/lib/ruby/1.8/benchmark.rb:308:in `realtime'
+  /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.3.4/lib/active_support/core_ext/benchmark.rb:17:in `ms'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/benchmarking.rb:68:in `perform_action_without_rescue'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/rescue.rb:160:in `perform_action_without_flash'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/flash.rb:146:in `perform_action'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:532:in `send'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:532:in `process_without_filters'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/filters.rb:606:in `process'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:391:in `process'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/base.rb:386:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/routing/route_set.rb:437:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:87:in `dispatch'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:121:in `_call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:130:in `build_middleware_stack'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:29:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:29:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/query_cache.rb:34:in `cache'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:9:in `cache'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/query_cache.rb:28:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.3.4/lib/active_record/connection_adapters/abstract/connection_pool.rb:361:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/haml-3.0.13/lib/sass/plugin/rack.rb:41:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/head.rb:9:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/methodoverride.rb:24:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/params_parser.rb:15:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/session/cookie_store.rb:93:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/failsafe.rb:26:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/rack-1.0.1/lib/rack/lock.rb:11:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.4/lib/action_controller/dispatcher.rb:106:in `call'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/rack/request_handler.rb:92:in `process_request'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_request_handler.rb:207:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:441:in `start_request_handler'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:381:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/utils.rb:252:in `safe_fork'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:377:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:163:in `start'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/railz/application_spawner.rb:222:in `start'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:253:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:126:in `lookup_or_add'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:247:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:80:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server_collection.rb:79:in `synchronize'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:246:in `spawn_rails_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:145:in `spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/spawn_manager.rb:278:in `handle_spawn_application'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `__send__'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:352:in `main_loop'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/lib/phusion_passenger/abstract_server.rb:196:in `start_synchronously'
+  /usr/local/lib/ruby/gems/1.8/gems/passenger-2.2.15/bin/passenger-spawn-server:61
+
+

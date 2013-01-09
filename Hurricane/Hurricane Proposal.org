@@ -1,0 +1,378 @@
+* Upgrades to Ruby Core
+
+Currently at: 
+ruby 1.8.7 (2009-06-12 patchlevel 174) Ruby Enterprise Edition 2009.10 
+
+Git repository for Enterprise Edition
+https://github.com/FooBarWidget/rubyenterpriseedition187-330
+
+
+** When do things get unsupported?
+
+Ruby 2.0 expected Feb 2013. First preview released recently.
+
+** Reommendation
+Should  move to 1.8.7 latest:
+Ruby Enterprise Edition 1.8.7 2012.02
+
+Shouldn't move to 1.9.* unless upgrading to Rails 3
+
+* Upgrades to Rails Core
+  
+Currently on 2.3.8
+
+** 2.3.x Changes
+*** 2.3.9 
+  - introduces deprecation warnings for Rails 3
+*** 2.3.10 
+  - minor release
+  - mainly resolves security bug from 2.3.9
+*** 2.3.11
+  - bugfixes
+  - Adresses a bug in cross site request forgery protection
+*** 2.3.12
+  - Fix compatibility issues with RubyGems 1.8.5
+*** 2.3.13
+ - 
+*** 2.3.14
+ - Security Fixes
+ - Bugfixes
+
+
+** When do things get unsupported?
+Rails 2.3.14 (August 2011) is the last release AFAIK and there appears to be no more active development on the Rails 2.3.x branch (March 2012 latest)
+
+** Recommendation
+Recommend move to latest version on 2.3.14 branch
+Should be relatively painless and will at least bring in later bug and security fixes.
+Move to 2.3.9+ will also give deprecation warnings that are relevant to change to any later change to Rails 3.x
+
+* Gems
+** Clear out unused gems? Uninstall?
+ - No need to worry about this Bundler + Gemfile will take care of it.
+** Rake
+*** Why Upgrade?
+ - Rake is fundamental and a dependecy of most gems and plugins.
+ - /Should/ be fairly minor syntactic changes.
+ - Our old Rake version almost certainly wont play nicely with any new Gems that we may one day have to add.
+*** Why not upgrade?
+ - Pretty much everything has some Rake integration - particularly the vendor/plugins. 
+ - Though changes /should/ be small syntax substitutions they will be scattered throughout many parts of the app.
+*** Plugins
+    These use 0.8.7 syntax e.g. tiny_mce
+*** Compromise
+ - Upgrade to 0.9.3
+ - This will give deprecation warnings for old syntax but should accept new syntax.
+** Rdoc
+ - Older versions seem to give trouble as noted in Wiki
+ - Newer versions seem to handle 
+* Upgrades to vendor plugins
+** Reommendation
+ - Trial upgrade Rake to 0.9.3
+ - If everything blows up 
+Not advisable at this stage - Necessary if we move to Rails 3
+
+
+* Use bundler
+Bundler is a standard part of Rails 3 but is compatible with Rails 2
+** Advantages
+*** Standardise Deployments across Catalyst developers
+ - should greatly speed up the process of people getting to work on the project
+ - might be increasingly important as Rails and gem versions become non-standard and out of date
+
+*** Lockdown a working environment
+ - Specifiy a "Gemfile" that can 
+ - A Gemfile provides a central descfiption of all 
+*** Ease the pain of any future upgrading 
+  - can easily roll back to a previous working configuration 
+  - makes it easier to isolate package versions that might break code.
+*** Relatively simple transition away from vendor/plugins
+ - just as you can specify a particular gem as a dependency of your app and tell Bundler to fetch it you can tell Bundler to pull code straight from a git repo 
+   - this can be as specific as a particular branch/tag/commit 
+ - Its then relatively simple to bump the version of the plugin/gem up to the present if desired and test for breakages
+   - since most plugins have now evolved to Gems this is a relatively painless way to move from the plugin form to the gem, if later desired
+* Testing
+Really /should/ have a better automated testing suite but this is  time prohibitive at present.
+** Recommendation
+Eave for now
+
+* Fix Major Bugs
+ - Some bugs are pretty big and dont have anything to do with Rails version or Gems.
+ - Recommend some time to fix most offensive/serious.
+
+* Deprecated Features
+** Ruby
+*** 1.8.7 to 1.9.3
+
+** Rails
+** Rake
+*** 0.9 to 10.0 - deprecated to unsuported
+ -  Classic namespaces are now gone. Rake is no longer able to reflect the options settings in the global variables ($rakefile, $show_tasks, $show_prereqs, $trace, $dryrun and $silent). The --classic-namespace option is no longer supported.
+ -  Global constants are no longer supported. This includes Task, FileTask, FileCreationTask and RakeApp). The constant missing hook to warn about using global rake constants has been removed.
+ -  The Rake DSL methods (task, file, directory, etc) are in their own module (Rake::DSL). The stub versions of these methods (that printed warnings) in Object have been removed. However, the DSL methods are added to the top-level main object. Since main is not in the inheritance tree, the presence of the DSL methods in main should be low impact on other libraries.
+ -  If you want to use the Rake DSL commands from your own code, just include Rake::DSL into your own classes and modules.
+ -  The deprecated syntax for task arguments (the one using :needs) has been removed.
+ -  The --reduce-compat flag has been removed (it’s not needed anymore).
+ -  The deprecated rake/sys.rb library has been removed.
+ -  The deprecated rake/rdoctask.rb library has been removed. RDoc supplies its own rake task now.
+ -  The deprecated rake/gempackagetask.rb library has been removed. Gem supplies its own package task now.
+*** 0.8.7 to 0.9 - Some stuff deprecated
+ -  Rake now warns when the deprecated :needs syntax used (and suggests the proper syntax in the warning).
+ -  Moved Rake DSL commands to top level ruby object ‘main’. Rake DSL commands are no longer private methods in Object. (Suggested by James M. Lawrence/quix)
+ -  Rake now uses case-insensitive comparisons to find the Rakefile on Windows. Based on patch by Roger Pack.
+ -  Rake now requires (instead of loads) files in the test task. Patch by Cezary Baginski.
+ -  Fixed typos. Patches by Sean Scot August Moon and R.T. Lechow.
+ -  Rake now prints the Rakefile directory only when it's different from the current directory. Patch by Alex Chaffee.
+ -  Improved rakefile_location discovery on Windows. Patch by James Tucker.
+ -  Rake now recognizes “Windows Server” as a windows system. Patch by Matthias Lüdtke
+ -  Rake::RDocTask is deprecated. Use RDoc::Task from RDoc 2.4.2+ (require ‘rdoc/task’)
+ -  Rake::GemPackageTask is deprecated. Use Gem::PackageTask (require ‘rubygems/package_task’)
+ -  Rake now outputs various messages to $stderr instead of $stdout.
+ -  Rake no longer emits warnings for Config. Patch by Santiago Pastorino.
+ -  Removed Rake’s DSL methods from the top level scope. If you need to call ‘task :xzy’ in your code, include Rake::DSL into your class, or put the code in a Rake::DSL.environment do … end block.
+ -  Split rake.rb into individual files.
+ -  Support for the –where (-W) flag for showing where a task is defined.
+ -  Fixed quoting in test task. (onestepback.org/redmine/issues/show/44, www.pivotaltracker.com/story/show/1223138)
+ -  Fixed the silent option parsing problem. (onestepback.org/redmine/issues/show/47)
+ -  Fixed :verbose=>false flag on sh and ruby commands.
+ -  Rake command line options may be given by default in a RAKEOPT environment variable.
+ -  Errors in Rake will now display the task invocation chain in effect at the time of the error.
+ -  Accepted change by warnickr to not expand test patterns in shell (allowing more files in the test suite).
+ -  Fixed that file tasks did not perform prereq lookups in scope (Redmine #57).
+
+
+
+* Time Breakdown
+
+| Action                         | Time (hours) |
+|--------------------------------+--------------|
+| Integrate Bundler into Project |            4 |
+| Upgrade to Latest Ruby 1.8.7   |            2 |
+| Upgrade to Rails Core          |           12 |
+| Upgrade Rake Gem               |            4 |
+| Test Configuration Changes     |            4 |
+|--------------------------------+--------------|
+| TOTAL                          |              |
+
+
+*Appendix*
+* Plugins Notes
+** acts_as_audited
+*** What It Does
+= acts_as_audited
+ 
+ acts_as_audited is an ActiveRecord extension that logs all changes to your models in an audits table.
+ 
+ The purpose of this fork is to store both the previous values and the changed value, making each audit record selfcontained.                                                                                                                              
+*** Current Status
+Now a gem
+** acts_as_list
+*** What It Does
+ ActsAsList
+ ==========
+ 
+ This acts_as extension provides the capabilities for sorting and reordering a number of objects in a list. The class that has   this specified needs to have a +position+ column defined as an integer on the mapped database table.
+ 
+ 
+ Example
+ =======
+ 
+   class TodoList < ActiveRecord::Base
+     has_many :todo_items, :order => "position"
+   end
+ 
+   class TodoItem < ActiveRecord::Base
+     belongs_to :todo_list
+     acts_as_list :scope => :todo_list
+   end
+ 
+   todo_list.first.move_to_bottom
+   todo_list.last.move_higher
+*** Current Status
+Now a gem
+** acts_as_tree
+*** What It Does
+ acts_as_tree
+ ============
+ 
+ Specify this +acts_as+ extension if you want to model a tree structure by providing a parent association and a children association. This requires that you have a foreign key column, which by default is called +parent_id+.
+ 
+   class Category < ActiveRecord::Base
+     acts_as_tree :order => "name"
+   end
+ 
+   Example:
+   root
+    \_ child1
+         \_ subchild1
+         \_ subchild2
+ 
+   root      = Category.create("name" => "root")
+   child1    = root.children.create("name" => "child1")
+   subchild1 = child1.children.create("name" => "subchild1")
+ 
+   root.parent   # => nil
+   child1.parent # => root
+   root.children # => [child1]
+   root.children.first.children.first # => subchild1
+*** Current Status
+Now a gem
+_We no longer support Ruby 1.8 or versions if Rails/ActiveRecord older than 3.0. If you're using a version of ActiveRecord older than 3.0 please use 0.1.1._
+** acts_as_tsearch
+*** What It Does
+ ActsAsTsearch
+ =============
+ 
+ Acts_as_tsearch is a plugin for Ruby on Rails which makes it simple to implement scalable, full text search for Rails if        you're using PostgreSQL as your database. It wraps the built-in full text search engine of PostgreSQL with a familiar           'acts_as' implementation.
+*** Current Status
+Does not seem to be packaged as a gem
+May be able to get bundler to source it from Github or this may be an alternative:
+https://github.com/dougal/acts_as_indexed
+** country_select
+*** What It Does
+CountrySelect
+=============
+
+Provides a simple helper to get an HTML select list of countries.  The list of countries comes from the ISO 3166 standard.  While it is a relatively neutral source of country names, it will still offend some users.
+
+Users are strongly advised to evaluate the suitability of this list given their user base.
+*** Current Status
+Since forked as a gem
+** db_populate
+no info
+** declarative_authorization
+*** What It Does
+ The declarative authorization plugin offers an authorization mechanism inspired
+ by _RBAC_.  The most notable distinction to existing authorization plugins is the
+ declarative authorization approach.  That is, authorization rules are not
+ programmatically in between business logic but in an authorization configuration.
+ 
+ Currently, Rails authorization plugins only provide for programmatic
+ authorization rules.  That is, the developer needs to specify which roles are
+ allowed to access a specific controller action or a part of a view, which is
+ not DRY.  With a growing application code base and functions, as it happens
+ especially in agile development processes, it may be decided to introduce new
+ roles.  Then, at several places of the source code the new group needs to be
+ added, possibly leading to omissions and thus hard to test errors.  Another
+ aspect are changing authorization requirements in development or
+ even after taking the application into production.  Then, privileges of
+ certain roles need to be easily adjusted when the original assumptions
+ concerning access control prove unrealistic.  In these situations, a
+ declarative approach as offered by this plugin increases the development
+ and maintenance efficiency.
+*** Current Status
+Now a gem
+** default_value_for
+*** What It Does
+ = Introduction
+ 
+ The default_value_for plugin allows one to define default values for ActiveRecord
+ models in a declarative manner. For example:
+ 
+   class User < ActiveRecord::Base
+     default_value_for :name, "(no name)"
+     default_value_for :last_seen do
+       Time.now
+     end
+   end
+   
+   u = User.new
+   u.name       # => "(no name)"
+   u.last_seen  # => Mon Sep 22 17:28:38 +0200 2008
+ 
+ *Note*: critics might be interested in the "When (not) to use default_value_for?"
+ section. Please read on.
+
+*** Current Status
+Now a gem
+** delayed_job
+*** What It Does
+Delated_job (or DJ) encapsulates the common pattern of asynchronously executing longer tasks in the background.
+      
+ It is a direct extraction from Shopify where the job table is responsible for a multitude of core tasks. Amongst those tasks    are: 
+      
+ * sending massive newsletters
+ * image resizing
+ * http downloads
+ * updating smart collections
+ * updating solr, our search server, after product changes
+ * batch imports 
+ * spam checks 
+** exception_notification
+*** What It Does
+= Exception Notifier Plugin for Rails
+
+The Exception Notifier plugin provides a mailer object and a default set of
+templates for sending email notifications when errors occur in a Rails
+application. The plugin is configurable, allowing programmers to specify:
+
+ * the sender address of the email
+ * the recipient addresses
+ * the text used to prefix the subject line
+
+The email includes information about the current request, session, and
+environment, and also gives a backtrace of the exception.
+*** Current Status
+Now a gem
+** localized_dates
+*** What It Does
+localized_dates
+=================
+
+The localized_dates plugin takes away some of the pain of localizing dates and times. It leverages the power of the
+Rails i18n plugin (http://rails-i18n.org/) to facilitate localization of dates and times.
+*** Current Status
+Still a plugin i think
+** restful_authentication
+*** What It Does
+"Restful Authentication Generator":http://github.com/technoweenie/restful-authentication
+
+This widely-used plugin provides a foundation for securely managing user
+authentication:
+ * Login / logout
+ * Secure password handling
+ * Account activation by validating email
+ * Account approval / disabling by admin
+ * Rudimentary hooks for authorization and access control.
+*** Current Status
+Still a plugin
+** theme_support
+*** What It Does
+= Theme Support for Rails Applications
+
+This plugin provides support for themes to the rails application environment. 
+It supports theme specific images, stylesheets, javascripts, and views. The 
+views can be in ERb (rhtml) or liquid formats. Optionally, you can configure 
+the theme system to ignore any templates except liquid ones.
+*** Current Status
+Replaced by a forked gem version:
+https://github.com/lucasefe/themes_for_rails
+** tiny_mce
+*** What It Does
+This plugin provides for the installation and utilization of TinyMCE 3.2.2 in Ruby on Rails
+applications.
+TinyMCE is a WYSIWYG HTML editing component released under the GNU Public License 2.1 (GPL 2.1) by Moxiecode Systems (http://tinymce.moxiecode.com/)
+*** Current Status
+Still a plugin it seems
+** unobtrusive
+*** What It Does
+== Unobtrusive
+
+This is a simple file-copying plugin to ease the process of using specific Javascript libraries in your Rails application.
+
+It includes the LowPro library by Dan Webb, some of his behaviors, the latest version of prototype.js, and a sample unobtrusive.js for you to edit.
+
+The unobtrusive.js file is yours to edit (or rename). You'll also need to include these files in the HTML templates in which you want to use them.
+
+== Usage
+
+  ./script/plugin install git://github.com/dwg/unobtrusive.git
+
+  ./script/generate unobtrusive
+  
+  <%= javascript_include_tag :unobtrusive %>
+
+
+
+*** Current Status
+Still a plugin

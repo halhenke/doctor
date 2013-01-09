@@ -1,0 +1,900 @@
+#+TITLE: Moodle Notes (2.3)
+*See [[file:~/Documents/Moodle%20Notes.org::*HowTo][Moodle: HowTo]] for more Moodle details*
+* Login
+Username: hal
+Password: Moodle-23
+* Users
+| username    | password       | Auth Method     |
+|-------------+----------------+-----------------|
+| =hulk=      | Smash-100      | Manual Accounts |
+| =weird_chick= | Mary-4-life    | Manual Accounts |
+| =goldilocks= | Mjolnir-4-life |                 |
+| =furious=   | SHIELD-No-1    |                 |
+|             |                |                 |
+
+* Generating user certificates
+I (foolishly) ran this as one huge command on the shell line:
+: ( openssl genrsa -des3 -out server.key 1024 ; openssl rsa -in server.key -out server.pem; openssl req -new -key server.key -out server.csr ; openssl x509 -req -days 9999 -in server.csr -signkey server.key -out server.crt )
+It asked me for a bunch of stuff like 
+: Enter pass phrase for server.key:
+and
+: A challenge password []:
+For each of these i just wrote =moodle=\\
+...i thought you should know.
+
+* Stuff relating to overriding/customisation to show Drupal related Name
+** Forum - =user_id= & name stuff
+  - Forum related code is in 
+   =mod/forum=
+***  info in the database
+Table =public.mdl_user=
+
+|-
+|  id              | bigint                 | not null default nextval('mdl_user_id_seq'::regclass) |
+|  auth              | character varying(20)  | not null default 'manual'::character varying |
+|  confirmed         | smallint               | not null default 0 |
+|  policyagreed      | smallint               | not null default 0 |
+|  deleted           | smallint               | not null default 0 |
+|  suspended         | smallint               | not null default 0 |
+|  mnethostid        | bigint                 | not null default 0 |
+|  username          | character varying(100) | not null default ''::character varying  |
+|  password          | character varying(32)  | not null default ''::character varying |
+|  idnumber          | character varying(255) | not null default ''::character varying |
+|  firstname         | character varying(100) | not null default ''::character varying |
+|  lastname          | character varying(100) | not null default ''::character varying  |
+|-
+
+*** List of files in mod/forum directory
+#+BEGIN_SRC bash
+  drwxrwxr-x  4 hal hal   4096 Dec 18 12:57 backup
+  drwxrwxr-x  2 hal hal   4096 Dec 18 12:57 db
+  -rw-rw-r--  1 hal hal  12493 Dec 18 12:57 discuss.php
+  -rw-rw-r--  1 hal hal   1939 Dec 18 12:57 forum.js
+  -rw-rw-r--  1 hal hal  17478 Dec 18 12:57 index.php
+  drwxrwxr-x  3 hal hal   4096 Dec 18 12:57 lang
+  -rw-rw-r--  1 hal hal 306876 Dec 18 12:57 lib.php
+  -rw-rw-r--  1 hal hal  21192 Dec 18 12:57 locallib.php
+  -rw-rw-r--  1 hal hal   3827 Dec 18 12:57 markposts.php
+  -rw-rw-r--  1 hal hal  11758 Dec 18 12:57 mod_form.php
+  drwxrwxr-x  2 hal hal   4096 Dec 18 12:57 pix
+  -rw-rw-r--  1 hal hal   9135 Dec 18 12:57 post_form.php
+  -rw-rw-r--  1 hal hal  34396 Dec 18 12:57 post.php
+  -rw-rw-r--  1 hal hal    670 Dec 18 12:57 prune.html
+  -rw-rw-r--  1 hal hal   4992 Dec 18 12:57 renderer.php
+  -rw-rw-r--  1 hal hal  15319 Dec 18 12:57 rsslib.php
+  -rw-rw-r--  1 hal hal  18829 Dec 18 12:57 search.php
+  -rw-rw-r--  1 hal hal   4665 Dec 18 12:57 settings.php
+  -rw-rw-r--  1 hal hal   2643 Dec 18 12:57 settracking.php
+  -rw-rw-r--  1 hal hal   4501 Dec 18 12:57 styles.css
+  -rw-rw-r--  1 hal hal   7237 Dec 18 12:57 subscribe.php
+  -rw-rw-r--  1 hal hal   4549 Dec 18 12:57 subscribers.php
+  drwxrwxr-x  3 hal hal   4096 Dec 18 12:57 tests
+  -rw-rw-r--  1 hal hal   2480 Dec 18 12:57 unsubscribeall.php
+  -rw-rw-r--  1 hal hal  14594 Dec 18 12:57 user.php
+  -rw-rw-r--  1 hal hal   1217 Dec 18 12:57 version.php
+  -rw-rw-r--  1 hal hal   9651 Dec 18 12:57 view.php
+#+END_SRC bash
+*** Investigating
+**** Grepping
+***** grep for author div - should show output
+#+BEGIN_SRC bash
+hal@HAL9000:~/work/test-sites/my-moodle-23$ grep -R "class\"author\"" mod/forum/
+mod/forum/locallib.php:        $output .= '<div class="author">'.get_string('bynameondate', 'forum', $by).'</div>';
+mod/forum/lib.php:    $output .= '<div class="author">'.get_string('bynameondate', 'forum', $by).'</div>';
+mod/forum/lib.php:    echo '<td class="author">';
+#+END_SRC bash
+ - variable
+=$bynameondate=
+
+***** grep for $bynameondate
+#+BEGIN_SRC bash
+hal@HAL9000:~/work/test-sites/my-moodle-23$ grep -R "bynameondate" mod/forum/
+mod/forum/lang/en/forum.php:$string['bynameondate'] = 'by {$a->name} - {$a->date}';
+#+END_SRC bash
+***** grep for function fullname
+#+BEGIN_SRC bash
+hal@HAL9000:~/work/test-sites/my-moodle-23$ grep -R "fullname" . | grep function
+
+./lib/moodlelib.php:function fullname($user, $override=false) {
+#+END_SRC bash
+**** Closer look
+*****  lib.php
+ - seems to have a lot of stuff for displaying pretty much everything....
+i.e
+=function forum_get_all_discussion_posts($discussionid, $sort, $tracking=false)=
+
+=function forum_get_user_posts($forumid, $userid)=
+
+=function forum_get_potential_subscribers($forumcontext, $groupid, $fields, $sort)=
+
+=function forum_subscribed_users($course, $forum, $groupid=0, $context = null, $fields = null)=
+
+=function forum_get_posts_by_user($user, array $courses, $musthaveaccess = false, $discussionsonly = false, $limitfrom = 0, $limitnum = 50)=
+*****  locallib.php
+ - Help the big lib?
+=private function prepare_post($post, $fileoutputextras=null)=
+calls
+=$fullname = fullname($users[$post->userid], $viewfullnames);=
+***** post.php 
+   - some stuff
+*****  index.php
+***** user.php
+***** view.php
+***** prune.html
+*****  renderer.php
+*****  rsslib.php
+*****  search.php
+*****  settings.php
+
+**** Getting Closer
+***** lib.php 
+982
+function =forum_cron()=
+#+BEGIN_SRC php
+     if ($userto->maildigest == 2) {
+                            // Subjects only
+                            $by = new stdClass();
+                            $by->name = fullname($userfrom);
+                            $by->date = userdate($post->modified);
+#+END_SRC php
+
+#+BEGIN_SRC php
+   $by = New stdClass;
+    $by->name = fullname($userfrom, $viewfullnames);
+    $by->date = userdate($post->modified, "", $userto->timezone);
+#+END_SRC php
+So fullname and $userfrom
+
+*** Found It
+OK so the function 
+=function fullname($user, $override=false)=
+on line 3533 of 
+lib/moodlelib.php
+povides the fullname
+ - *HOWEVER*
+ - it provides the user name for other contexts also such as the logged in message at the top of the screen....
+
+So we want to replace it just in the forum module....
+
+*** References to fullname() function in mod/forum
+**** Files and Linenumbers in mod/forum 
+#+BEGIN_SRC bash
+grep -Rn "fullname(" mod/forum/
+mod/forum/user.php:178:        $fullname = fullname($user);
+mod/forum/user.php:296:$userfullname = fullname($user);
+mod/forum/rsslib.php:349:                $item->author = fullname($user);
+mod/forum/markposts.php:75:$info->name  = fullname($user);
+mod/forum/post.php:522:                       fullname($USER).'</a>';
+mod/forum/post.php:525:        $data->name = fullname($USER);
+mod/forum/post.php:660:            $message .= '<br />'.get_string("editedpostupdated", "forum", fullname($realuser));
+mod/forum/settracking.php:59:$info->name  = fullname($USER);
+mod/forum/subscribe.php:131:$info->name  = fullname($user);
+mod/forum/renderer.php:96:                $table->data[] = array($this->output->user_picture($user, array('courseid'=>$course->id)), fullname($user), $user->email);
+mod/forum/locallib.php:313:        $fullname = fullname($users[$post->userid], $viewfullnames);
+mod/forum/lib.php:716:                $smallmessagestrings->user = fullname($userfrom);
+mod/forum/lib.php:982:                            $by->name = fullname($userfrom);
+mod/forum/lib.php:1093:    $by->name = fullname($userfrom, $viewfullnames);
+mod/forum/lib.php:1532:               '<div class="name">'.fullname($post, $viewfullnames).'</div>'.
+mod/forum/lib.php:3079:    $fullname = fullname($userfrom, $viewfullnames);
+mod/forum/lib.php:3276:    $postuser->fullname    = fullname($postuser, $cm->cache->caps['moodle/site:viewfullnames']);
+mod/forum/lib.php:3698:    $fullname = fullname($post, has_capability('moodle/site:viewfullnames', $modcontext));
+mod/forum/lib.php:3758:         fullname($usermodified).'</a><br />';
+mod/forum/lib.php:4786:    $info->name  = fullname($USER);
+mod/forum/lib.php:5810:                $by->name = fullname($post, $canviewfullnames);
+mod/forum/lib.php:6024:    $fullname = fullname($activity->user, $viewfullnames);
+#+END_SRC bash
+**** References counted by file in =mod/forum=
+#+BEGIN_SRC bash
+grep -Rc "fullname(" mod/forum/
+mod/forum/user.php:2
+mod/forum/styles.css:0
+mod/forum/pix/icon.gif:0
+mod/forum/rsslib.php:1
+mod/forum/unsubscribeall.php:0
+mod/forum/post_form.php:0
+mod/forum/forum.js:0
+mod/forum/markposts.php:1
+mod/forum/post.php:3
+mod/forum/db/access.php:0
+mod/forum/db/install.xml:0
+mod/forum/db/messages.php:0
+mod/forum/db/upgrade.php:0
+mod/forum/db/log.php:0
+mod/forum/db/events.php:0
+mod/forum/lang/en/forum.php:0
+mod/forum/settracking.php:1
+mod/forum/version.php:0
+mod/forum/subscribe.php:1
+mod/forum/settings.php:0
+mod/forum/prune.html:0
+mod/forum/tests/generator/lib.php:0
+mod/forum/tests/generator_test.php:0
+mod/forum/subscribers.php:0
+mod/forum/renderer.php:1
+mod/forum/view.php:0
+mod/forum/discuss.php:0
+mod/forum/mod_form.php:0
+mod/forum/backup/moodle1/lib.php:0
+mod/forum/backup/moodle2/restore_forum_activity_task.class.php:0
+mod/forum/backup/moodle2/backup_forum_stepslib.php:0
+mod/forum/backup/moodle2/backup_forum_settingslib.php:0
+mod/forum/backup/moodle2/backup_forum_activity_task.class.php:0
+mod/forum/backup/moodle2/restore_forum_stepslib.php:0
+mod/forum/index.php:0
+mod/forum/locallib.php:1
+mod/forum/search.php:0
+mod/forum/lib.php:11
+#+END_SRC bash
+**** Only files that have at least one in =mod/forum= directory
+#+BEGIN_SRC bash
+grep -Rc "fullname(" mod/forum/ | grep -v :0
+mod/forum/user.php:2
+mod/forum/rsslib.php:1
+mod/forum/markposts.php:1
+mod/forum/post.php:3
+mod/forum/settracking.php:1
+mod/forum/subscribe.php:1
+mod/forum/renderer.php:1
+mod/forum/locallib.php:1
+mod/forum/lib.php:11
+#+END_SRC bash
+*** References to fullname() function in the whole Moodle app
+#+BEGIN_SRC bash
+grep -Rc "fullname(" . | grep -v :0
+grep: ./config.php./user/profile.php:3
+./user/repository.php:1
+./user/message.html:1
+./user/editlib.php:1
+./user/view.php:2
+./user/edit.php:2
+./user/groupaddnote.php:1
+./user/addnote.php:1
+./user/index.php:4
+./user/emailupdate.php:1
+: Permission denied
+./user/selector/lib.php:3
+./user/filters/lib.php:1
+./user/portfolio.php:1
+./user/editadvanced.php:2
+./user/lib.php:3
+./user/portfoliologs.php:1
+./tag/index.php:1
+./tag/manage.php:1
+./tag/locallib.php:1
+./webservice/upload.php:1
+./webservice/externallib.php:1
+./course/recent_form.php:2
+./course/pending.php:1
+./course/loginas.php:2
+./course/info.php:1
+./course/recent.php:1
+./course/lib.php:13
+./mod/glossary/rsslib.php:1
+./mod/glossary/print.php:1
+./mod/glossary/sql.php:2
+./mod/glossary/view.php:1
+./mod/glossary/formats/TEMPLATE/TEMPLATE_format.php:1
+./mod/glossary/formats/encyclopedia/encyclopedia_format.php:1
+./mod/glossary/formats/fullwithauthor/fullwithauthor_format.php:1
+./mod/glossary/lib.php:2
+./mod/data/preset.php:1
+./mod/data/lib.php:1
+./mod/lesson/essay_form.php:1
+./mod/lesson/report.php:1
+./mod/lesson/essay.php:2
+./mod/scorm/userreport.php:2
+./mod/scorm/report/interactions/report.php:2
+./mod/scorm/report/basic/report.php:2
+./mod/workshop/allocation/manual/renderer.php:3
+./mod/workshop/allocation/random/lib.php:6
+./mod/workshop/renderer.php:6
+./mod/workshop/lib.php:3
+./mod/forum/user.php:2
+./mod/forum/rsslib.php:1
+./mod/forum/markposts.php:1
+./mod/forum/post.php:3
+./mod/forum/settracking.php:1
+./mod/forum/subscribe.php:1
+./mod/forum/renderer.php:1
+./mod/forum/locallib.php:1
+./mod/forum/lib.php:11
+./mod/assignment/type/online/file.php:1
+./mod/assignment/type/online/assignment.class.php:1
+./mod/assignment/type/upload/notes.php:4
+./mod/assignment/type/upload/assignment.class.php:2
+./mod/assignment/type/uploadsingle/assignment.class.php:1
+./mod/assignment/lib.php:12
+./mod/choice/renderer.php:1
+./mod/choice/lib.php:2
+./mod/quiz/overrides.php:1
+./mod/quiz/override_form.php:2
+./mod/quiz/overridedelete.php:1
+./mod/quiz/review.php:1
+./mod/quiz/attemptlib.php:1
+./mod/quiz/locallib.php:4
+./mod/quiz/report/attemptsreport_table.php:2
+./mod/quiz/report/grading/report.php:2
+./mod/quiz/lib.php:1
+./mod/assign/submission/onlinetext/locallib.php:1
+./mod/assign/gradingtable.php:2
+./mod/assign/renderable.php:1
+./mod/assign/renderer.php:2
+./mod/assign/locallib.php:8
+./mod/assign/lib.php:1
+./mod/feedback/show_entries.php:2
+./mod/feedback/show_nonrespondents.php:1
+./mod/feedback/analysis_to_excel.php:1
+./mod/feedback/lib.php:2
+./mod/url/locallib.php:1
+./mod/chat/gui_header_js/users.php:1
+./mod/chat/view.php:1
+./mod/chat/report.php:1
+./mod/chat/gui_basic/index.php:1
+./mod/chat/chatd.php:1
+./mod/chat/lib.php:13
+./mod/book/tool/print/index.php:1
+./mod/wiki/renderer.php:8
+./mod/wiki/pagelib.php:8
+./mod/survey/graph.php:2
+./mod/survey/report.php:3
+./mod/survey/lib.php:1
+./blog/rsslib.php:2
+./blog/edit_form.php:2
+./blog/locallib.php:2
+./blog/lib.php:17
+./notes/delete.php:1
+./notes/edit.php:2
+./notes/index.php:1
+./notes/lib.php:2
+./enrol/flatfile/lib.php:1
+./enrol/users.php:3
+./enrol/bulkchange_forms.php:1
+./enrol/ajax.php:1
+./enrol/authorize/locallib.php:3
+./enrol/manual/editenrolment.php:1
+./enrol/manual/ajax.php:1
+./enrol/index.php:1
+./enrol/self/editenrolment.php:1
+./enrol/paypal/ipn.php:2
+./enrol/paypal/lib.php:1
+./enrol/unenroluser.php:2
+./enrol/locallib.php:1
+./enrol/externallib.php:1
+./enrol/users_forms.php:2
+./message/output/jabber/message_output_jabber.php:1
+./message/index.php:3
+./message/lib.php:8
+./mnet/service/enrol/course.php:1
+./repository/manage_instances.php:1
+./repository/boxnet/lib.php:1
+./repository/draftfiles_ajax.php:1
+./repository/dropbox/lib.php:2
+./repository/lib.php:2
+./admin/user/user_bulk_display.php:1
+./admin/user/user_bulk_forcepasswordchange.php:2
+./admin/user/user_bulk_delete.php:2
+./admin/user/user_bulk_message.php:1
+./admin/user/user_bulk_enrol.php:1
+./admin/user/user_bulk_cohortadd.php:1
+./admin/user/user_bulk_confirm.php:2
+./admin/user/lib.php:3
+./admin/user.php:4
+./admin/registration/forms.php:1
+./admin/settings/server.php:1
+./admin/tool/spamcleaner/index.php:1
+./admin/roles/usersroles.php:1
+./admin/roles/admins.php:2
+./admin/roles/permissions.php:1
+./admin/roles/override.php:1
+./admin/roles/assign.php:2
+./admin/roles/check.php:3
+./admin/roles/lib.php:1
+./admin/handlevirus.php:1
+./grade/import/lib.php:1
+./grade/edit/tree/grade_form.php:1
+./grade/report/user/index.php:3
+./grade/report/user/lib.php:1
+./grade/report/overview/index.php:2
+./grade/report/grader/ajax_callbacks.php:1
+./grade/report/grader/lib.php:4
+./grade/lib.php:1
+./rating/index.php:1
+./question/type/edit_question_form.php:2
+./question/editlib.php:2
+./login/signup_form.php:1
+./login/confirm.php:2
+./login/change_password.php:2
+./login/index.php:1
+./theme/mymobile/renderers.php:5
+./userpix/index.php:1
+./group/overview.php:1
+./group/autogroup.php:1
+./group/index.php:2
+./iplookup/index.php:1
+./lib/rsslib.php:2
+./lib/weblib.php:1
+./lib/uploadlib.php:2
+./lib/form/filemanager.php:2
+./lib/accesslib.php:2
+./lib/tablelib.php:2
+./lib/moodlelib.php:11
+./lib/navigationlib.php:3
+./lib/odslib.class.php:2
+./lib/dml/moodle_database.php:1
+./lib/dml/tests/dml_test.php:2
+./lib/datalib.php:4
+./lib/cronlib.php:1
+./lib/filebrowser/file_info_stored.php:1
+./lib/filebrowser/file_info_context_user.php:1
+./lib/filebrowser/file_info.php:2
+./lib/outputrenderers.php:3
+./lib/portfolio/formats/leap2a/lib.php:3
+./lib/adminlib.php:2
+./blocks/quiz_results/block_quiz_results.php:2
+./blocks/messages/block_messages.php:1
+./blocks/completionstatus/details.php:1
+./blocks/myprofile/block_myprofile.php:1
+./blocks/mentees/block_mentees.php:1
+./blocks/news_items/block_news_items.php:1
+./blocks/online_users/block_online_users.php:1
+./report/completion/index.php:5
+./report/stats/locallib.php:2
+./report/security/locallib.php:3
+./report/participation/index.php:1
+./report/configlog/index.php:1
+./report/log/graph.php:2
+./report/log/index.php:1
+./report/log/locallib.php:4
+./report/progress/index.php:3
+./.git/objects/pack/pack-62cb149fab3a6f887072a02c0141eba66ebb8b14.pack:1
+./comment/locallib.php:1
+./comment/lib.php:2
+#+END_SRC bash
+*** DONE Now looking for get_string and its usage
+=return get_string('fullnamedisplay', '', $user);=
+**** interface string_manager?
+lib/moodlelib.php: Line 6320
+#+BEGIN_SRC php
+interface string_manager {
+    /**
+     * Get String returns a requested string
+     *
+     * @param string $identifier The identifier of the string to search for
+     * @param string $component The module the string is associated with
+     * @param string|object|array $a An object, string or number that can be used
+     *      within translation strings
+     * @param string $lang moodle translation language, NULL means use current
+     * @return string The String !
+     */
+    public function get_string($identifier, $component = '', $a = NULL, $lang = NULL);
+#+END_SRC php
+**** implementation of get_string()
+In file =lib/moodlelib.php=:
+
+The main =get_string()= is defined on
+ - lib/moodlelib.php: Line 7274
+   - This calls either 
+     - =install_string_manager->get_string()= version 
+     - =core_string_manager->get_string()=
+
+StringManager Interface is defined on:
+ - lib/moodlelib.php: Line 6320
+
+and implemented on:
+ - lib/moodlelib.php: Line 7000
+   - =class install_string_manager implements string_manager=
+   - =get_string= on Line 7055
+ - lib/moodlelib.php: Line 6418 
+   - =class core_string_manager implements string_manager=
+   - =get_string= on Line 6637
+
+
+**** Grepping
+***** Where is get_string defined
+****** looking
+#+BEGIN_SRC bash
+hal@HAL9000:~/work/test-sites/my-moodle-23$ grep -Rc " function get_string" . | grep -v :0
+grep: ./config.php: Permission denied
+./admin/tool/unittest/ex_reporter.php:1
+./question/behaviour/behaviourbase.php:1
+./lib/moodlelib.php:4
+./lib/filterlib.php:1
+#+END_SRC bash
+It doesnt seem to be the =install_string_manager->get_string()= one so where is the 
+=core_string_manager->get_string()= one?
+#+BEGIN_SRC bash
+hal@HAL9000:~/work/test-sites/my-moodle-23$ grep -Rc "core_string_manager" . | grep -v :0
+grep: ./config.php: Permission denied
+./config-dist.php:1
+./lib/moodlelib.php:2
+#+END_SRC bash
+****** FOUND
+Line 6418
+=class core_string_manager implements string_manager=
+Line 6637
+=public function get_string($identifier, $component = '', $a = NULL, $lang = NULL)=
+*** How it works
+ - Fullname returns the usersname. Output format is largely dependent on the value of
+=$CFG->fullnamedisplay=
+
+If nothing else =get_string= gets called with the user and string =fullnamedisplay=
+=get_string('fullnamedisplay', '', $user);=
+ - Behaviour is set from this function
+   - i.e. =$CFG->fullnamedisplay= is just a flag.
+   - Therefore to change this we need to change this function
+ - ATM we either return one of 5 things
+   - =return '';=
+   - =return $user->firstname .' '. $user->lastname;=
+   - =return $user->lastname .' '. $user->firstname;=
+   - =return $user->firstname;=
+   - =return get_string('fullnamedisplay', '', $user);=
+
+=get_string= called here is the function on line 7276 of =moodlelib.php=
+ - it calls =clean_param= on 'fullnamedisplay'
+ - and then
+ -  =get_string_manager()->get_string($identifier, $component, $a);=
+
+**** =function get_string_manager($forcereload=false)=
+returns either
+#+BEGIN_SRC php
+            $singleton = new core_string_manager($CFG->langotherroot, $CFG->langlocalroot, $langcacheroot,
+                                                 !empty($CFG->langstringcache), $translist, $langmenucache);
+#+END_SRC php
+#+BEGIN_SRC php
+        } else {
+            $singleton = new install_string_manager();
+#+END_SRC php
+
+It doesnt call =install_string_manager()->get_string();= 
+as far as i can tell....
+
+** ScreenName Fix
+  * find out when overide=true
+  * Add =drupal_name= field to mdl_user table in database
+  * In =fullname()= function check for =drupal_name=
+    * AND check =$CFG->drupalNameShow= so we have configuration options.
+  * turn into git patch
+*** Updating the Database
+ - Use local/plugin for "scrappy" modules/code
+   - in this case local/drupal_name
+ - Moodle functions for updating the database seem to be in lib/datalib.php
+
+Useful:\\
+http://phpdocs.moodle.org/HEAD/default/xmldb_field.html
+** fullname() control flow
+  - check user has firstname and lastname
+  - default--non-override: behaviour - *Unless in admin mode both first and lastnames can be forced to specific values*
+    - if =$CFG->forcefirstname= then 
+      - =$user->firstname= = =$CFG->forcefirstname=;
+    - and same for lastname
+  - Next bugger around with =fullnamedisplay=
+    - if there is a =$SESSION->fullnamedisplay= then use it
+  - Then 3 different formats based on the value of =$CFG->fullnamedisplay=
+  - If none match then call =get_string= on 'fullnamedisplay'
+*** Settings of relevance
+  - =$override=
+  - =$CFG->forcefirstname=
+  - =$CFG->forcelastname=
+  - =$CFG->fullnamedisplay=
+  - =$SESSION->fullnamedisplay=
+
+
+
+* Twitter Stuff
+
+** My @Anywhere API Application Key
+Name: My-Moodle-23
+Description: Testing my Moodle
+Website: http://my-moodle-23/
+Callback URL: 
+
+*** OAuth settings
+Your application's OAuth settings. Keep the "Consumer secret" a secret. This key should never be human-readable in your application.\\
+#+BEGIN_VERSE
+Access level	 Read-only 
+About the application permission model
+Consumer key	nOn1XTkBxekHmVhRyfU4kg
+Consumer secret	scFPmlPjLSh9iL41VEEBLJSLFKLdOY5gZMtIsQss
+Request token URL	https://api.twitter.com/oauth/request_token
+Authorize URL	https://api.twitter.com/oauth/authorize
+Access token URL	https://api.twitter.com/oauth/access_token
+Callback URL	None
+#+END_VERSE
+
+*** Your access token
+
+Use the access token string as your "oauth_token" and the access token secret as your "oauth_token_secret" to sign requests with your own Twitter account. Do not share your oauth_token_secret with anyone.
+
+Access token	386071273-2PEY5bPhayKoS6oKVzmKzUfoAZEGwWbRMt81ni4
+Access token secret	E6VvZgWGbHh2mXIzq6dRkYy9kmNYcMnsG0TnGZJIos
+Access level	Read-only
+
+** Getting "authenticity token" stuff
+http://stackoverflow.com/questions/3633572/how-secure-are-hidden-authenticity-tokens-in-twitters-oauth-clients-web-ui
+Assuming that you already have created an oauth client app in twitter, you can go to http://twitter.com/apps to manage them. When I viewed the source of the HTML pages, I see that they use a hidden form parameter called an authenticity token in their form definitions.
+
+That's a standard feature of Rails (which Twitter's front-end is written in). The authenticity token is a random string generated per session, and is used to guard against CSRF attacks. You can read more about the attack vector and why Rails uses the authenticity token on the Rails Security Guide. An app being served fully under SSL wouldn't prevent a CSRF attack; the purpose is simply to ensure that when a POST/PUT/DELETE is made to a resource, it is done so from a form generated by the application, and which has been seen in some form by the user.
+** Embedded Twitter Timeline Doesn't Work
+https://dev.twitter.com/discussions/10706
+** Twitter Inline Form
+*** Control Flow.....
+1. Check if =window.__twitterIntentHandler= is true
+2. If yes - return - do nothing...
+3. If not, chuck up some defalt values for a new window
+4. Provides a handleIntent function
+   1. Either passed an event or gets the window.event
+   2. target is either e.target or e.srcElement
+   3. Traverse upwards until we get to the first  =<a>= link
+   4. Check if target matches the intent Regular Expression - =/twitter\.com(\:\d{2,4})?\/intent\/(\w+)/=
+      1. If so calculate a window height and width
+      2. event e.preventDefault()
+5. Check if documet.addEventListener:
+   1. =document.addEventListener('click', handleIntent, false);=
+6. otherwise if (document.attachEvent):
+   1. =document.attachEvent('onclick', handleIntent);=
+*** For some reaon it is called when i call it from from the reply button but not when i click the tweet button
+#+BEGIN_COMMENT
+** I have an ajax/get call to the twitter reference and now i get this:
+: XMLHttpRequest cannot load https://twitter.com/intent/tweet. Origin http://my-moodle-23 is not allowed by Access-Control-Allow-Origin.
+Is it due to the "same origin policy?:
+
+https://developer.mozilla.org/en-US/docs/JavaScript/Same_origin_policy_for_JavaScript?redirectlocale=en-US&redirectslug=Same_origin_policy_for_JavaScript
+
+Or is it to do with a callback?
+*SAME ORIGIN POLICY*
+
+** JSONP and the Same origin Policy
+http://stackoverflow.com/questions/5389297/ajax-overcome-same-origin-policy
+
+*** One answer - *JSONP* - Typically, this is accomplished by implementing JSONP script generation on the server, so that generated script calls your callback after it is loaded and executed.
+
+Basically what you need to do is to add script element (with src set to your source url). The script served should, execute a function call to your supplied callback (sent via URL parameter).
+
+Some Ajax frameworks support this kind of communication out of the box, e.g. jQuery.
+
+Also some publicly available services, support JSONP Ajax communication, e.g. Twitter (via callback parameter).
+
+
+*** You cant use JSONP and a POOST method - only GET
+ - some people hack around this by using a GET method but still dending info to write
+   - violates REST but you know
+ - apparently someone else is saying you can but you just cant get the results....
+http://stackoverflow.com/questions/4419869/jsonp-and-post-action
+
+*** Another - *PROXY* - For bypassing same origin policy, you should create a proxy and then send the request through proxy...
+
+See detailed answer here
+
+Click here for Script for proxy setting
+
+Additional note, I think firefox 3.5 and more automatically bypasses the same origin policy for ajax..
+
+** My Twitter URLS
+http://ubuntuforums.org/showthread.php?t=1974099
+https://www.google.com.au/search?oq=wacom+intuous+5+ubuntu&sugexp=chrome,mod=0&sourceid=chrome&ie=UTF-8&q=wacom+intuous+5+ubuntu#hl=en&safe=off&tbo=d&biw=1217&bih=602&sclient=psy-ab&q=wacom+intuous+5+ubuntu+12.0.4&oq=wacom+intuous+5+ubuntu+12.0.4&gs_l=serp.3...8216.10761.0.11019.7.7.0.0.0.0.196.1197.0j7.7.0.les%3B..0.0...1c.1.iKasjDtTdCA&pbx=1&fp=1&bpcl=40096503&cad=b&sei=ibzkUJC3D-bKmgX15ICYAQ&bav=on.2,or.r_gc.r_pw.r_cp.r_qf.&sei=FOHkUN_KBajPmgWk64GACg
+https://drive.google.com/?usp=chrome_app#my-drive
+https://chrome.google.com/webstore/category/themes?hl=en
+https://c9.io/
+https://koding.com/Login
+https://www.evernote.com/Home.action#st=p&n=bf084b3e-594e-4b6c-b752-c382e1d46216
+http://www.nvidia.com/object/linux-display-amd64-310.19-driver.html
+http://wiki.debian.org/IntroDebianPackaging
+http://packages.debian.org/search?keywords=nvidia-glx
+https://help.ubuntu.com/community/BinaryDriverHowto/Nvidia
+http://orgmode.org/org.html#Horizontal-rules
+https://www.google.com.au/search?oq=org-mode+and+pdf&sugexp=chrome,mod=0&sourceid=chrome&ie=UTF-8&q=org-mode+and+pdf
+https://wiki.wgtn.cat-it.co.nz/wiki/Catalyst_Australia_Pty_Ltd/Open_Universites_Australia/moodle
+https://www.google.com.au/search?oq=git+diff+patch+order&sugexp=chrome,mod=0&sourceid=chrome&ie=UTF-8&q=git+diff+patch+order#hl=en&safe=off&tbo=d&sclient=psy-ab&q=git+diff+patch+reverse+order&oq=git+diff+patch+reverse+order&gs_l=serp.3...18851.20097.0.20340.8.8.0.0.0.3.204.1420.0j7j1.8.0.les%3B..0.0...1c.1.OEVd4u1hbVU&pbx=1&fp=1&bpcl=40096503&biw=1231&bih=514&cad=b&sei=fuTjUMWxJ8nimAXujYDwCw&sei=przkUP3dDaqKmQWV14HoAg&bav=on.2,or.r_gc.r_pw.r_cp.r_qf.&sei=FOHkUP_uD6bumAXq6YGwCg
+http://stackoverflow.com/questions/1979520/auto-open-nerdtree-in-every-tab/7640505#7640505
+https://wrms.catalyst.net.nz/wr.php?request_id=202820
+http://ubuntuforums.org/showthread.php?t=1515562
+http://sourceforge.net/apps/mediawiki/linuxwacom/index.php?title=Downloads
+http://my-moodle-23/my/index.php
+https://www.google.com.au/search?q=window.open&aq=f&oq=window.open&sugexp=chrome,mod=12&sourceid=chrome&ie=UTF-8
+http://api.jquery.com/category/ajax/
+http://stackoverflow.com/questions/5389297/ajax-overcome-same-origin-policy
+http://140dev.com/twitter-api-programming-tutorials/hello-twitter-oauth-php/
+http://stackoverflow.com/questions/4947825/is-there-a-callback-for-twitters-tweet-button
+https://dev.twitter.com/apps/3855389/settings
+http://stackoverflow.com/questions/800827/twitter-oauth-callbackurl-localhost-development
+https://dev.twitter.com/docs/intents
+https://dev.twitter.com/docs/api/1.1
+https://github.com/robogeek/twitter-embed
+http://thenextweb.com/twitter/2011/03/31/twitter-just-unveiled-web-intents-heres-how-to-use-them/
+https://dev.twitter.com/docs/tweet-button
+http://docs.moodle.org/24/en/Iframe
+https://moodle.org/mod/forum/discuss.php?d=190199
+http://docs.moodle.org/dev/YUI
+http://docs.moodle.org/dev/Blocks/Appendix_A#html_attributes.28.29
+https://twitter.com/hal9zillion
+https://twitter.com/settings/widgets/new?display_config%5Bexpand_media%5D=on&display_config%5Bheight%5D=&display_config%5Blink_color%5D=&display_config%5Btheme%5D=light&domains%5B%5D=%2Amy-moodle-23%2A&error=GENERIC_SAVE_ERROR&timeline_config%5Bhide_at_replies%5D=yes&timeline_config%5Bscreen_name%5D=hal9zillion&timeline_config%5Btimeline_id%5D=386071273&widget=user
+http://forums.whirlpool.net.au/forum-replies.cfm?t=2016244&p=52
+http://www.comicvine.com/hulk/29-2267/comicvine-hulk-vs-real-hulk/92-633847/?page=last#reply_form
+http://www.youtube.com/watch?v=H6qKiBl3nrA
+https://twitter.com/intent/tweet?via=TheOldMan&original_referer=http://my-moodle-23/blocks/twitter_feed/twitter.html
+chrome-devtools://devtools/devtools.html?docked=false&dockSide=bottom&toolbarColor=rgba(0,0,0,1)&textColor=rgba(255,255,255,1)
+chrome-devtools://devtools/devtools.html?docked=false&dockSide=bottom&toolbarColor=rgba(0,0,0,1)&textColor=rgba(255,255,255,1)
+https://twitter.com/intent/tweet?original_referer=http%3A%2F%2Fmy-moodle-23%2Fblocks%2Ftwitter_feed%2Ftwitter_inline.html&tw_p=tweetbutton&url=http%3A%2F%2Fmy-moodle-23%2Fblocks%2Ftwitter_feed%2Ftwitter_inline.html
+
+
+#+END_COMMENT
+
+** OK so (tactics)
+ - Web intent is nice because it avoids OAuth nightmare
+ - Seems if i want to use AJAX i need to deal with JSON-like data
+   - which involves formatting it in a twitter box or whatever
+   - Not sure if i can use the Web Intent stuff with JSONP
+
+ - Otherwise I have to log-in with OAuth stuff
+   - wont this mean other windows anyway?
+
+*** What I definitely cant do
+ - Anywhere Api let me tweet directly from the side-box
+ - This will be deprecated
+ - I cant make that same Web Intent call from straight javascript.
+   - /Maybe/ i can fool it with a proxy but i doubt it...
+
+*** Can I:
+1. MAke an AJAX call to my own site to tell it to tweet a message
+2. Call =file_get_contents(URL)= with php to get a cache of stuff and then parse through it with Javascript?
+3. Fake a proxy?
+4. Use Web Intent stuff with JSONP, AJAX and my own client formatting.
+
+
+** Background info
+ - Twitter deprecating old ways of accessing site/data
+   - *TRANSLATION* Twitter needs money and wants to force people to use twitter clients so they can show you adds etc.
+   - Gradually forcing people to move away from the use of third party clients towards twitter products and site
+#BEGIN_COMMENT
+ - Twitter moved from Basic Auth to OpenAuth
+   - Giant hassle from a dev perspective
+#END_COMMENT
+This page pretty effectively sums everything up
+http://blog.dansingerman.com/post/31052497029/twitter-effectively-killing-jsonp-too
+#+BEGIN_VERSE
+What does this mean to developers?
+
+Well, in practice it means all Twitter API requests will now need to be server to server. The scaling advantages of having a browser be able to make requests directly to the Twitter API will be completely removed.
+#+END_VERSE
+
+** Our choice
+1. Redirect people to the twitter site in a popup window with "Web Intents"
+   1. Easy
+   2. All takes place in a new window
+   3. Cant put it in an iframe
+   4. Cant hijack the form
+      1. Form has an authenticity token generated by twitter
+   5. If we want stuff to happen in our own client
+2. OAUTH with form and Rest API 1.1 - JSONP
+   1. More involved
+   2. Authentication must happen on a server-to-server basis - not very seamless
+   3. Restrictions on how many API calls can be made per hour etc....
+   4. /Every/ request must be OAUTH authenticated
+   5. Twitters terms of services enforce a particular look, particular buttons
+** Web Intents
+ - pushed by Twitter as the way forward.
+ - Open in a new window or reload whole page
+   - Cant open in an iFrame
+   - Cant replace with call to AJAX
+** Problems with Putting Everything in a node/block on our site
+*** Cant put Twitter.com in an iframe
+#+BEGIN_QUOTE
+Framing the twitter.com site in an IFRAME or otherwise is against the terms of service -- by using OAuth to obtain an access token, you should be using the API instead of the site. To initiate the OAuth flow, you can either redirect in the main browser window, or initiate a new window and then use Javascript to detect when the redirection phase has been completed.
+#+END_QUOTE
+*** Cant put Web Intents in an iframe
+*** Twitter and JSONP?
+This page pretty effectively sums everything up
+http://blog.dansingerman.com/post/31052497029/twitter-effectively-killing-jsonp-too
+
+
+*** Cant avoid OAuth and all that jazz
+  - As of March 2013 Twitter REST API 1.0 is gone and we all have to use REST API 1.1
+  - This requires every single call to be properly OAUTHed
+*** Many difficulties in using jQuery/javascript with OAuth
+ - Means you have to/risk exposing your OAUTH credentials/keys in the scripts/source that you send to the client...
+#+BEGIN_QUOTE
+We don't have a Javascript Twitter SDK like this at this time. We don't support long-lived tokens over OAuth 2 (which is what we'd need to do to support the model you're talking about). Right now, to leverage a long-term relationship with a user, you're advised to use server-to-server OAuth 1.0A.
+#+END_QUOTE
+
+**** Potential Workaround?
+  - *Used by the Jitter library* - AJAX call to your own sites php to get the OAUTHH details and then send them on to twitter
+  - Seems to be dead
+
+*** If cant be done then have to do it server side in PHP - Not really conducive to our nice little widget
+
+** OAUTH
+*** Twitter uses OAUTH 1.0
+*** OAUTH and javascript/client side stuff
+This /seems/ to work /fairly/ well
+http://derek.io/blog/2010/how-to-secure-oauth-in-javascript/
+
+ - OAUTH Authorization via Javascript
+ - OAUTH tokens stored in YQL - Yahoo Query Language
+ - Example page asks you to login -
+ - I can then at least throw this into an iframe
+ - *HOWEVER* - it does seem to fail a bit - not polished.....
+
+**** ERROR diagnostics
+#+BEGIN_VERSE
+Uncaught TypeError: Cannot read property 'user' of null twitter.js:241
+Y.Twitter.profileHandler twitter.js:241
+Y.YQL.proto twitter.js:191
+(anonymous function) jsonp.js:149
+(anonymous function) yql:1
+#+END_VERSE
+***** Detailed Call path.....
+: yui_main.js
+declares the Twitter sub-object 
+#+BEGIN_SRC javascript
+'Twitter': {
+        	fullpath: 'js/twitter.js'
+        },
+#+END_SRC
+
+Begins fetching OAUTH tokens
+
+: Y.Twitter.call({type: "access_token"}, function(tokens){
+: Y.Twitter.call({type: "request_token"}, function(tokens){
+
+Gets the list of tweets
+#+BEGIN_SRC javascript
+function renderLoggedInUI() {
+		// Load in the user's lists
+        Y.Twitter.call({type:"lists"}, function (lists) {
+            var html='', i, List;x
+#+END_SRC
+
+Gets trends and stuff
+#+BEGIN_SRC javascript
+	// reset the trends
+	function resetTrends() {
+		Y.Twitter.call({type: "trends"}, function (trends) {
+			var html, i;
+#+END_SRC
+
+=Y.Twitter= is a function that returns a 
+
+#+BEGIN_SRC javascript
+#+END_SRC
+
+
+#+BEGIN_VERSE
+For example, when Twitter recently deprecated their Basic Auth services, that left OAuth as the only authentication method. It was supposed to be the death of JS-only Twitter apps. This was unfortunate for quite a few developers who leveraged the browsers ability to do Basic auth, to help with scaling their Twitter apps. I know, I was one of them.
+
+So then I began to think what if you weren’t forced to expose your keys? What if your JS app could talk to any web API out there, in a secure, user-authenticated way?
+
+Is that actually possible? Yup.
+
+So let’s crack the code of what is necessary to do OAuth securely in JavaScript.
+
+You cannot store your consumer keys inside your JS code. Not even obfuscated. But it has to be stored somewhere web-accessible so your JS code can talk to it.
+
+Because of the same-origin policy, that ‘somewhere’ has to be the same domain as your JS app. Unless of course you only rely on HTTP GET, in which case you can do JSONP.
+
+Your storage location cannot transmit your consumer key pair back to you. So that means it needs to do the OAuth request on your behalf.
+#+END_VERSE
+
+*** Sample for setting up an OAuth request
+https://dev.twitter.com/docs/auth/authorizing-request
+Include the following OAUTH tokens in every request
+#+BEGIN_SRC javascript
+var oauth_consumer_key="nOn1XTkBxekHmVhRyfU4kg";
+var oauth_nonce="kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg"; 
+var oauth_signature="tnnArxj06cWHq44gCs1OSKk%2FjLY%3D"; 
+var oauth_signature_method="HMAC-SHA1"; 
+var oauth_timestamp="1357267130"; 
+var oauth_token="386071273-2PEY5bPhayKoS6oKVzmKzUfoAZEGwWbRMt81ni4";
+var oauth_version="1.0";
+#+END_SRC
+Percent encode the various strings
+ - in PHP =rawurlencode=
+
+
+** SimpleSaml - Does this deal with  OAUTH stuff?
+ - Yes and no apparently  - more about logging people in through one site/one authentication method from what I understand
+** A purely javascript based solution/client:
+ - One guy wrote a javascript based Twitter client that uses Yahoo Query Language to store the OAuth Keys to allow Javascript based login with OAuth without compromising user tokens.
+ - I verified that it works from my account and was able to embed a decent looking feed and "tweet-box" in an iframe in a block but the app is kind of buggy and stopped working. I spent a bit of time trying to get it working again but thats going to be its own thing
+
+
+   

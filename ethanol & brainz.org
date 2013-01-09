@@ -1,0 +1,63 @@
+http://www.ncbi.nlm.nih.gov/pubmed/22201960
+Front Biosci (Elite Ed). 2012 Jan 1;4:1358-67.
+Ethanol and adult CNS neurodamage: oxidative stress, but possibly not excitotoxicity.
+Collins MA, Neafsey EJ.
+Source
+Department of Molecular Pharmacology and Therapeutics, Loyola University Chicago, Stritch School of Medicine, Maywood, IL 60153, USA. mcollin@lumc.edu
+Abstract
+Evidence from experiments with adult rodents chronically treated with ethanol via either repetitive binges or continuous intake/exposure supports the occurrence of brain oxidative stress and, at least in binge intoxication/rat models, its essential causative role in neurodamage. However, pharmacological antagonism experiments reveal that N-methyl-D-aspartate (NMDA) receptor-dependent excitotoxicity is not responsible for adult mammalian brain neurodegeneration caused by repetitive binge ethanol intoxication and withdrawals. Since NMDA receptor antagonists apparently are untested with respect to neuronal death/loss in continuous intake/ingestion rodent models, e.g., ethanol/water or ethanol/liquid diets, it is therefore erroneous to assert, as is often done, that excitotoxicity is an important mechanism for ethanol-induced adult mammalian brain damage. Alternatively, results from several laboratories indicate that neurodegeneration due to chronic binge ethanol exposure/withdrawal may be dependent on redox transcription factor signaling and neuroinflammatory/oxidative stress pathways (increased arachidonic acid mobilization and pro-inflammatory cytokines; decreased anti-inflammatory cytokines) downstream of microglial/astroglial activation and moderate yet significant brain edema.
+
+http://www.ncbi.nlm.nih.gov/pubmed/17067360
+Alcohol Clin Exp Res. 2006 Nov;30(11):1938-49.
+BHT blocks NF-kappaB activation and ethanol-induced brain damage.
+Crews F, Nixon K, Kim D, Joseph J, Shukitt-Hale B, Qin L, Zou J.
+Source
+Bowles Center for Alcohol Studies, University of North Carolina at Chapel Hill, CB 7178, Chapel Hill, NC 27599, USA. ftcrews@med.unc.edu
+Abstract
+BACKGROUND:
+Binge ethanol administration causes corticolimbic brain damage that models alcoholic neurodegeneration. The mechanism of binge ethanol-induced degeneration is unknown, but is not simple glutamate-N-methyl-D-aspartate (NMDA) excitotoxicity. To test the hypothesis that oxidative stress and inflammation are mechanisms of binge ethanol-induced brain damage, we administered 4 antioxidants, e.g., butylated hydroxytoluene (BHT), ebselen (Eb), vitamin E (VE), and blueberry (BB) extract, during binge ethanol treatment and assessed various measures of neurodegeneration.
+METHODS:
+Adult Sprague-Dawley rats were treated with intragastric ethanol 3 times per day (8-12 g/kg/d) alone or in combination with antioxidants or isocaloric diet for 4 days. Animals were killed, and brains were perfused and extracted for histochemical silver stain determination of brain damage, markers of neurogenesis, or other immunohistochemistry. Some animals were used for determination of nuclear factor kappa B (NF-kappaB)-DNA binding by electrophoretic mobility shift assay (EMSA) or for reverse transcription-polymerase chain reaction (RT-PCR) of cyclooxygenase 2 (COX2).
+RESULTS:
+Binge ethanol induced corticolimbic brain damage and reduced neurogenesis. Treatment with BHT reversed binge induced brain damage and blocked ethanol inhibition of neurogenesis in all regions studied. Interestingly, the other antioxidants studied, e.g., Eb, VE, and BB, did not protect against binge-induced brain damage. Binge ethanol treatment also caused microglia activation, increased NF-kappaB-DNA binding and COX2 expression. Butylated hydroxytoluene reduced binge-induced NF-kappaB-DNA binding and COX2 expression.
+CONCLUSIONS:
+Binge-induced brain damage and activation of NF-kappaB-DNA binding are blocked by BHT. These studies support a neuroinflammatory mechanism of binge ethanol-induced brain damage.
+
+
+http://www.ncbi.nlm.nih.gov/pubmed/15878999
+J Pharmacol Exp Ther. 2005 Aug;314(2):780-8. Epub 2005 May 5.
+Comparison of cannabidiol, antioxidants, and diuretics in reversing binge ethanol-induced neurotoxicity.
+Hamelink C, Hampson A, Wink DA, Eiden LE, Eskay RL.
+Source
+Section on Molecular Neuroscience, Laboratory of Cellular and Molecular Regulatiuon, National Institute of Mental Health/NIH, Bldg. 49, Room 5A-35, 9000 Rockville Pike, Bethesda, MD 20892, USA.
+Abstract
+Binge alcohol consumption in the rat induces substantial neurodegeneration in the hippocampus and entorhinal cortex. Oxidative stress and cytotoxic edema have both been shown to be involved in such neurotoxicity, whereas N-methyl-d-aspartate (NMDA) receptor activity has been implicated in alcohol withdrawal and excitoxic injury. Because the nonpsychoactive cannabinoid cannabidiol (CBD) was previously shown in vitro to prevent glutamate toxicity through its ability to reduce oxidative stress, we evaluated CBD as a neuroprotectant in a rat binge ethanol model. When administered concurrently with binge ethanol exposure, CBD protected against hippocampal and entorhinal cortical neurodegeneration in a dose-dependent manner. Similarly, the common antioxidants butylated hydroxytoluene and alpha-tocopherol also afforded significant protection. In contrast, the NMDA receptor antagonists dizocilpine (MK-801) and memantine did not prevent cell death. Of the diuretics tested, furosemide was protective, whereas the other two anion exchanger inhibitors, L-644,711 [(R)-(+)-(5,6-dichloro2,3,9,9a-tetrahydro 3-oxo-9a-propyl-1H-fluoren-7-yl)oxy acetic acid] and bumetanide, were ineffective. In vitro comparison of these diuretics indicated that furosemide is also a potent antioxidant, whereas the nonprotective diuretics are not. The lack of efficacy of L-644,711 and bumetanide suggests that the antioxidant rather than the diuretic properties of furosemide contribute most critically to its efficacy in reversing ethanol-induced neurotoxicity in vitro, in our model. This study provides the first demonstration of CBD as an in vivo neuroprotectant and shows the efficacy of lipophilic antioxidants in preventing binge ethanol-induced brain injury.
+
+Alcohol Alcohol. 2009 Mar-Apr;44(2):115-27. Epub 2008 Oct 21.
+Mechanisms of neurodegeneration and regeneration in alcoholism.
+Crews FT, Nixon K.
+Source
+Bowles Center for Alcohol Studies, University of North Carolina, Chapel Hill, NC 27599, USA. FTCrews@med.unc.edu
+Abstract
+AIMS:
+This is a review of preclinical studies covering alcohol-induced brain neuronal death and loss of neurogenesis as well as abstinence-induced brain cell genesis, e.g. brain regeneration. Efforts are made to relate preclinical studies to human studies.
+METHODS:
+The studies described are preclinical rat experiments using a 4-day binge ethanol treatment known to induce physical dependence to ethanol. Neurodegeneration and cognitive deficits following binge treatment mimic the mild degeneration and cognitive deficits found in humans. Various histological methods are used to follow brain regional degeneration and regeneration.
+RESULTS:
+Alcohol-induced degeneration occurs due to neuronal death during alcohol intoxication. Neuronal death is related to increases in oxidative stress in brain that coincide with the induction of proinflammatory cytokines and oxidative enzymes that insult brain. Degeneration is associated with increased NF-kappaB proinflammatory transcription and decreased CREB transcription. Corticolimbic brain regions are most sensitive to binge-induced degeneration and induce relearning deficits. Drugs that block oxidative stress and NF-kappaB transcription or increase CREB transcription block binge-induced neurodegeneration, inhibition of neurogenesis and proinflammatory enzyme induction. Regeneration of brain occurs during abstinence following binge ethanol treatment. Bursts of proliferating cells occur across multiple brain regions, with many new microglia across brain after months of abstinence and many new neurons in neurogenic hippocampal dentate gyrus. Brain regeneration may be important to sustain abstinence in humans.
+CONCLUSIONS:
+Alcohol-induced neurodegeneration occurs primarily during intoxication and is related to increased oxidative stress and proinflammatory proteins that are neurotoxic. Abstinence after binge ethanol intoxication results in brain cell genesis that could contribute to the return of brain function and structure found in abstinent humans.
+Alcohol Alcohol. 2009 Mar-Apr;44(2):115-27. Epub 2008 Oct 21.
+Mechanisms of neurodegeneration and regeneration in alcoholism.
+Crews FT, Nixon K.
+Source
+Bowles Center for Alcohol Studies, University of North Carolina, Chapel Hill, NC 27599, USA. FTCrews@med.unc.edu
+Abstract
+AIMS:
+This is a review of preclinical studies covering alcohol-induced brain neuronal death and loss of neurogenesis as well as abstinence-induced brain cell genesis, e.g. brain regeneration. Efforts are made to relate preclinical studies to human studies.
+METHODS:
+The studies described are preclinical rat experiments using a 4-day binge ethanol treatment known to induce physical dependence to ethanol. Neurodegeneration and cognitive deficits following binge treatment mimic the mild degeneration and cognitive deficits found in humans. Various histological methods are used to follow brain regional degeneration and regeneration.
+RESULTS:
+Alcohol-induced degeneration occurs due to neuronal death during alcohol intoxication. Neuronal death is related to increases in oxidative stress in brain that coincide with the induction of proinflammatory cytokines and oxidative enzymes that insult brain. Degeneration is associated with increased NF-kappaB proinflammatory transcription and decreased CREB transcription. Corticolimbic brain regions are most sensitive to binge-induced degeneration and induce relearning deficits. Drugs that block oxidative stress and NF-kappaB transcription or increase CREB transcription block binge-induced neurodegeneration, inhibition of neurogenesis and proinflammatory enzyme induction. Regeneration of brain occurs during abstinence following binge ethanol treatment. Bursts of proliferating cells occur across multiple brain regions, with many new microglia across brain after months of abstinence and many new neurons in neurogenic hippocampal dentate gyrus. Brain regeneration may be important to sustain abstinence in humans.
+CONCLUSIONS:
+Alcohol-induced neurodegeneration occurs primarily during intoxication and is related to increased oxidative stress and proinflammatory proteins that are neurotoxic. Abstinence after binge ethanol intoxication results in brain cell genesis that could contribute to the return of brain function and structure found in abstinent humans.

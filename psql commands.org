@@ -1,0 +1,436 @@
+* Mysql, Psql Equivalents
+
+mysql: SHOW TABLES
+postgresql: \d
+postgresql: SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+
+mysql: SHOW DATABASES
+postgresql: \l
+postgresql: SELECT datname FROM pg_database;
+
+mysql: SHOW COLUMNS
+postgresql: \d table
+postgresql: SELECT column_name FROM information_schema.columns WHERE table_name ='table';
+
+mysql: DESCRIBE TABLE
+postgresql: \d+ table
+postgresql: SELECT column_name FROM information_schema.columns WHERE table_name ='table';
+* Logging into a psql client on a system you arent a user (but you do have sudo)
+sudo su postgres -c "psql -l"
+sudo su postgres -c "psql moodle-kincoppal"
+
+
+* MOST USEFUL METADATA
+** From psql
+List schemas
+=\dnS=
+List schema permissions
+=\dn+=
+All tablespaces
+=\db=
+List databases
+=\l=
+Table/view permissions
+=\dp=
+** SYSTEM INFORMATION functions
+http://www.postgresql.org/docs/8.3/static/functions-info.html
+
+*** Session Information
+| Name                         | Return Type              | Description                                                           |
+| current_database()           | name                     | name of current database                                              |
+| current_schema()             | name                     | name of current schema                                                |
+| current_schemas(boolean)     | name[]                   | names of schemas in search path optionally including implicit schemas |
+| current_user                 | name                     | user name of current execution context                                |
+| inet_client_addr()           | inet                     | address of the remote connection                                      |
+| inet_client_port()           | int                      | port of the remote connection                                         |
+| inet_server_addr()           | inet                     | address of the local connection                                       |
+| inet_server_port()           | int                      | port of the local connection                                          |
+| pg_my_temp_schema()          | oid                      | OID of session's temporary schema, or 0 if none                       |
+| pg_is_other_temp_schema(oid) | boolean                  | is schema another session's temporary schema?                         |
+| pg_postmaster_start_time()   | timestamp with time zone | server start time                                                     |
+| session_user                 | name                     | session user name                                                     |
+| user                         | name                     | equivalent to current_user                                            |
+| version()                    | text                     | PostgreSQL version information                                        |
+
+*** Access Privileges
+| Name                                                  | Return Type | Description                                     |
+| has_database_privilege(user, database, privilege)     | boolean     | does user have privilege for database           |
+| has_database_privilege(database, privilege)           | boolean     | does current user have privilege for database   |
+| has_function_privilege(user, function, privilege)     | boolean     | does user have privilege for function           |
+| has_function_privilege(function, privilege)           | boolean     | does current user have privilege for function   |
+| has_language_privilege(user, language, privilege)     | boolean     | does user have privilege for language           |
+| has_language_privilege(language, privilege)           | boolean     | does current user have privilege for language   |
+| has_schema_privilege(user, schema, privilege)         | boolean     | does user have privilege for schema             |
+| has_schema_privilege(schema, privilege)               | boolean     | does current user have privilege for schema     |
+| has_table_privilege(user, table, privilege)           | boolean     | does user have privilege for table              |
+| has_table_privilege(table, privilege)                 | boolean     | does current user have privilege for table      |
+| has_tablespace_privilege(user, tablespace, privilege) | boolean     | does user have privilege for tablespace         |
+| has_tablespace_privilege(tablespace, privilege)       | boolean     | does current user have privilege for tablespace |
+| pg_has_role(user, role, privilege)                    | boolean     | does user have privilege for role               |
+| pg_has_role(role, privilege)                          | boolean     | does current user have privilege for role       |
+
+Privilege Types:
+=SELECT, INSERT, UPDATE, DELETE, REFERENCES, TRIGGER, CREATE, CONNECT, TEMPORARY, EXECUTE, and USAGE=
+and
+ALL
+
+example usage:
+=SELECT has_function_privilege('joeuser', 'myfunc(int, text)', 'execute');=
+=SELECT has_table_privilege('myschema.mytable', 'select');=
+
+* SYSTEM CATALOGS - psql/postgres admin type commands
+
+For info on the relation between system catalog commands and information_schema see:
+http://dba.stackexchange.com/questions/5509/is-the-mapping-between-postgresql-system-tables-and-information-schema-views-doc
+
+"In addition to public and user-created schemas, each database contains a pg_catalog schema, which contains the system tables and all the built-in data types, functions, and operators"
+
+select * from pg_shadow;
+
+
+* INFORMATION_SCHEMA
+
+- So what can you find in the INFORMATION_SCHEMA?
+
+schemata—Lists the schemas (in the current database) that are owned by you
+tables—Lists all tables in the current database (actually, you only see those tables that you have the right to access in some way)
+columns—Lists all columns in all tables that you have the right to access
+views—Lists all of the views you have access to in the current database
+table_privileges—Shows the privileges you hold (or that you granted) for each accessible object in the current database
+domains—Lists all of the domains defined in the current database
+check_constraints—Lists all of the CHECK constraints defined for the accessible tables (or domains) in the current database
+
+This tells you about the tables in information_schema:
+\dt information_schema.*
+or:
+\dt information_schema.*
+This will give you the "views" in information_schema:
+\dv information_schema
+
+SELECT table_schema, table_name, table_type FROM information_schema.tables;
+
+or to get all tables in the information_schema:
+SELECT * FROM information_schema.tables;
+where table_schema = 'information_schema';
+
+
+* LIST OF PSQL COMMANDS - "copied stright from "psql   \?")
+
+General
+  \copyright             show PostgreSQL usage and distribution terms
+  \g [FILE] or ;         execute query (and send results to file or |pipe)
+  \h [NAME]              help on syntax of SQL commands, * for all commands
+  \q                     quit psql
+
+Query Buffer
+  \e [FILE] [LINE]       edit the query buffer (or file) with external editor
+  \ef [FUNCNAME [LINE]]  edit function definition with external editor
+  \p                     show the contents of the query buffer
+  \r                     reset (clear) the query buffer
+  \s [FILE]              display history or save it to file
+  \w FILE                write query buffer to file
+
+Input/Output
+  \copy ...              perform SQL COPY with data stream to the client host
+  \echo [STRING]         write string to standard output
+  \i FILE                execute commands from file
+  \o [FILE]              send all query results to file or |pipe
+  \qecho [STRING]        write string to query output stream (see \o)
+
+Informational
+  (options: S = show system objects, + = additional detail)
+  \d[S+]                 list tables, views, and sequences
+  \d[S+]  NAME           describe table, view, sequence, or index
+  \da[S]  [PATTERN]      list aggregates
+  \db[+]  [PATTERN]      list tablespaces
+  \dc[S]  [PATTERN]      list conversions
+  \dC     [PATTERN]      list casts
+  \dd[S]  [PATTERN]      show comments on objects
+  \ddp    [PATTERN]      list default privileges
+  \dD[S]  [PATTERN]      list domains
+  \det[+] [PATTERN]      list foreign tables
+  \des[+] [PATTERN]      list foreign servers
+  \deu[+] [PATTERN]      list user mappings
+  \dew[+] [PATTERN]      list foreign-data wrappers
+  \df[antw][S+] [PATRN]  list [only agg/normal/trigger/window] functions
+  \dF[+]  [PATTERN]      list text search configurations
+  \dFd[+] [PATTERN]      list text search dictionaries
+  \dFp[+] [PATTERN]      list text search parsers
+  \dFt[+] [PATTERN]      list text search templates
+  \dg[+]  [PATTERN]      list roles
+  \di[S+] [PATTERN]      list indexes
+  \dl					list large objects, same as \lo_list
+  \dL[S+] [PATTERN]      list procedural languages
+  \dn[S+] [PATTERN]      list schemas
+  \do[S]  [PATTERN]      list operators
+  \dO[S+] [PATTERN]      list collations
+  \dp     [PATTERN]      list table, view, and sequence access privileges
+  \drds [PATRN1 [PATRN2]] list per-database role settings
+  \ds[S+] [PATTERN]      list sequences
+  \dt[S+] [PATTERN]      list tables
+  \dT[S+] [PATTERN]      list data types
+  \du[+]  [PATTERN]      list roles
+  \dv[S+] [PATTERN]      list views
+  \dE[S+] [PATTERN]      list foreign tables
+  \dx[+]  [PATTERN]      list extensions
+  \l[+]                  list all databases
+  \sf[+] FUNCNAME        show a function's definition
+  \z      [PATTERN]      same as \dp
+
+Formatting
+  \a                     toggle between unaligned and aligned output mode
+  \C [STRING]            set table title, or unset if none
+  \f [STRING]            show or set field separator for unaligned query output
+  \H                     toggle HTML output mode (currently off)
+  \pset NAME [VALUE]     set table output option
+                         (NAME := {format|border|expanded|fieldsep|footer|null|
+                         numericlocale|recordsep|tuples_only|title|tableattr|pager})
+  \t [on|off]            show only rows (currently on)
+  \T [STRING]            set HTML <table> tag attributes, or unset if none
+  \x [on|off]            toggle expanded output (currently off)
+
+Connection
+  \c[onnect] [DBNAME|- USER|- HOST|- PORT|-]
+                         connect to new database (currently "postgres")
+  \encoding [ENCODING]   show or set client encoding
+  \password [USERNAME]   securely change the password for a user
+  \conninfo              display information about current connection
+
+Operating System
+  \cd [DIR]              change the current working directory
+  \timing [on|off]       toggle timing of commands (currently off)
+  \! [COMMAND]           execute command in shell or start interactive shell
+
+Variables
+  \prompt [TEXT] NAME    prompt user to set internal variable
+  \set [NAME [VALUE]]    set internal variable, or list all if no parameters
+  \unset NAME            unset (delete) internal variable
+
+Large Objects
+  \lo_export LOBOID FILE
+  \lo_import FILE [COMMENT]
+  \lo_list
+  \lo_unlink LOBOID      large object operations
+
+
+* Example Syntax
+select * from pg_views
+where viewname='tables';
+
+
+* Granting permissions - trickiness
+Generally you want something like:
+=GRANT ALL ON DATABASE total_moodle_bullshit TO moodle_test;=
+*BUT*
+See [[*Granting%20permissions%20on%20a%20database%20is%20not%20the%20same%20as%20granting%20permissions%20on%20tables%20or%20sequences][Granting permissions on a database is not the same as granting permissions on tables or sequences]]
+
+
+* Things To Look Out For
+** PSQL is funny about ''s vs ""s
+ - Normally it will want you to use '' for column names
+ - one exception seems to be hyphens as noted  [[*psql%20doesnt%20like%20hyphens%20in%20names][here]]
+** Granting permissions on a database is not the same as granting permissions on tables or sequences
+This:
+=GRANT ALL ON DATABASE total_moodle_bullshit TO moodle_test;=
+gives the ability to connect etc
+but to have the ability to insert, select etc on tables you need t do something like this:
+=GRANT ALL ON ALL TABLES IN SCHEMA public TO "moodle_test";=
+*ALSO* you prob want to give privileges on sequences also...
+=GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO "moodle_test";=
+
+Weird that i havent run into this before...
+
+** Postgres doesn't seem to like the keyword 'AS' when using aliases - THIS DOESNT SEEM TO BE TRUE
+
+So you can do:
+
+SELECT * FROM node n JOIN node_revisions nr ON (n.nid = nr.nid) WHERE type = 'admin_note';
+
+or:
+
+SELECT * FROM node JOIN node_revisions ON (node.nid = node_revisions.nid) WHERE type = 'admin_note';
+
+but not:
+
+SELECT * FROM node AS n JOIN node_revisions AS nr ON (node.nid = node_revisions.nid) WHERE type = 'admin_note';
+
+:-O
+
+
+** psql doesnt like hyphens in names
+=GRANT ALL ON DATABASE totara-ducere TO totara-ducere;=
+wont work. 
+Instead:
+=GRANT ALL ON DATABASE "totara-ducere" TO "totara-ducere";=
+
+
+* Cool PSQL Features
+ - psql has tab complete
+
+
+* COOL QUERIES
+** Get all columns except one or two
+
+SELECT 'SELECT ' || array_to_string(ARRAY(SELECT 'o' || '.' || c.column_name
+        FROM information_schema.columns As c
+            WHERE table_name = 'node_type' 
+            AND  c.column_name NOT IN('description')
+    ), ',') || ' FROM node_type As o' As sqlstmt;
+
+** Use regular expression in looking for a value:
+SELECT * FROM variable
+WHERE NAME ~ 'formblock_expose_.*';
+
+** Get all rows from one table that fail to join to records in another table
+SELECT e.id, e.user_id, e.group_id, e.activate_on, e.complete_on, g.id 
+FROM enrolments AS e left join groups AS g 
+ON e.group_id = g.id 
+WHERE user_id = 17970 
+AND g.id IS NULL; 
+
+** Count records in a table
+SELECT COUNT(*) FROM table_name
+** Count all records with the same name
+: select COUNT(id), name from courses where name~'Hist' GROUP BY name;
+*** Which gives
+#+BEGIN_VERSE
+ count |                  name                   
+-------+-----------------------------------------
+     2 | 7 History
+     1 | 12 Online HSC Ancient History
+     2 | 10 Elective History
+     1 | 11 Ancient History
+     1 | 8 History / Geography
+     1 | 10 History / Geography
+     2 | 12 History Extension
+     1 | 7 History / Geography (AIM)
+     1 | 8 History / Geography (AIM)
+     1 | 10 Geography/History
+     1 | 11 HSC Extension History
+     1 | 7 History / Geography
+     1 | 8 History
+     1 | 10 History
+     1 | 8 History SHIP
+     1 | 12 Ancient History
+     1 | 11 Online HSC Ancient History
+     2 | 9 Elective History
+     1 | 10 L2 History - Elective
+     1 | 11 Online Preliminary Ancient History
+     1 | 11 HSC Modern History
+     1 | 10 Ancient History
+     1 | 7 History (AIM)
+     1 | 9/10 L2 History Elective
+     1 | 8 History (AIM)
+     2 | 11 Online Preliminary Extension History
+     1 | 11 Extension History
+     1 | 12 Extension History
+     1 | 11 Modern History
+     1 | 12 Online HSC Modern History
+     1 | 11 Online HSC Extension History
+     1 | 7 History SHIP
+     1 | 12 Online HSC Extension History
+     2 | 11 History Extension
+     2 | 9 History
+     1 | 9 History / Geography
+     1 | 11 HSC Ancient History
+     1 | 12 Ancient History Online
+     1 | 12 Modern History
+#+END_VERSE
+e.g.
+: mynbcs-rails-dev=# select id, name from courses where name = '7 History';
+**** Checking this is true:
+#+BEGIN_VERSE
+ id  |   name    
+-----+-----------
+   5 | 7 History
+ 399 | 7 History
+(2 rows)
+#+END_VERSE
+
+** Only Select the first n records
+SELECT * FROM table LIMIT 100
+** See if a record exists or not
+From Rails
+: SELECT 1 AS one FROM "users" WHERE (LOWER("users"."email") = LOWER('hal3000@hunome.com') AND "users"."id" = 3) LIMIT 1;
+This will return
+#+BEGIN_EXAMPLE
+ one 
+-----
+   1
+(1 row)
+#+END_EXAMPLE
+
+if something exists and
+
+#+BEGIN_EXAMPLE
+ one 
+-----
+(0 rows)
+#+END_EXAMPLE
+if it does not
+
+
+* Basic Stuff
+** login to particular database as particular user
+these goddamn inconsistent upper/lower case flags....
+psql -d total_moodle_bullshit -U moodle_test
+
+** Make a new site-user (typical)
+ - this site has no permissions to create databasees, roles,  isnt a superuser and we prompt for a password...
+createuser -DSRP ducere-training-totara-moodle
+** Addin/changing a user's login password
+=ALTER USER "totara-ducere" WITH PASSWORD 'totara';=
+
+
+* Cool stuff from the command line
+** Showing all users without logging in
+=$ psql total_moodle_bullshit -c "\dg"=
+
+
+* Dropping a Database
+Cant be connected to it...
+From bash shell:
+$ dropdb databasename
+* ...and recreating it
+$ createdb -O mynbcs mynbcs-rails-dev
+$ psql mynbcs-rails-dev < dumped_data.sql
+
+
+
+
+
+
+* PSQL format - tips
+** Toggle print table headings
+\t
+** TODO Toggle wrap lines
+\pset something?
+This didnt really work for me:
+http://merlinmoncure.blogspot.com.au/2007/10/better-psql-with-less.html
+** Print horizontal lines between rows
+\pset border 3
+** pset - general
+http://postgres.cz/wiki/Enhanced-psql#Human_text_wrapping
+ - \pset NAME [VALUE]     set table output option
+                         (NAME := {format|border|expanded|fieldsep|footer|null|
+                         numericlocale|recordsep|tuples_only|title|tableattr|pager})
+  
+ - \set [NAME [VALUE]]    set internal variable, or list all if no parameters
+** pset - see current options
+Type 
+=\pset option_name=
+to see current setting e.g 
+=\pset format=
+Output format is aligned.
+
+** Table options
+\T table_options
+Allows you to specify attributes to be placed within the table tag in HTML tabular output mode. 
+This command is equivalent to \pset tableattr table_options.
+** Toggle align row with columns
+\a
+** Display a row in its own little block (extended display mode)
+\x
+
+** Show output as HTML table
+\pset format html

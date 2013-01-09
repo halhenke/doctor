@@ -1,0 +1,289 @@
+#+TITLE: Emacs KnowHow
+* Cool Things I Have Learned About Emacs
+** prints out a Python style docstring
+(documentation 'foo)
+** takes you to the file for a given lib name of the type (require foo_mod)
+(find-library foo_mod)
+** Compile file
+(byte-compile-file foo.el) 
+Will use current buffer file by default (with prompt) and compile.
+Will probably be useful when package management fails to build something properly - you can probably cmopile files manually yourself
+** To reload .emacs file after changes
+M-x load-file ~/.emacs
+*OR* it is probably safer to select changes that you have made and then
+M-x eval-region RET
+** Close current bufer/window/frame:
+C-x k / C-x 0 / s-w
+** Get filename/path of current buffer
+ - eval =bufferfile-name= function
+=\M-: (buffer-file-name)=
+** reload buffer from disk
+s-u 
+** MODES
+=C-h m= or =M-x describe-mode= shows all the active minor modes (and major mode) and a brief description of each.
+Also: =M-:= describe-mode or describe-minor-mode 
+** Package management
+el-get in combination with built in package management for github goodness
+** To check whether you are in a non-terminal system look at the value of:
+window-system
+it will be "pc" or "ns" (OS X) or if in terminal nil
+** Check emacs version
+emacs-version
+** Changing Font
+  (set-face-attribute 'default (selected-frame) :height 100)
+ (set-frame-font
+    "-outline-Courier New-normal-normal-normal-mono-11-*-*-*-c-*-iso8859-1")
+** Rectangles and associated commands e.g. 
+=C-x r k= - Kill the text of the region-rectangle, saving its contents as the “last killed rectangle” (kill-rectangle). 
+** Display literal input - what emacs is seeing
+=C-q= runs the command quoted-insert, which reads the next input character/event and inserts it.
+ - The best way to see what is getting sent to emacs is by writing
+=(read-event)=
+in an interactive lisp session, evaluating it with <Command-r> and then moving the mouse/pressing a key whatever
+** See what a function name is bound to
+=(symbol-function 'function-name)= to find out what a function name is bound to
+
+* HowTos (not necessarily that cool...)
+** Cancel a command while in the middle of it
+=\C-g=
+* EDEBUG
+=M-x edebug-eval-top-level-form=
+or go to the source and do =C-u C-M-x= (<Control u> <Control Alt x>) to set up a function for edebugging
+last-command and this-command
+Normally, whenever a function is executed, Emacs sets the value of this-command to the function being executed (which in this case would be copy-region-as-kisll). At the same time, Emacs sets the value of last-command to the previous value of this-command.
+diff-buffer-with-file to see if a buffers contents are different from the file
+M-: buffer-file-name ; to see the file name for the current buffer...
+** Open multiple shells
+=C-u M-x shell= will let you open multiple shells
+** Lisp source files for emacs and packages
+All the lisp files for the current installation of emacs are in:
+ /Applications/Emacs.app/Contents/Resources/lisp:
+;----------------------------------------------------------------------
+
+* Version Control
+*** See differences between the file and the last commit (changes you have made)
+C-x v =
+and when in the generated diff buffer
+C-c C-c
+will take you to the appropriate line in the file
+*** See a commit history of what everyone ahs done to the file by  and commit committor
+M-x vc-annotate
+*To see instructions on further commands in vc mode do C-h m to bring up minor mode command list*
+*** C-x v l 
+*** C-x v d 
+
+* ediff
+Can be done on regions as well as files
+
+* Org mode
+** Getting and inserting hyperlinks to other sections of a document
+*** Get link to current section
+M-x org-store-link
+ - Supposed to be bound to <C-c l> but isnt
+*** Insert stored link 
+M-x org-insert-link 
+ - bound to <C-c C-l> i think
+
+** On Github
+Org-mode support on Github is provided by the ~org-ruby~ gem.\\
+Its a bit patchy.\\
+In particular paragraph\newline support is not great - ~\\~ does not work and a blank line to separate paragraphs insets a blank line in the document.
+** ORG MODE - Bindings and Customisations
+*** TODO Change the <M-up>/<M-down> bindings so that we dont move stuff around inadvertantly
+*** TODO Change the <M-left>/<M-right> bindings so that we dont change header levels inadvertantly
+*** DONE Get shift select mode working somehows*
+
+;----------------------------------------------------------------------
+; Ways to jump between predefined points in a file (function definitions etc)
+;----------------------------------------------------------------------
+
+** Export to MediaWiki & Defining new export modes
+In the el-get package org-mode-experimental,
+in =contrib/lisp/org-export-generic.el= there is a rough mediawiki export mode I believe.
+Its stored in 
+: defvar org-generic-alist
+
+You can make a new one with =org-set-generic-type=
+#+BEGIN_SRC elisp
+ (org-set-generic-type
+  "really-basic-text"
+  '(:file-suffix  ".txt"
+    :key-binding  ?R
+
+    :title-format "=== %s ===\n"
+    :body-header-section-numbers t
+    :body-header-section-number-format "%s) "
+    :body-section-header-prefix  "\n"
+    :body-section-header-suffix "\n"
+    :body-line-format "  %s\n"
+    :body-line-wrap   75))
+#+END_SRC
+
+
+Other wise you are supposed to define a new one using =contrib/lisp/org-export.el= with something like
+: (defmacro org-export-define-backend (backend translators &rest body)
+
+* TO DO
+** DONE A comment-region that comments out all lines that are being "touched" by the current region
+** DONE A select-region and type that simultaneously deletes the previously selected region and inserts the new text instead of deselecting and inserting text
+  - SOLVED -  (set delete-selection-mode t)
+** DONE Line NUmbering package.
+** TODO Follow links in directories in current window
+** TODO Save window and frame configuration 
+** DONE A function bound to "s-4" (Command 4) that creates a "square" set of 4 windows in the current frame.
+** TODO Fix the require stuff for rinari - stuff should be in util subdirectory?
+** DONE <Command Tab> for tab completion or something like it
+** Some form of command binding to help - (global-set-key (remap 'x) 'y) ? ;x and y have to be functions not key bindings in that case
+** DONE Find a good <Command> Binding for C-x C-f
+** DONE Good binding for Keyboard Macro invocation
+** Bind Set mark - <Command Spacebar> ? (Prob not as necessary now that shift select is working good)
+** DONE Binding for global and regional indent - <s-\>
+** KEYBINDINGS - Good available keybindings:
+-  <s-Return>
+-  <s-spacebar> - system bound to spotlight - UNBOUND!
+-  <s-escape> - system bound to Front Row - UNBOUND!
+-  <s-TAB> - system bound to expose
+-  <s-+>
+-  <s-=>
+-  <s-Delete>
+-  function key?
+** TODO An irb/interpreter mode for running irb (and perhaps Python) over a shell. The main thing would be to start a new interactive
+command history - so that we dont get irb commands in our bash history and vice versa
+** TODO Bindings for the trackpad multitouch gestures?
+** TODO Get search to automatically wrap.
+** TODO Interactive lisp - call eval-print-last-sexp such that it evals the S-expression that the cursor is inside of OR the last one if not inside one
+     - could be a little dangerous - we might be in an "implicit lisp environment"
+** TODO A function to evaluate a region of lisp functions (a la eval-region) but then capture the output of each s-expression (a la eval-print-last-sexp) in a new buffer
+** TODO If not available - create a means of navigating in directoory mode similar to in Mac OSX Finder - 
+- <Command-up> up a directory
+- <Command-right> open a directory
+- Should still allow global buffer/frame/window navigation as much as possible so will have to think hard about bindings to use
+
+* Defining Comments
+If comments are undefined for a particular mode or file type you can define them yourself 
+by evaluating:
+#+BEGIN_SRC elisp
+(set 'comment-start "<!--")
+(set 'comment-end "-->")
+#+END_SRC elisp
+* BUGS
+** A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
+** delete-selection-mode stopped working when i saved a new buffer and text mode was enabled. 
+Started working again after i deactivated and re-activated the mode
+** When I used <Command b> or tried to switch to a buffer it would not change the buffer in the current window
+as normal but would move me to a currently open window in another frame which was already showing the buffer. 
+Not necessarily a bad thing but would like this behaviour to be consistent. 
+
+* Regular Expressions in Emacs
+See here for more info
+http://ergoemacs.org/emacs/emacs_regex.html
+
+** *GOTCHA!s*
+*** Number of backslashes is different in "string-mode" and "command-mode"
+Emacs needs /double the normal number of backslashes/ to be inputted when in string form
+e.g.
+to match this pattern
+
+=**Sunday 16 Dec 2012**=
+=**Tuesday 11 Dec 2012**=
+
+instead of the following:
+=\*\*\(.*\)\*\*=
+
+we actually need:
+=\\*\\*\\(.*\\)\\*\\*=
+
+*However* when done interactively we only need single backslashes..
+ - e.g. when we call =query-replace-regexp= we only need single backslashes for the query
+ - and /no backslashes/ for the replace, except to indicate captured text
+
+
+So to replace:
+=**Tuesday 11 Dec 2012**=
+with 
+=*Tuesday 11 Dec 2012*=
+its 
+=query-replace-regexp \*\*\(.*\)\*\*=
+=*\1*=
+
+In other words
+#+BEGIN_QUOTE
+Backslashes must be double-quoted when used in Lisp code. Regular expressions are often specified using strings in EmacsLisp. Some abbreviations are available: \n for newline, \t for tab, \b for backspace, \u3501 for character with unicode value 3501, and so on. Backslashes must be entered as \\. Here are two ways to replace the decimal point by a comma (e.g. 1.5 -> 1,5), first by an interactive command, second by executing Lisp code (type C-x C-e after the expression to get it executed).
+           M-x replace-regexp RET \([0-9]+\)\. RET \1, RET
+          (while (re-search-forward "\\([0-9]+\\)\\." nil t)
+                        (replace-match "\\1,"))
+#+END_QUOTE
+
+*** Dont use pattern matching things in the "replace" part of your regexp Query-Replace
+*** Matching Newlines and patterns that span multiple lines - super inconsistent
+ - *First* - remember the =.= operator only matches /non-newline characters/ - if you use something like =.*= to match stuff then by default you are restricting /that part of the match/ to one line.
+ - In string mode =\n= works to match a newline
+ - In command mode =\n= will not work as either a query or replace
+   - Instead you need to use =\C-q \C-j= to produce a newline in your reg-exp
+** Impossible Ones - SOLVED
+*** Replace everything between > at the beginning of a line and an empty line with
+#+BEGIN_QUOTE \1 #+END_QUOTE
+
+close\\
+="^>\\(.*\n\\)*?\n"=
+\\basically you need a \n to match a newline
+*apparently in the query-replace version \n doesnt work and you need
+=C-q C-j= instead.
+
+*this is it i think*
+"^>\\(\\(.*\n\\)*?\\)\n"
+\\and match against\\
+
+#+BEGIN_QUOTE\n
+\1\n
+#+END_QUOTE\n
+
+We get something like
+=(default ^>\(\(.*^J\)*?\)^J -> #+BEGIN_QUOTE^J\1#+END_QUOTE^J^J=
+
+** Examples
+=M-x regexp-builder=
+ - Build experssion inside quotes...
+e.g.
+="|NERDTree-.*|"=
+ - Copy if necessary:
+=C-c C-w=
+ - Search-replace regexp
+C-M-%
+ - When pasting response - remove quotation marks e.g.
+=|NERDTree-.*|=
+** HowTos
+*** Capturing a sub-expression
+\(captured\)
+*** Outputting a captured sub-expression
+\n
+where n is the nth captured sub-expression
+
+** Regexpbuilder
+Useful stuff.\\
+Operates in string mode so you will want to convert syntax (backslashes & newlines) if you are going to use in a command.
+* Outline-minor-mode
+ - With the below for example you can hide or show functions with hide/show sub-trees
+;; Better for PHP mode
+(add-hook 'php-mode-user-hook
+	  '(lambda ()
+	     (outline-minor-mode)
+	     (setq outline-regexp " *\\(private funct\\|public funct\\|funct\\|class\\|#head\\)")
+	     (hide-sublevels 1)))
+
+* Rectangle Stuff
+** Insert a string to the left of every line of the rectanle
+M-x string-insert-rectangle
+* Editing files on remote machines from EMACS via TRAMP
+
+Emacs will work the same on remote machines as when you are editing a file as root on the local machine.
+As long as the hostname is in /etc/hosts and the machine unnderstands the scpc protocol 
+(means you can do stuff without constantly using password as in scp) then you go
+C-x C-f /user@host:/path/to/file
+
+*Important* - You will probably be asked for your passphrase as well as/instead of the password
+Make sure you dont muck this up too much as you wont get in!
+
+** Didnt work when ido-mode was enabled and i was trying to login to BigMac - Would hang indefinitely
+: /ssh:Noches@BigMac:
+would ask me for my password and would then hang forever. Forced me to kill emacs.

@@ -1,0 +1,143 @@
+* Cool commands & Tricks
+** How to add extension to all files in a folder in Unix/Linux
+
+# extension = .xml
+# Dont think this is recursive...is it?
+find . -type f -exec mv {} {}.xml ';'
+
+** Find any file containing a specific piece of text in the path of the current directory
+find . -exec grep "findThisString" '{}' \; -print
+
+
+* Sudo/su etc
+To become another user
+$ sudo su - username
+To become another user for just one task
+$ sudo su - username -c "command_example arg_example"
+
+* ps to show user id and group id
+** ps with output specific to show UID, GID and args
+ ps -eo uid,gid,args
+** ps to show user and other stuff
+ps -ef | grep apache
+** User defined output
+=To see every process with a user-defined format:=
+          ps -eo pid,tid,class,rtprio,ni,pri,psr,pcpu,stat,wchan:14,comm
+          ps axo stat,euid,ruid,tty,tpgid,sess,pgrp,ppid,pid,pcpu,comm
+          ps -eo pid,tt,user,fname,tmout,f,wchan
+** List output Codes
+ps L
+** A good format - PID  TT   USER     GROUP    COMMAND  COMMAND
+ps -eo pid,tt,user,group,fname,args | grep pass
+
+* Is the following syntax possible to set and ENV variable and call a command?
+ RAILS_ENV=development ruby management_scripts/tmp.rb
+
+* Spaces in filenames
+These are equivalent and work:
+touch ~/Documents/"A bad file"
+touch ~/Documents/A\ bad\ file
+
+This doesnt surprisingly:
+touch "~/Documents/A bad file"
+
+** In emacs
+*However*
+Trying to open a file in emacs called:
+~/Documents/"A bad day for leisure"
+Will create the file named
+"A bad day for leisure"
+
+*Instead* open
+~/Documents/A bad day for leisure
+to get
+A bad day for leisure
+* Redirecting outputs
+0 stdin
+1 stdout
+2 stderr
+
+=From that perspective, the “>/dev/null 2>&1″ redirects the standard output to /dev/null to discard all standard output, and the 2 (standard error or any error message) is been redirected or treated as 1 (standard output), which means all error, warning or debug messages are also discarded or dropped. In other words, the cron job will execute without notification whatsoever, whether or not it’s completed successfully, has warning or failed. The & sign in front of 1 is standard syntax for file descriptor destination.=
+
+*example*
+#+BEGIN_SRC bash
+hal@philemon:~/upgrade/rake_deprecate$ sudo ./rake_delayed_task 1>rake_output 2>rake_error
+hal@philemon:~/upgrade/rake_deprecate$ ls
+rake_delayed_task  rake_error  rake_output
+hal@philemon:~/upgrade/rake_deprecate$ cat rake_error 
+config.load_paths is deprecated and removed in Rails 3, please use autoload_paths instead
+config.load_paths is deprecated and removed in Rails 3, please use autoload_paths instead
+config.load_paths= is deprecated and removed in Rails 3, please use autoload_paths= instead
+hal@philemon:~/upgrade/rake_deprecate$ cat rake_output 
+mynbcs (rails):RAILS_ENV=production: Queuing delayed job to touch file.
+#+END_SRC bash
+
+* Execute commands in a subshell
+=( export RAILS_ENV=development; /usr/local/bin/rake --silent delayed_job:touch_file)=
+** as SUDO
+The above subshell invocation doesnt terminate properly (an interactive shell is launched)
+when that syntax is used.
+Use this instead:
+=sudo bash -c " export RAILS_ENV=production; cd /app/mynbcs/current/; /usr/local/bin/rake --silent delayed_job:touch_file "=
+
+
+* Get the current time in "Epoch Time"
+: date +%s
+
+* Using =find=
+** find all file whose name matches a string
+find . -name "secret_token"
+** find all file whose name matches a regular expression
+find . -name "*.org"
+** Find any file containing a specific piece of text in the path of the current directory
+find . -exec grep "findThisString" '{}' \; -print
+
+* Grep
+** Count how many times a word appears in each file
+grep -Rc "the-string" path/
+and only print those files that are positive:
+grep -Rc "the-string" path/ | grep -v :0
+** Get the total count of a certain string in a directory
+=cat path/* | grep -c "the-string"=
+** print a linenumber
+grep -Rn "name" mod/forum/
+
+* Weird Errors & Unexpected Things
+** Sub-Shell fails weird/doesnt terminiate properly when run as sudo
+*** PROBLEM
+The following works just fine from the command line:
+=( export RAILS_ENV=development; /usr/local/bin/rake --silent delayed_job:touch_file)=
+i.e. The rake delayed_job:touch_file does not complain that RAILS_ENV is not set
+
+HOWEVER...
+ON philemon, the following does not work when called with sudo 
+(it doesnt work without sudo either because we need sudo to access some logs on this server)
+
+: ( RAILS_ENV=production ; sudo /usr/local/bin/rake --trace --silent delayed_job:touch_file )
+: sudo -s "( export RAILS_ENV=production ; /usr/local/bin/rake --trace --silent delayed_job:touch_file )"
+instead the subshell doesnt sem to terminate properly and we get logged into an interactive root shell
+e.g.
+#+BEGIN_SRC bash
+hal@philemon:~/upgrade/rake_deprecate$ sudo -s "( export RAILS_ENV=production ; /usr/local/bin/rake --trace --silent delayed_job:touch_file )"
+root@philemon:~/upgrade/rake_deprecate# 
+#+END_SRC bash
+
+*** SOLUTION
+explicitly call a bash sbshell
+: sudo bash -c "( export RAILS_ENV=production; cd /app/mynbcs/current/; /usr/local/bin/rake --silent delayed_job:touch_file )"
+or just:
+: sudo bash -c " export RAILS_ENV=production; cd /app/mynbcs/current/; /usr/local/bin/rake --silent delayed_job:touch_file "
+*** FURTHER PROBLEM
+This didn't work when called in a root owned directory
+: sudo bash -c "git clone git+ssh://git.catalyst.net.nz/git/private/oua/saml.git -b idp idp"
+Repeatedly prompted for password and then password of =root@git.catalyst.net.nz=!
+#+BEGIN_VERSE
+If you are using sudo with git commands (e.g. using sudo git clone because you are deploying to a root-owned folder), ensure that you also generated the key using sudo. Otherwise, you will have generated a key for your current user, but when you are doing sudo git, you are actually the root user – thus, the keys will not match.
+#+END_VERSE
+
+From Github
+#+BEGIN_VERSE
+Sudo or sudon't?
+
+In almost all cases you should not be using the sudo command with git. If you have a very good reason you must use sudo, then ensure you are using it with every command (it's probably just better to use su to get a shell as root at that point). If you generate ssh keys without sudo, then when you try to use a command like sudo git push, you won't be using the ssh key you generated.
+#+END_VERSE

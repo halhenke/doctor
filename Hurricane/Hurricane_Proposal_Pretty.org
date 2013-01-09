@@ -1,0 +1,139 @@
+
+* Upgrades to Ruby Core
+
+_Currently at:_ 
+
+ruby 1.8.7 (2009-06-12 patchlevel 174) Ruby Enterprise Edition 2009.10 
+
+** When do things get unsupported?
+
+Ruby 2.0 expected Feb 2013. 
+
+First preview released recently.
+
+** Recommendation
+ - Should  move to 1.8.7 latest:
+ - Ruby Enterprise Edition 1.8.7 2012.02
+
+Shouldn't move to 1.9.* unless upgrading to Rails 3
+
+
+* Upgrades to Rails Core
+
+_Currently at:_
+
+Ruby 2.3.8
+
+** Rails 2.3.x Changes
+**** Rails 2.3.9 
+   - introduces deprecation warnings for Rails 3
+**** Rails 2.3.10 
+   - minor release
+   - mainly resolves security bug from 2.3.9
+**** Rails 2.3.11
+   - bugfixes
+   - Adresses a bug in cross site request forgery protection
+**** Rails 2.3.12
+   - Fix compatibility issues with RubyGems 1.8.5
+**** Rails 2.3.13
+  - 
+**** Rails 2.3.14
+  - Security Fixes
+  - Bugfixes
+
+
+** When do things get unsupported?
+Rails 2.3.14 (August 2011) is the last release AFAIK.
+
+There appears to be no more active development on the Rails 2.3.x branch (March 2012 latest)
+
+** Recommendation
+ - Recommend move to latest version on 2.3.14 branch
+ - Should be relatively painless and will at least bring in later bug and security fixes.
+ - Move to 2.3.9+ will also give deprecation warnings that are relevant to change to any later change to Rails 3.x
+
+
+* Gems
+** Clear out references to unused/obsolete gems? Uninstall?
+ - No - Let Bundler automate this - more details in Section [[Bundler]]
+** Rake
+*** Why Upgrade?
+ - Rake is fundamental and a dependecy of most gems and plugins.
+ - /Should/ be fairly minor syntactic changes.
+ - Our old Rake version almost certainly wont play nicely with 
+   - any new Gems that we may one day have to add.
+   - any existing gems we may wish to upgrade
+*** Why not upgrade?
+ - Pretty much everything has some Rake integration - particularly the vendor/plugins. 
+ - Though changes /should/ be small syntax substitutions they will be scattered throughout many parts of the app.
+*** Compromise
+ - Upgrade to 0.9.0
+ - This will give deprecation warnings for old syntax but should accept new syntax.
+
+** Recommendation
+ - Trial upgrade Rake to 0.9.0
+ - If everything blows up dont waste any more time on it.
+
+
+* Upgrades to vendor plugins
+ - Many of the plugins have now been updated and repackaged as gems. 
+ - However not all have. Some have been superceded by other gems.
+ - While this would go a great distance towards simplifying the architecture of the app it could be a big time sink.
+ - However, Bundler may get us halfway to a more modern solution without much work and at worst should provide a fairly painless way to try some changes.
+** Recommendation
+ - Dont dig around by hand and try to repackage this old code. 
+ - Use Bundler to manage this stuff and make things a little more sane.
+
+
+* Bundler
+Bundler is designed to standardise Ruby development  environments across different machines.
+
+Bundler is a standard part of Rails 3 but is compatible with Rails 2.
+
+** Advantages
+*** Standardise Deployments across Catalyst developers
+ - should greatly speed up the process of people getting to work on the project
+ - might be increasingly important as Rails and gem versions become non-standard and out of date
+*** Lockdown a working environment
+ - A Gemfile provides a central declaration of all dependecies of the app. 
+ - The Gemfile.lock is a snapshot of the current state.
+*** Ease the pain of any future upgrading 
+  - can easily roll back to a previous working configuration 
+  - makes it easier to isolate package versions that might break code.
+*** Relatively simple transition away from vendor/plugins
+ - just as you can specify a particular gem as a dependency of your app and tell Bundler to fetch it you can tell Bundler to pull code straight from a git repo 
+   - this can be as specific as a particular branch/tag/commit 
+ - Its then relatively simple to bump the version of the plugin/gem up to the present if desired and test for breakages
+   - since most plugins have now evolved to Gems this is a relatively painless way to move from the plugin form to the gem, if later desired
+
+
+* Testing
+Really /should/ have a better automated testing suite but this is  time prohibitive at present.
+** Recommendation
+Leave automated testing for now and use Vincent
+
+
+* Existing Bugs
+ - Some bugs are pretty big and dont have anything to do with Rails version or Gems.
+ - Dont think we will get much of a magic bullet solution to these from upgrades - just a hunch based on what i've seen.
+ - Problem is some will require a relatively deep understanding of the app and what it is supposed to do - takes time
+ 
+** Recommendation 
+ - Recommend some time to fix most offensive/serious.
+ - "Patch up" rather than chase down fundamental problems.
+
+
+* Time Breakdown
+
+| Action                         | Time (hours) |
+|--------------------------------+--------------|
+| Upgrade to Latest Ruby 1.8.7   |            2 |
+| Upgrade  Rails Core            |            8 |
+| Integrate Bundler into Project |            4 |
+| Integrate plugins with Bundler |            6 |
+| Upgrade Rake Gem               |            4 |
+| Basic Bug Fixes                |            8 |
+| Test  Changes                  |            8 |
+|--------------------------------+--------------|
+| TOTAL                          |           40   |
+

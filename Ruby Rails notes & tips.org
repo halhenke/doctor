@@ -1,0 +1,344 @@
+* Routing
+** member vs collection
+http://stackoverflow.com/questions/3028653/difference-between-collection-route-and-member-route-in-ruby-on-rails
+                URL                 Helper                      Description
+----------------------------------------------------------------------------------------------------------------------------------
+member          /photos/1/preview   preview_photo_path(photo)   Acts on a specific resource so required id (preview specific photo)
+collection      /photos/search      search_photos_url           Acts on collection of resources(display all photos)
+
+
+* Diagnostics
+** Print a message from a controller/view
+#+BEGIN_SRC ruby
+render :json => 'This is the string'
+#+END_SRC ruby
+
+
+* Gem Commands
+** Check which gems a gem depends on (i.e. it needs)
+gem dependency  rails
+
+** ALSO check which gems depend on this gem (i.e. which need it)
+gem dependency  -R rails
+
+** Install a gem
+sudo gem install -r zzzzzz
+
+** Install a gem with version
+** Adding a source to the gem package source list
+gem  sources -a http://gems.github.com
+** Uninstalling a gem and all dependencies
+*** Shell Script - doesnt seem to recursively delete dependencies
+Modified from:
+for gem in `gem list --no-version`; do
+  gem uninstall -aIx $gem
+done
+
+for gem in `gem dependency rails -v=3.2.1`; do
+  gem uninstall -aIx $gem
+done
+*** Ruby Script from GitHub
+https://github.com/mattdipasquale/gem_uninstall_r
+
+** Searching for all version of rails gems on remote server
+gem search -ra "rails" | egrep "^rails "
+
+** Install a particular gem version - DOES THIS HAVE PROBLEMS?
+sudo gem install -r rails -v=2.3.14
+** Update the gem executable/rubygems
+# New way
+sudo gem update --system
+# OLD WAY, for historical purposes 
+sudo gem install rubygems-update --no-rdoc --no-ri
+sudo update_rubygems
+
+** Info on whre gems are installed etc
+gem env
+
+
+* Modules and loading/accessing their inards
+** See loaded modules
+=Module.included_modules=
+
+For more:
+http://www.ruby-doc.org/core-1.9.3/Module.htm
+
+** Getting at an included module from
+use =const_get= \\
+ - ActiveSupport::Deprecation is a submodule
+=ActiveSupport.const_get(:Deprecation).methods=
+
+** Defining a module vs acccessing it
+To define a module the first time we need to decalre the full module bit
+#+BEGIN_SRC ruby
+module LRD
+  module FormHelper
+    def labeled_input(object_name, method, options = {})
+      input = text_field(object_name, method, options)
+      label = label(object_name, method, options)
+      content_tag(:div, (label+input), { :class =&gt; 'labeled_input' }
+    end
+  end
+end
+#+END_SRC ruby
+
+Whereas to access it you just need something like:
+#+END_SRC ruby
+module LRD::FormBuilder
+  # ActionPack's metaprogramming would have done this for us, if FormHelper#labeled_input 
+  # had been defined  at load.   Instead we define it ourselves here.
+  def labeled_input(method, options = {})
+    @template.labeled_input(@object_name, method, objectify_options(options))
+  end
+end
+#+END_SRC ruby
+
+* Introspection - from the command line
+** Check an objects methods minus inhereited stuff
+obj.methods - Object.methods
+** Look for specific methods
+#+BEGIN_SRC ruby
+=obj.methods.grep /to_/=
+#+END_SRC ruby
+or like above
+#+BEGIN_SRC ruby
+(UserProfile.find(3).knowtypes.methods - Object.methods).grep /create/ 
+#+END_SRC ruby
+
+Could even do some clever stuff like look for only methods that are not defined on parent:
+#+BEGIN_SRC ruby
+(obj_1.methods - obj_1.parent.methods).grep /create/ 
+#+END_SRC ruby
+or...
+#+BEGIN_SRC ruby
+#+END_SRC ruby
+** Instance & Class Variables
+obj.instance_variables
+obj.class_variables
+
+
+* Requiring code
+We require files - not modules or namespaces
+i.e.
+=require(''active_record/deprecation)=
+Unlike say elisp where we require a tag that is provided in a loadpath by a =provide= statement
+
+
+* How does Rake work
+Call rake in a directory it will automatically call the Rakefile
+
+** Example of hurricane app
+In this case it then requires these files:
+#+BEGIN_SRC ruby
+require 'config/boot'
+require 'rake'
+require 'rake/testtask'
+require 'rdoc/task'
+require 'tasks/rails'
+#+END_SRC ruby
+This is where we get the deprecation warnings
+ - config/boot checks whether rails is running i think
+
+then this task throws an error if RAILS_ENV isnt defined....
+#+BEGIN_SRC ruby
+task :touch_file => :environment do                                                          
+  if ENV.has_key?('RAILS_ENV')                                                               
+    RAILS_ENV = ENV['RAILS_ENV']                                                             
+  else                                                                                       
+    puts 'FATAL rake delayed_job:touchfile: RAILS_ENV not set.'                              
+    exit 1                                                                                   
+  end                                                                                        
+  # 'Hurricane::TouchFileJob' is defined in config/initializers.                             
+  puts "mynbcs (rails):RAILS_ENV=#{RAILS_ENV}: Queuing delayed job to touch file."           
+  Delayed::Job.enqueue(Hurricane::TouchFileJob.new)                                          
+end 
+#+END_SRC ruby
+otherwise it
+ - prints "mynbcs (rails):RAILS_ENV=#{RAILS_ENV}: Queuing delayed job to touch file."   
+ - and using the Delayed plugin
+ - it puts a Hurricane::TouchFileJob class into a queue...
+
+
+
+* Converting vendor/plugins to Rails 3 and/or gems
+This is pretty in depth:
+http://bibwild.wordpress.com/2012/04/25/converting-a-more-complex-rails-2-3-style-plugin-to-non-deprecated-under-rails-3-2/
+
+Basically a few ways to do this:
+** Just move it to the =/lib= directory
+ - If theres just some logic - i.e. a Ruby script - this is the best approach
+ - if theres something that has to be done at the beginning add some code to =config/initializers= directory
+** Rebuild the plugin as a gem
+ - not as hard as it might otherwise be given that we can use =Bundle gem= to provide the structure of a gem
+ - still could be pretty bad
+ - have to move stuff around
+   - init code
+   - rake tasks
+** Use bundler to just include the repository/code
+ - Not 100% sure this works but it could be the easiest
+ - Just dont have the version resolution of a gem
+   - ...which we dont have anyway with a plugin
+ - Make up a fake version number - should be fine
+** Use Rails::Engine inheritance
+ - Generate a fake gemspec and whack it in the plugin root directory
+ - 
+
+
+* Is it possible to tell which gems an app is *actually* using?
+ - in short - no
+http://stackoverflow.com/questions/9793360/figuring-out-which-gems-rails-app-does-not-use
+ - could load each gem and grep for method usage
+ - also grep for requires
+*BUT*
+ - ruby can dynamically generate methods, eval a string etc.
+ - Makes it prety much a manual process unless your test coverage is awesome...
+
+** rough algorithm
+*** load gem in ruby environment
+ - inspect 
+   - i.e. gemName.methods.collect {}
+ - grep the app for any use of the term
+ - log the result
+*OR*
+*** grep the gem source
+ - get all "def xxxxx"
+
+Yeah this seems stupid - why parse stuff
+
+
+
+* Code Snippets
+** Overriding Existing Module/Class Definitions
+
+The following was an attempt to override deprecation messages being generated:
+#+BEGIN_SRC ruby
+module ActiveSupport
+    module Deprecation
+        class << self
+            def warn(message = nil, callstack = caller)
+                puts "poo"
+                #behavior.call(deprecation_message(callstack, message), callstack) if behavior && !silenced?
+            end
+        end
+        module ClassMethods
+            def deprecated_method_warning(method_name, message=nil)
+                puts "blah"
+            end
+        end
+    end
+end
+#+END_SRC ruby
+
+didnt work because ActiveSupport::Dependency.load_paths was not being called
+
+Instead load paths was being called from 
+=Rails::Initializer.do |config|=
+and so we had to overload this:
+#+BEGIN_SRC ruby
+module Rails
+    class Configuration
+        # Deprecated, use autoload_paths.
+        def load_paths
+            # $stderr.puts("config.load_paths is deprecated and removed in Rails 3, please use autoload_paths instead")
+            puts "whoops 1"
+            autoload_paths
+        end
+        
+        # Deprecated, use autoload_paths=.
+        def load_paths=(paths)
+            # $#stderr.puts("config.load_paths= is deprecated and removed in Rails 3, please use autoload_paths= instead")
+            puts "whoops 2"
+            self.autoload_paths = paths
+        end
+    end
+end
+#+END_SRC ruby
+
+** Rails Controller Stuff
+*** redirect output to the index method from the same controller
+#+BEGIN_SRC ruby
+    redirect_to ({:action => "index"}) and return
+#+END_SRC ruby
+*** call the =set_user_profile= method every time before the create method
+#+BEGIN_SRC ruby
+  before_filter :set_user_profile, :only =>[:create]
+#+END_SRC ruby
+**  Rails Active Record stuff
+*** Assigning via _id or not
+Both these are viable ways to do this and might be equivalent:
+#+BEGIN_SRC ruby
+@user_profile_knowtype.user_profile_id = @user_profile.id
+#+END_SRC ruby
+#+BEGIN_SRC ruby
+@user_profile_knowtype.user_profile = @user_profile
+#+END_SRC ruby
+
+
+* Weird Errors
+** Gem install brings in lots of different stuff inexplicably - UNSOLVED
+running:
+#+BEGIN_SRC bash
+sudo gem install rails -v=2.3.14
+sudo gem install rake -v=0.9.0
+#+END_SRC bash
+rake 0.9.2.2 was suddenly installed on philemon
+along with Rails 3.2.1
+
+
+
+
+* Specific Rails errors and solutions
+If you get this:\\
+=User(#70180561615400) expected, got ActiveSupport::HashWithIndifferentAccess(#70180531877120)=\\
+you may need\\
+=accepts_nested_attributes_for :user=\\
+in your =UserProfile= declaration.
+and in your form, make sure you have
+#+BEGIN_SRC web
+
+#+END_SRC web
+and not:
+#+BEGIN_SRC web
+      <%= f.fields_for @user_profile.user do |user| %>
+#+END_SRC web
+also may need =attr_accessible :user_attributes=
+
+
+* How forms in Rails work
+ - You call forms_for on a model *instance* i.e. on an *object - not a class*
+ - If its blank Rails will then generate empty fields you can add stuff too
+ - If not Rails will add existing info to the fields and you can edit it
+ - After this Rails will store all this in =params[:yourobjectname]=
+   - This is effectively a series of string key value pairs (HTML cannot do anything else) but Rails will format in such a way that it will read it as a hash/array/dictionary.
+** sub_objects
+ - These can also be edited in a form
+ - Rails will pass them to the post method with the suffix attributes e.g. =params[:user][:user_profile_attributes]=
+ - check out the name of this input field
+#+BEGIN_SRC web
+       <input class="faux-tag-checkbox inline" type="checkbox" name="user[user_profile_attributes][user_profile_languages_attributes][]" value="<%= lang.id %>" <%= @user_profile.id.present? ? (@user_profile.has_language?(lang.id) ? "checked=\"true\"" : "") : "" %> />
+#+END_SRC
+ - the name determines what the key will be in the post form - if you have a [] at the end of the name then the values will be placed in an array
+ - If you have =accepts_nested_attributes_for user_profile= in your =user= model *and* =user_profile= =belongs_to= =user= then it should work
+   - you may have to write a =user_profile_attributes=(attributes)= method in =user= yourself
+** More on different methods of building Forms
+ - We are creating an HTML form that will update/create/edit a specific instance of a Rais model
+ - So we have to specify fields for different model attributes we wish to edit.
+  
+   We have 3 basic ways to build form helpers:
+   1. =form_tag= - completely manual form construction
+      - takes two args: path and options
+      - can form a complete form with the help of these others
+	- =label_tag=
+	- =text_field_tag=
+	- =submit_tag=
+   2. something like =<% text_field(model, model_property) %>= which takes two args
+      - first is a model instance that is being edited
+      - second is an attribute of the model (doesnt have to be attribute though - just property type pair of methods)
+   3. =form_for(:model_instance)=
+      - yields a form builder
+      - methods called on form builder to build the specific form
+      - effectively a shorthand for method
+   4. =fields_for()= is same as 3 except does not create outer HTML form tags
+      - therefore can be used to add form fields for other models in the same form 
+
+
