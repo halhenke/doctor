@@ -1,0 +1,786 @@
+#+TITLE: My Notes on Git
+
+* Understanding Git
+Git is /directional/
+
+Repositories have upstream remotes but no knowledge of how many downstream repos may be pointing at them.
+
+More importantly commits have references to other commits in the past (i think).
+ - Thats why if you set =HEAD= to point to an earlier commit you essentially lose the more recent commits.
+
+Git will prevent you from pushing older changes over newer changes (?)
+
+1. The =HEAD= pointer/ref determines which branch you are on by pointing to a particular branchname pointer/ref
+2. The branchname pointer/ref points tot the latest commit on each branch
+
+* What do these Commands do?
+# Separate into:
+# * Porcelain
+# * Plumbing
+   add        Add file contents to the index
+   bisect     Find by binary search the change that introduced a bug
+   branch     List, create, or delete branches
+   checkout   Checkout a branch or paths to the working tree
+   clone      Clone a repository into a new directory
+   commit     Record changes to the repository
+   diff       Show changes between commits, commit and working tree, etc
+   fetch      Download objects and refs from another repository
+   grep       Print lines matching a pattern
+   init       Create an empty git repository or reinitialize an existing one
+   log        Show commit logs
+   merge      Join two or more development histories together
+   mv         Move or rename a file, a directory, or a symlink
+   pull       Fetch from and merge with another repository or a local branch
+   push       Update remote refs along with associated objects
+   rebase     Forward-port local commits to the updated upstream head
+   reset      Reset current HEAD to the specified state
+   rm         Remove files from the working tree and from the index
+   show       Show various types of objects
+   status     Show the working tree status
+   tag        Create, list, delete or verify a tag object signed with GPG
+
+   git-cherry - Find commits not merged upstream
+   git-am - Apply a series of patches from a mailbox
+   git-bundle - Move objects and refs by archive
+   git-citool - Graphical alternative to git-commit
+   git-describe - Show the most recent tag that is reachable from a commit
+   git-difftool - Show changes using common diff tools
+   git-show - Show various types of objects
+   git-show-branch - Show branches and their commits
+
+
+* Git Notes (from Mac/Hunome)
+** Git Config
+*** General config set syntax
+: git config --local remote.origin.url git@github.com:Hunome/hunome-dev.git
+*** Set which editor to use with git commits
+: git config --global core.editor emacs
+** Adding Files To The Index
+Adds new untracked files to the index - everything in current directory and all subdirectories
+: git add .  
+
+*** IMPORTANT NOTE ON ADD
+: git add directory 
+recursively adds all files in directory but not files in .gitignore
+However - if you do
+: git add directory/* 
+you are telling git to add files in .gitignore also - and git will complain  
+*unless* you use the -f option also
+
+: git add -u 
+Adds tracked files that have been modified and deletes deleted files from the index.
+
+Or
+: git add -A 
+is the equivalent of both of the above commands combined
+
+**** PROBLEM?
+Now - when I fetch a new commit and the Gemfile/Gemfile.lock changes I am getting all sorts of grief
+Gemfile.lock should be included in the repo apparently to be shared amongst all devs
+However I might be making machine dependent configuration options to some Gems and these 
+will be lost I believe, if I reinstall everything...not sure if thats the case on this manchine
+but I had to install pg with 
+: bundle config build.pg --with-pg-config=/opt/local/lib/postgresql92/bin/pg_config
+for instance - I might lose those cutomizations.
+
+Dont have a solution yet but will think on it if it becomes a problem
+See
+http://stackoverflow.com/questions/4151495/should-gemfile-lock-be-included-in-gitignore/5360120#5360120
+**** For more info - FIXED
+ACTUALLY - bundle seems to remember these configuration options.
+see output of 
+: bundle config
+# then run
+: bundle install
+# and it all updated fine.
+#---------------------------------------------------------------------------
+** General Fetch/Merge Workflow
+1. git fetch new commits                                                                         
+2. git checkout working branch and git merge the_updated_branch
+*or* git merge origin/branch to merge chages straight into current branch
+
+
+e.g. we are on local branch sprint-2 and we wish to merge from remote branch sprint-2-models
+This local branch has previously been setup to fetch from this remote branch
+: git fetch
+We must specify the local copy of the remote branch
+: git merge origin/sprint-2-models 
+
+If there are conflicts then either edit them in editor to reflect the changes you want
+by selecting between differences listed between 
+#+BEGIN_VERSE
+<<<<<<<<< HEAD 
+our_changes 
+========= 
+their_changes 
+>>>>>>>>> their_branch
+#+END_VERSE
+OR if you want to keep one or the other
+: git checkout --ours db/schema.rb
+or
+: git checkout --theirs db/schema.rb
+depending on whether you want to keep this branches copy of the file or the other 
+branch you are merging into the current branch
+then we must git add the conflicted files again
+and git commit again to complete the merge
+
+** Git Checkout
+*** Discard all changes and checkout the selected branch
+: git checkout -- .
+** Git Logging
+*** Nice looking
+: git log --pretty --abbrev-commit 
+*** One line of only last commit
+: git log --oneline -1
+gives
+: ee354a5 Removed extra route defs
+*** Only show commit tag for last commit
+: git log -1 --pretty=format:%H
+gives
+: ee354a5754f55b1a25d0517a747d54fae1770656
+*** Only show abbreviated commit tag for last commit
+: git log -1 --pretty=format:"%h"
+gives
+: ee354a5
+*** Only show abbreviated commit tag for second last commit
+: git log --skip=1 -1 --pretty=format:"%h"
+5207d6b
+*** Pretty version of last 4 commits to effect the Gemfile
+: git log --skip=1 -1 --pretty Gemfile
+*** Hash commits of last 2 commits to effect the Gemfile
+: git log -2 --pretty=format:%h Gemfile
+49c9330
+40b35e1
+*** last 4 commits on branch hal_spark but not on spark
+: git log --pretty -4 --branches hal_spark --not spark
+*** Show commits from current branch that havent been merged into hal_spark
+: git cherry hal_spark --abbrev
++ a294718
++ 49c9330
++ 55f7781
++ fc5c315
++ bb37541
++ 5207d6b
++ ee354a5
+*** List changes in Gemfile between last commits of two branches
+: git diff spark..hal_spark Gemfile.lock
+*** Output a rough graphical drawing of everything  
+: git log --graph --oneline --all
+*** Add all new files and then untrack those you dont want
+: git add -A
+: git rm --cached FILE_NAME 
+*IMPORTANT* - if you leave out the --cached flag then git will remove the actual file from your working tree
+
+** Diff
+*** List changes in Gemfile between last commits of two branches
+: git diff spark..hal_spark Gemfile.lock
+*** Can also do diff showing only changes on particular directories/paths in different branches
+: git diff merge..hal db/migrate/
+*** Show all changes beteen two branches *except* for certain paths
+show all files that changed except for those in the =public= directory:
+: git diff --name-only HEAD..temp-heroku-push | grep -v '^public/'
+*** Show the diff between last commit and third last commit
+: git diff HEAD^^^ HEAD app/views/home/_modals.html.erb
+
+** Tracking Remote Branches
+*** Show which local branches track which remote files
+: git remote show origin
+*** More info on tracking and local to remote branch configuration:
+: git config --local -l
+*** Syntax for push and which branch goes where
+: git push remote_name source_ref:destination_branch
+*** List the commits which have remotes/origins/sparks in their "ancestry"
+: git branch --contains remotes/origin/spark
+*** This branch will now track remote/origin/spark and will fetch/puch/pull to/from 
+: git checkout --track origin/spark
+*** The "checkout -b" option creates a branch and then switches to it"
+: git checkout --track -b haml origin/haml
+or more briefly
+: git checkout -t origin/haml
+*** From stack-overflow: How to set an existing branch to track a remote branch
+USING Git 1.8.0:
+Given a branch foo and a remote upstream:
+: git branch -u upstream/foo
+Or, if local branch foo is not the current branch:
+: git branch -u upstream/foo foo
+USING Git 1.7.0:
+: git branch --set-upstream foo upstream/foo
+
+** git show 
+*** show a file from one commit
+: git show 59edf908ddfae46ead7b80f02609778b9bc5aace:app/views/home/_modals.html.erb
+
+
+* Git
+
+** As compared to Mercurial
+http://stackoverflow.com/questions/1598759/git-and-mercurial-compare-and-contrast/1599930#1599930
+** Terminology and features
+
+|--------------+---------------------------------------------------------------------------------------------------------------|
+| Term         | Meaning                                                                                                       |
+|--------------+---------------------------------------------------------------------------------------------------------------|
+| Tree         | Um - think it means a commit                                                                                  |
+| refspec      | I think this is like a valid reference to a commit/tree                                                       |
+| blob         | This is the hash of a file i think                                                                            |
+| fast-forward | When you are merging branches if one branch is essentially just the ancestor of another git will, by default, |
+|              | try to 'fast-forward' the merge - it wont create a new commit with both branches as parents but instead       |
+|              | will just  update the branch pointer to point to the newest commit.                                           |
+|              | By contrast a merge commit will not include the intermediate commits in the master branch.                    |
+|              | Only the new merge commit is included.                                                                        |
+|              |                                                                                                               |
+|--------------+---------------------------------------------------------------------------------------------------------------|
+*** Features/Explanations of some commands
+**** Git Cherry-Pick
+This seems to be for merging only certain commits from one branch to another
+**** Git Rebase
+  - This seems to be for when you only want to apply all the changes you have made on one branch to another as one mega-commit
+  - Like doing git diff between two branches and then applying a patch
+  - Ends up the same as merging but you dont have a bunch of intermediate commits
+
+**** Git merge-file
+Takes a common ancestor and two divergent files and merges changes into one of the files
+From man page
+#+BEGIN_VERSE
+     git merge-file [-L <current-name> [-L <base-name> [-L <other-name>]]]
+               [--ours|--theirs|--union] [-p|--stdout] [-q|--quiet] [--marker-size=<n>]
+               <current-file> <base-file> <other-file>
+
+       git merge-file incorporates all changes that lead from the <base-file> to <other-file> into <current-file>.
+       The result ordinarily goes into <current-file>. git merge-file is useful for combining separate changes to
+       an original. Suppose <base-file> is the original, and both <current-file> and <other-file> are modifications
+       of <base-file>, then git merge-file combines both changes.
+#+END_VERSE
+** NEVER add .gitconfig to your repo
+If you do a merge and get 
+: <<<<<<
+: ======
+: >>>>>>>
+in your file git wont work
+** You can clone from anywhere - local, remote
+ - Doesn't have to be a remote site - you can clone from any directory with a git repo
+ - You have to clone though to get a repo somewhere - you cant "push" your repo to another empty directory...i dont think
+   - *UPDATE - YES YOU CAN* - see [[*Pushing%20to%20a%20bare%20repository][Pushing to a bare repository]]
+   - This implies we have a real "flowchart" of upstream and downstream repos
+ - What if we cloned a repo and then added that clone as a remote in the /original/ repo? Could we then push and pull to one another?
+   - Not sure about that. I think i tried stuff before and i couldnt push and pull to the same branch.
+   - It was like i needed a third upstream repository for both to work from...
+
+** Cloning a bare repository
+This checks out the repo but doesnt create working directory based on it:
+: git clone --bare gitname.git
+** Pushing to a bare repository
+You need the command 
+: git init --bare gitname.git
+#+BEGIN_VERSE
+~/project $ git init
+~/project $ git add .
+~/project $ git commit -m "first commit"
+~/project $ cd ~/Google\ Drive/git
+
+~/Google\ Drive/git $ git init --bare project.git
+~/Google\ Drive/git $ cd ~/project
+
+~/project $ git remote add origin ~/Google\ Drive/git/project.git
+~/project $ git push -u origin master
+#+END_VERSE
+** Gitignore
+*** Comments
+Any line beginning with #
+: # a comment
+*** Ignoring everything *except* a particular file/directory
+A ! sign will reverse a particular command
+
+You may get into trouble if you are trying to include something that is deeply nested in a previously ignored directory however.
+This is from Stack Overflow:
+#+BEGIN_VERSE
+# First, ignore everything
+*
+# Now, whitelist anything that's a directory
+!*/
+# And all the file types you're interested in.
+!*.one
+!*.two
+!*.etc
+#+END_VERSE
+*** Problem with =vim_runtime=
+Trying to work with "negated include" syntax like this:
+: .vim_runtime/*
+: !.vim_runtime/my_configs.vim
+*BUT* - vim_runtime is a git repo itself 
+ - e.g. its invisible to us......FUCK
+ - I kind of need that my_config file inside there - should it be symlinked from =vim_runtime= to somewhere else?
+ - is there a better solution?
+** Removing/"Untracking" stuff
+*** A good Summary or =git rm=, =git rm --CACHED=, =git reset HEAD= etc
+#+BEGIN_VERSE
+git rm will remove entries from the staging area. This is a bit different from git reset HEAD which "unstages" files. By "unstage" I mean it reverts the staging area to what was there before we started modifying things. git rm on the other hand just kicks the file off the stage entirely, so that it's not included in the next commit snapshot, thereby effectively deleting it.
+
+By default, a git rm file will remove the file from the staging area entirely and also off your disk > (the working directory). To leave the file in the working directory, you can use git rm --cached.
+#+END_VERSE
+ - =git rm file= pretty much equivalent of deleting something, adding that deletion to the index and then committing
+*** Removing Stuff you have added to the branch/index without deleting it from your "working tree"
+: git rm --CACHED
+This will effectively delete stuff from the working index so that you need to 
+: git add -u
+so that these files are not included in the next commit.
+
+But although they are lsited by =git status= as being deleted they will still exist on your normal filesystem.
+** Checkout a branch for inspection but not for adding any permanent work
+=HEAD= will not be pointed at branchref
+: git checkout --detach branch
+What this means is that if you then checkout another branch (even if you have made commits in the meantime) that there will be no ref pointing to these new commits. Being unreachable they will eventually be garbage collected.
+
+This is equivalent to checking out a non-ref commit
+: git checkout fgh452ab12..
+
+If you wish to make any commits permanent you must either create a new branch or tag the commit
+** Checkout particular files/directories from another commit/branch
+: git checkout source_branch <paths>...
+Then
+: git add <paths>...
+etc
+** What does checkout do exactly?
+From man page
+#+BEGIN_QUOTE
+       Updates files in the working tree to match the version in the index or the specified tree. If no paths are
+       given, git checkout will also update HEAD to set the specified branch as the current branch.
+#+END_QUOTE
+ 1. If you give it only a branch/commit then it will update the working tree to that commit
+    1. By default checkouts of other branches wont proceed if the index or working tree does not match =HEAD=.
+ 2. If you give it a *path and a branch* then it will update the index and then the working tree from that commit
+ 3. If you give it a *path without a branch* then it will update the working tree from the index
+
+#+BEGIN_VERSE
+The reason for this is that git checkout has two very different modes of operation, depending on whether you supply a path or not. If you do supply a path it doesn't change HEAD at all, it just "updates the named paths in the working tree from the index file, or from a named <tree-ish> (most often a commit)".  This only updates the paths that were actually present in that other commit.
+#+END_VERSE
+** Tags 
+- are like alternate names, references.
+- Must be unique on both remote and local branches
+** Git reset - soft vs hard etc
+The syntax is 
+: git reset [<mode>] [<commit>]
+ - A 'soft' commit will just point the =HEAD= ref at the commit
+ - A 'hard' reset will throw away all changes in the index and the working tree and revert both to the named commit
+ - A 'mixed' reset will reset the index but /not/ the working tree. This is the default.
+ - A 'merge reset... 
+ - A 'keep' reset... 
+** Show/List Things
+*** Graphical git general
+: git gui
+*** Show pretty much anything from another branch/commit
+: git show commit:path
+For example
+: git show origin/new_linux:.vim_runtime/vimrcs/hal.vim 
+Bash completion even works in the other commits making this pretty awesome
+*** Show all files in a commit
+Need the -r flag to make it recursive:
+: git ls-tree --name-only -r 5ff6ef6dccd7f57d30c2bcc9c3fb203a25930e12
+**** Show all files in the current branch
+: git ls-tree HEAD
+You can restrict this to paths by supplying a UNIX file pattern arg e.g.:
+: git ls-tree HEAD .emac*
+: 100644 blob 0f17acf384ee26238e6e252e7f74a2f04f504a6b	.emacs
+: 040000 tree 2af4f2ee8668537a843940323d507b1442deb250	.emacs.d
+***** Show similar but only for a subdirectory e.g. 'app'
+: git ls-tree -r HEAD app
+*** Show files which have changed between different branches
+: git diff --name-only branch1..branch2
+*** Show changes between specific commits
+**** General form between arbitrary commits
+: git diff commit_sha1..commit_sha1
+**** Show diffs from the last commit
+: git diff HEAD..HEAD^
+This is equivalent
+: git diff ..HEAD^
+*** Show all untracked files
+The following only seem to go one level deep
+: git ls-files --other --exclude-standard
+*** Show all changes in a commit
+: git diff-tree --name-only -r <commit-ish>
+
+*** Show all branches that match a given pattern
+git branch --list pattern
+e.g.
+$ git branch --list *green*
+> * mdl19-greenmedicine
+*** Show if the current branch contains another branch
+Several graphical methods might give you all this info at once but best might be:
+: git branch --contains other-branch
+*** Show log on remote branch
+This will only show what you have last fetched (i.e. its the "local-remote")
+: git log -2 origin/mdl19-greenmedicine
+*** List all files in a branch/commit (recursively)
+: git ls-tree -r branch
+: git ls-tree -r branch | wc -l
+: git diff --name-only branch | wc -l
+*** Show a list of git branches, ordered by most recent commit
+Only local branches:
+: git for-each-ref --sort=-committerdate refs/heads/
+Only remote branches:
+: git for-each-ref --sort=-committerdate refs/remotes
+Both:
+: git for-each-ref --sort=-committerdate refs
+** Generate a patch file from the diff of two commits
+Order is important branch1..branch2 will make patch to go from branch1 to branch2
+: git diff -p commit_sha1..commit_sha1 > output_file.patch
+** Merging from a specific tag
+$ git merge tag
+** How to tell if you can or cant do a forced push
+: git remote -v
+if repository has an ssh protocol prefix such as:
+: origin  git+ssh://git.catalyst.net.nz/git/private/moodle-r2.git (fetch)
+: origin  git+ssh://git.catalyst.net.nz/git/private/moodle-r2.git (push)
+then you wont be allowed to do 
+: git push origin my_branch -f
+** What bevan did:
+git branch updates_2012_11-core-upgrade
+git checkout updates_2012_11-core-upgrade
+git checkout upstream/catalyst-6.x
+git checkout -b catalyst-6.x
+git pull upstream catalyst-6.x
+git checkout updates_2012_11-core-upgrade
+git merge catalyst-6.x
+
+What i did:
+git branch updates_2012_11-core-upgrade
+git checkout updates_2012_11-core-upgrade
+git merge upstream/catalyst-6.x
+
+
+
+Querying Drupal node_type table
+SELECT type, name, module, has_title, title_label, has_body, body_label, custom, modified, locked, orig_type FROM node_type;
+** What does -- mean?
+Its just syntax to separate the branch name from the filenames e.g.
+: git checkout screencast -- file1 file2
+** Problems & Troubleshooting
+*** Git wont add files from a directory
+
+If you add a folder containing a git repository to your git repository the contents of that folder will 
+by default be invisible to git and it will not add them even if you add the enclosing directory.
+
+To get out of this:
+
+rename the folder a couple of times
+or more properly
+: git rm --cached  /path/to/directory
+
+** Recovering from a bad git commit
+*** The naughty way
+
+WARNING this will lose all your latest changes you have done also...
+
+Find the last good commit you did
+checkout that branch
+: git checkout 6gfgsgdhsghjghjgsy78798
+do 
+: git clean -fd 
+to delete later commits (i think)
+do 
+: git branch -D updates_2012_11
+To delete the current branchx
+create a new branch
+: git branch  updates_2012_11
+checkout that branch
+: git checkout  updates_2012_11
+Now heres the really bad bit:
+: git push origin updates_2012_11 -f
+This will force the upstream branch to match the local branch and get rid of later commits
+Its only OK if you are the only one working on that branch.
+
+Now you have to start from the beginning and redo the changes
+
+** Setting up a git repo in Google Drive
+
+   Pretty cool - just clone from something - a directory - and then you have a mobile private git repository
+   e.g.
+: ( cd ~/Google\ Drive/org-docs/; git clone ~/Documents/Org-Docs .)
+and thats all there. Nobody can read it and I can acccess it anywhere. All for free.
+ - *Also* - if I store my org-mode notes then the links between them might still work despite being on different machines
+   - though =~/Google\ Drive/org-docs/= is going to be expanded to =/User/Hal/Google\ Drive/org-docs/=
+*** Hmmmm - a bad idea?
+    http://stackoverflow.com/questions/11296947/xcode-git-issues-with-google-drive-dropbox
+
+*** Here seems to be the problem - not sure i got this right
+ - Just say you are working in a repository stored on Google Drive
+ - You are on one branch called /master/
+ - You are also on another machine and you work in the Google Drive remote folder
+ - When you connect Google Drive on the other machine, which might not even be on the same machine it will try to sync your files
+ - Wait that makes no sense - you cant be on different branches in the same remote directory 
+
+*** The Problem Take 2 
+ - OK say you are using your Google Drive to store remote wrking repos
+ - You start off with two machines in exactly the same state.
+   - From same repo, same branch etc
+ - You branch on one machine, do some changes and then push to your local "Google Drive" Folder version of this remote
+ - This changes the .git files in that folder
+ - You have another machine and you also push to the local version of the remote *but it hasnt synced up the changes from the other machine yet* and its local version of the remote
+from a repository stored on a have one branch of a project checked out on one branch - /master/
+ - Then the changes might not synch well and the repo becomes corrupted?
+
+*** Basically - you have two remote repos
+ - That are local folders on different machines.
+ - If they each sync properly between with the remote cloud storage at Google between commits then thats all fine
+ - But if you push to one and then push to another without syncing in between then you are in trouble
+*** Solutions?
+**** Try to avoid syncing your "Git Repos" folder
+ - Turn off local sync on that folder - it wont show up in your local Google Drive Folder
+ - When you want to make changes you have to change the Preferences, push to or clone from it and then you /should/ unsynch from it.
+ - Changes will get pushed to the server.
+ - It means that you cant use it as a public repo for lots of people to work on but as a private repo for one person at a time, working on multiple machines - should be ok?
+**** Work only on the Google Drive folder - dont clone/push or pull
+ - So you create a repository on the GDrive folder and commit/branch etc.
+ - When you work on other machine you merely sync up with the same folder and edit in it.
+***** However means your 'build' might have to happen on GDrive and use a lot of space.
+
+** Issues Related to Using Git to manage the evolution of files located directly in your home directory
+*** Why do this?
+We want to have git manage files like 
+#+BEGIN_VERSE
+.emacs
+.vimrc
+.bashrc
+#+END_VERSE
+across various machines
+*** Why might this be tricky?
+**** *Everything* in the user space of our computer is now potentially being tracked by a git repo
+**** A lot of unrelated files that configure unrelated things, that we may even wish to track/synch quite differently across different machines are now being tracked by a single git repository
+***** Theres no way to have two git repos to work on the same directory AFAIK
+***** Means we have to think carefully about what we include in each branch/commit
+**** If you switch branches (perhaps to one created on a different OS) things might get a bit crazy
+**** All your other git repos are now effectively/potentially git submodules
+     - This could be cool if you want to automatically update your documentation on one machine based on your main repo
+     - ...or it could be disasterous
+**** At any rate the whole thing makes me a bit nervous
+*** Why its fundamentally different to usage of git for code stuff
+**** In coding you are generally trying to keep everything synchronous across machines
+     - yes? no?
+       - Maybe its not that different
+     - But i do feel that i would keep more of a distinction between the linux and the Mac branch for example
+       - i.e. there would be no end goal to merge them all into a Master branch one day
+     - We Probably want to sync /some stuff/ between all branches (=.emacs= file etc) but only track other stuff for the purposes of backup and comparison
+
+**** In coding you are working in an isolated sub-branch - here potentially everything is tracked by git
+ - This means we have to be much more careful
+ - Pretty much every other git repository is now a submodule
+*** Why its going to be very difficult to merge stuff from my linux branch into my Mac branch
+1. I dont want them to be the same - I just want to get changes I make to one .emacs file on one machine OS and have them applied to my .emacs file on another machine/OS
+2. Its really tough to understand these different branches
+
+*** What should be synced across machines?
+**** Definitely synced
+Configuration files such as
+#+BEGIN_VERSE
+.emacs
+.vimrc
+.bashrc
+.profile
+.inputrc
+#+END_VERSE
+etc
+
+Also, a properly done =.gitignore= file, which first excludes everything and then includes those things i have decided above to sync on each machine 
+
+**** Not sure about synced
+Files that are normally kind of managed by package managers in emacs
+eg 
+: .emacs.d/elpa/*
+: .emacs.d/el-get/*
+ - Should be pulled down locally on each machine?
+   - Might get a bit troubling to do otherwise?
+   - I think so
+**** Not synced
+***** .bundle/config
+Would be nice but too volatile e.g.
+: BUNDLE_BUILD__PG: --with-pg-config=/opt/local/lib/postgresql92/bin/pg_config
+One machine might have a different version of postgres
+*** How Do I deal with the problem of merging in branches that have files I dont actually wish to add
+**** The Problem Summarized
+  - I have stuff that is in the other branches that just shouldnt be there and I dont want to bring in because it will wreck my current stuff
+    - The kind of =.emacs.d/elpa/*= type stuff of =.ssh/id_rsa= shit
+  - The problem is 
+    - i cant remove it from the remote branch /unless i check it out in the first place./
+      - Can't I?
+**** The Problem a bit different - git merge wont overwrite untracked files
+ - Stuff in my current branch that isnt tracked wont be overwritten *even with the no-commit option*
+ - This means i cant use that option.
+ - Best alternative?
+   1. Checkout files, reset head and add interactively?
+      - No thanks
+	- no merge history
+	- Slower. Hassle.
+   2. Force a merge
+      - No.
+   3. Get an empty directory, clone from this repo, checkout branch with extra tracked files, Prune it commit and push
+   4. Create new branch, remove files you dont want to merge, new commit and then merge
+   5. Track other files temporarily, merge no--commint (?), select files you want, untrack files.
+      - This didn't work - i have changes in these file i havent committed. 
+***** *Actually not a bad thing* - it will automatically warn me when there is a conflict...
+***** But it also means git merges become directional
+      - I could have a branch that tracks extra files that i /could merge changes into/ but that i /couldn't merge changes from/
+      - Thats bad because if i had an OS X branch and a Linux branch I would want to merge changes from one to the other via a common branch that would track less files.
+**** Only merge certain files from the other branch
+  - Can be done in a number of ways
+  - This one is closest to a "true" merge [[*Use%20-%20%3Dgit%20merge%20--no-commit%3D%20to%20interactively%20alter%20the%20merge%20-%20prob%20the%20best%20solution][Using "git merge --no-commit" to interactively alter a merge]]
+***** Simplest but not the best - checkout only some files from the branch and then commit
+Checkout files independently
+: git checkout branchname -- file1 file2
+However 
+ - you wont have a branch in your history (i.e. a commit that has more than one commit as parent)
+ - This is assuming you want the whole file from the other branch without any attempt to merge
+***** Like above but after checking out file you can stage/commit only /portions/ of a file using =git add -p=
+This wont produce a true merge in the git history either, if that is important.
+
+But it should allow you to stage only certain parts of a file from another tree.
+
+This will add the file to the index and the working directory
+: git checkout other_branch file1
+Unstage the new file
+: git reset HEAD file1
+Interactively select those parts of the file you want to keep (manual merge?)
+: git add -p file1
+***** Use =git checkout branch file= and =git add -p= and /then/ merge to create a merge in commit history
+Still isn't a proper merge in your graph history and doesnt merge files with any you might already have.
+
+From here:
+http://stackoverflow.com/questions/7482650/git-merge-only-some-selected-pieces-of-source-code-across-a-few-files
+
+Make a new temp branch
+: git checkout -b temp_branch branch2
+Checkout a file you want from the other branch
+: git checkout branch1 /path/to/file/with_changes
+Repeat step #2 for each file involved.
+Then set your index to your original branch state (while keeping the checked out files in your working tree)
+: git reset HEAD
+and only stage the portions of the file changes that you want.
+: git add -p 
+: git commit
+You now have the selective merge as a new commit.\\
+I believe the purpose of this next bit (and making the temp branch) is to artificially show that this is a true merge when gits history is shown (they say a merge is only all or nothing):
+: git checkout -f branch2
+: git merge temp_branch
+
+***** Use - =git merge --no-commit= to interactively alter the merge - *prob the best solution*
+Best described here:
+http://stackoverflow.com/a/7292109/935470
+
+Do a merge that stops before it commits:
+: git merge --no-commit branch2
+This will put merged versions of files in both your index and working tree.\\
+You can then unstage some changes, (checkout will update the index also)
+: git checkout --ours
+or all of them and add back only the ones you want (reset by default only changes the index)
+: git reset HEAD
+: git add path
+
+Once you are ready you commit the changes and this should produce a proper commit.
+***** Use - =git merge --squash=
+1. Like =merge --no-commit= it will effectively update your index and working tree as if you had merged but will not produce a commit.
+2. *Unlike* merge when you do commit it will not produce a tree history that shows a merge - it will look like the changes were just changes that you manually applied. i.e. The other branch will not be a parent of your new commit.
+
+From the man page:
+#+BEGIN_QUOTE
+Produce the working tree and index state as if a real merge happened (except for the merge information),
+but do not actually make a commit or move the HEAD, nor record $GIT_DIR/MERGE_HEAD to cause the next git
+commit command to create a merge commit. This allows you to create a single commit on top of the current
+branch whose effect is the same as merging another branch (or more in case of an octopus).
+#+END_QUOTE
+***** Split the other commit into several commits that only effect certain files
+With interactive base - seems complex
+http://plasmasturm.org/log/530/
+**** Manually "Fix" the branches before commiting
+ - I Could
+   1. clone repo in a new, empty, temp directory
+   2. checkout different branches
+   3. remove things from the cache that might damage my setup
+   4. Push them back to the remote
+*** Things to do
+**** Have a well managed .gitignore file
+      - You can/should eliminate most directories so that git can /potentially/ only track a smaller number of files and directories
+**** On a new machine/OS
+       	- always start with a fresh branch with the default install.
+       	- then merge things over from the other branch
+
+*** Working Notes: The process of getting everything in order
+**** Taking stock of what I currently have 
+***** how i did it
+Use something like:
+: git log --graph --oneline --all
+or 
+: gitk --all
+This will show a graph of all commits in all branches and in the case of gitk will show where the branch tags point.
+***** ...and what I currently have
+I have these important branches:
+ - Airbook
+ - remotes/origin/new_linux
+ - remotes/origin/BigMac
+
+These Branches have the following files currently tracked:
+[[images/My\ Git\ Tools\ repo\ -\ files\ tracked\ on\ different\ branches.tiff][My Git Tools repo - files tracked on different branches]]
+**** My Plan
+***** DONE Create a new branch and try to merge AirBook and BigMac together
+      - First Get BigMac uptoDate
+***** TODO Then merge stuff from the NewLinux Branch
+****** Temporarily add these files
+: git add -f .vim_runtime/
+: git add -f .gitconfig
+: git add -f .ssh/
+: git add -f .vim/
+
+Then as soon as possible do 
+: git checkout --ours path
+for the above
+
+****** Adding and deleting files in the middle of a merge
+I tried to do 
+: git rm --cached .ssh/config~
+during the interrupted merge but it seemed to indicate i had to choose one or the other and merge.
+i.e. Anything at least in: 
+#+BEGIN_VERSE
+ Unmerged paths:
+   (use "git add <file>..." to mark resolution)
+
+	both added:         .emacs
+	both added:         .vimrc
+#+END_VERSE
+has to be at the end of the commit.
+
+OTOH I could add new files to the commit and delete them.
+
+I'm not sure about removing files that were part of the merge but did not have a merge conflict
+*Yes you can!*
+
+So as long as there isn't a merge conflict you can add or remove anything to the index before the commit.
+
+If you rename something or put the contents in another file git will register it as a moved file as they will have the same sha-key
+****** Merge
+#+BEGIN_VERSE
+.bash_logout
+.bash_rc
+.emacs
+.inputrc
+.vimrc
+.emacs.d/packages/
+.emacs.d/init_files
+#+END_VERSE
+****** Discard
+#+BEGIN_VERSE
+.gitignore_global
+.viminfo
+.vim/
+.emacs.d/most
+.ssh/most
+#+END_VERSE
+****** This is complex
+#+BEGIN_VERSE
+.bashrc_local  # This should prob be moved to a linux-specific version and other stuff factored out of .bashrc into a mac-specific one
+#+END_VERSE
+****** Keep this stuff but not in the same place
+#+BEGIN_VERSE
+origin/new_linux:.vim_runtime/vimrcs/hal.vim 
+keymapping/
+.ssh/config
+#+END_VERSE
+***** TODO Delete debian branch. Probably host somewhere else...
+

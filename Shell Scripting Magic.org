@@ -1,3 +1,5 @@
+#+TITLE: Some tips & Commands to make Shell Scripting always Pretty Sweet
+ - Also see [[file:linux%20mode%20help.org][Unix Help]] for other stuff
 * Cool commands & Tricks
 ** How to add extension to all files in a folder in Unix/Linux
 
@@ -8,6 +10,8 @@ find . -type f -exec mv {} {}.xml ';'
 ** Find any file containing a specific piece of text in the path of the current directory
 find . -exec grep "findThisString" '{}' \; -print
 
+** Copy a files contents to the clipboard
+: pbcopy < ~/.ssh/id_rsa.pub
 
 * Sudo/su etc
 To become another user
@@ -31,7 +35,42 @@ ps L
 ps -eo pid,tt,user,group,fname,args | grep pass
 
 * Is the following syntax possible to set and ENV variable and call a command?
- RAILS_ENV=development ruby management_scripts/tmp.rb
+: RAILS_ENV=development ruby management_scripts/tmp.rb
+I think you want this?
+: env RAILS_ENV=development ruby management_scripts/tmp.rb
+
+** Actually - no i dont think so
+See this: 
+http://stackoverflow.com/questions/10938483/bash-specifying-environment-variables-for-echo-on-command-line
+
+The reason why this works for suff like a script but not for something like 
+: SOMEVAR=BBB echo zzz $SOMEVAR zzz
+is because the parent shell evaluates $SOMEVAR on the command line before it invokes the command with the modified environment.
+
+Consider:
+# #+BEGIN_SRC bash
+: echo "Hey" "man"
+Hey man
+: echo "Hey" $PWD
+Hey /Users/Hal/code/hunome/hunome-dev
+: echo "Hey" $poo
+Hey
+: poo=machine echo "Hey" $poo
+Hey
+: poo=machine echo "Hey" '$poo'
+Hey $poo
+: poo=machine echo "Hey" $'poo'
+
+*** This however gives the desired behaviour - eval and single quotes
+Hey poo
+: poo=machine eval echo "Hey" '$poo'
+Hey machine
+
+*** Why? - same reason as sh -c works
+Because it forces evaluation of $poo to be delayed so that it is evaluated in the context of the new shell\\
+Similar to:
+: poo=machine sh -c 'echo "Hey" $poo'
+Hey machine
 
 * Spaces in filenames
 These are equivalent and work:
@@ -81,12 +120,22 @@ Use this instead:
 =sudo bash -c " export RAILS_ENV=production; cd /app/mynbcs/current/; /usr/local/bin/rake --silent delayed_job:touch_file "=
 
 
+* User Info
+** Show who is logged in
+: who
+** Getting info on a users Group Membership
+: groups Hal
+is equiv to
+: id -Gn Hal
+or 
+: id -p Hal
+
 * Get the current time in "Epoch Time"
 : date +%s
 
 * Using =find=
 ** find all file whose name matches a string
-find . -name "secret_token"
+: find . -name "secret_token"
 ** find all file whose name matches a regular expression
 find . -name "*.org"
 ** Find any file containing a specific piece of text in the path of the current directory

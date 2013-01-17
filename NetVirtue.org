@@ -1,0 +1,18 @@
+#+TITLE: How To Get Into NetVirtue and Do Stuff
+
+* Getting To cPanel
+First find the client area:
+https://nvarea.netvirtue.com.au/clientarea.php
+
+Login.
+
+Go to the =Services->MyServices= Menu Link:
+https://nvarea.netvirtue.com.au/clientarea.php?action=products
+
+
+Click on View Details:
+https://nvarea.netvirtue.com.au/clientarea.php?action=productdetails
+
+Down the bottom, uder the account/billing info, will be a Button that says 
+: Login to cPanel
+*PRESS IT*

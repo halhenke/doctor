@@ -1,3 +1,27 @@
+* Passenger
+To restart passenger do
+: touch tmp/restart.txt
+
+* Bundler
+** See local configuration options
+: bundle config --local
+** Get rid of gem installed by bundler
+You have to get rid of all ones not required by the Gemfile
+: bundle clean
+: bundle clean --force 
+will wipe even system gems
+
+Otherwise you are supposed to do 
+: bundle exec gem uninstall whatever
+but this doesnt seem to work
+
+* Rake
+Show all tasks
+: rake -T
+or 
+: rake -D
+
+
 * Routing
 ** member vs collection
 http://stackoverflow.com/questions/3028653/difference-between-collection-route-and-member-route-in-ruby-on-rails
@@ -8,10 +32,88 @@ collection      /photos/search      search_photos_url           Acts on collecti
 
 
 * Diagnostics
-** Print a message from a controller/view
+inspect?
+: @object.inspect
+** Rails
+*** Print a message from a controller/view
 #+BEGIN_SRC ruby
 render :json => 'This is the string'
 #+END_SRC ruby
+*** Print a debug message to the log
+: logger.(debug|info|warn|error|fatal)
+e.g.
+: logger.debug "Person attributes hash: #{@person.attributes.inspect}"
+ Calling it as =Rails.logger= is also valid
+
+*** Using the =ruby-debug= gem
+**** Setup/installation
+See this blog
+http://chrisadams.me.uk/2009/04/28/how-to-set-up-a-debugger-with-mod_railspassenger/
+
+Actually that might be outdated - the whole thing took ages but below instructions should be good for Rails 3 and Ruby 1.9
+
+***** Installing the Gem
+# Problems with Ruby 1.9. I couldnt do it in Bundler (didnt try =sudo bundler= though)had to do this:
+# : sudo gem install ruby-debug19
+put 
+: gem 'debugger'
+in your Gemfile
+***** Other Configuration to be done once per app
+****** Whack this in config/environments/development.rb
+#+BEGIN_SRC ruby
+  if File.exists?(File.join(Rails.root,'tmp', 'debug.txt'))
+    Debugger.wait_connection = true
+    Debugger.start_remote
+    File.delete(File.join(Rails.root,'tmp', 'debug.txt'))
+  end
+#+END_SRC
+can specify port and host if you like
+#+BEGIN_SRC ruby
+  remote_host = '127.0.0.1' 
+  remote_port = 7000 
+  if File.exists?(File.join(Rails.root,'tmp', 'debug.txt'))
+    Debugger.wait_connection = true
+    Debugger.start_remote(remote_host, remote_port)
+    File.delete(File.join(Rails.root,'tmp', 'debug.txt'))
+  end
+#+END_SRC
+****** Create a rake restart task
+Heres what i have in a =lib/tasks/rails_debug.rake= file
+#+BEGIN_SRC ruby
+    desc "Restarts passenger if in debug mode"
+    task :restart do
+      system("touch tmp/restart.txt")
+      system("touch tmp/debug.txt") if ENV["DEBUG"] == 'true'
+    end
+#+END_SRC
+****** Create an rdebug.rc file
+ - either in home directory or current directory
+ - This may have been crucial - not sure
+At any rate heres what i have in my ./rdebug.rc file
+#+BEGIN_VERSE
+set autolist
+set autoeval
+set autoreload
+#+END_VERSE
+***** Configuration to be done whenever you want to start the debugger
+****** Call restart of passenger via rake task with DEBUG env variable set to true
+: bundle exec rake restart DEBUG=true
+****** THEN - VERY IMPORTANT - you must load a NEW page to get server to work
+any page it doesnt matter
+****** Open a remote debug session with
+: bundle exec rdebug -c
+or if port and host specified earlier
+: bundle exec rdebug -c -p 7000 -h 127.0.0.1
+
+*** Checking for the eistance of a =params= key/value
+: if params[:country_list].present?
+* Commenting out Stuff in a Rails web template
+Comments out both HTML and Ruby logic
+#+BEGIN_SRC web
+<%# if false %>
+  ...old bit here
+<% end %>
+#+END_SRC web
 
 
 * Gem Commands
@@ -93,6 +195,7 @@ module LRD::FormBuilder
 end
 #+END_SRC ruby
 
+
 * Introspection - from the command line
 ** Check an objects methods minus inhereited stuff
 obj.methods - Object.methods
@@ -116,6 +219,107 @@ or...
 obj.instance_variables
 obj.class_variables
 
+** Check which environment the rails console is being run in
+: Rails.env
+=> "development"
+
+
+* Rails
+** Console
+*** Start the console in a particuar environment
+: rails console development
+or, allegedly:
+: RAILS_ENV=test rails console
+which should prob be:
+: Rails.env=test rails console
+*** Check which environment the rails console is being run in
+: Rails.env
+=> "development"
+ - Dont seem to be able to change this properly by setting 
+: Rails.env="production"
+on the console command line
+
+** Sprockets
+ - =app/assets/stylesheets/application.css/= and =app/assets/javascripts/application.js/=
+*** Comments
+ - anything which is preceded with an = sign is included
+ - otherwise its commented out
+ - e.g. in the following
+#+BEGIN_SRC css
+/*
+ *= require_self
+ *= require foundation_and_overrides
+ *= require_tree .
+ * require jquery.ui.autocomplete
+ */
+#+END_SRC
+the line 
+:  * require jquery.ui.autocomplete
+is "commented out". while
+:  *= require_tree .
+is not.
+
+
+* Ruby Meta/Magic Stuff
+** You can call methods based on strings with the send method
+: object.send("add_#{@type_of_fruit}", d)
+Heres a more involved example
+#+BEGIN_SRC ruby
+      	["backgrounds","knowtypes","interests","languages","cities","countries"].each do |t|
+          if params["user_profile_#{t}"].present? 
+            params["user_profile_#{t}"].each do |d|
+              @user_profile.send("add_#{t.singularize}", d)
+            end
+          end
+      	end
+#+END_SRC
+*** If locally defined method (same class) then do like this
+same for Rails associations
+#+BEGIN_SRC ruby
+class UserProfileInterest < ActiveRecord::Base
+  def bat_kill()
+    send("bat_karate")
+  end
+  def bat_karate()
+  end
+end
+#+END_SRC
+
+See here also [[*Rails%20converting%20strings%20to%20symbols%20etc][Rails converting strings to symbols etc]]
+
+** Operating system commands
+Strings enclosed with backquotes or =%x{}= are be considered by Ruby as operating system commands. Just try:
+: puts (`calc`)
+: puts ("Current directory content is: #{%x/dir/}")
+
+
+* Heroku
+** Transferring a PostGres Database to and from heroku
+http://www.ryandaigle.com/a/pgtransfer-is-the-new-taps
+First install pg transfer
+: heroku plugins:install https://github.com/ddollar/heroku-pg-transfer
+*** Yeah i dont know Heres what I had to do
+First put the database on a publically accessible url
+ - in this case inside the =public_html= directory on my Net Virtue server
+   - I had to make the enclosing =Hunome= directory and the =dev2prod.sql= file both readable and executable by the world
+then i could run 
+: heroku pgbackups:restore DATABASE 'http://halhenke.net/Hunome/dev_2_prod.sql' --confirm hunome-dev
+and this worked - needed =--confirm hunome-dev= to 'force' this change
+
+Sort of like this:
+https://devcenter.heroku.com/articles/heroku-postgres-import-export#import
+
+* Rails converting strings to symbols etc
+This module does it:
+: ActiveSupport::CoreExtensions::String::Inflections
+e.g.
+: 'Book Author Title'.parameterize.underscore.to_sym
+ - note - =.to_sym= is a Ruby string method
+** String to Class
+: "Object".constantize # => Object
+Apparently for Ruby you use
+: Module.const_get
+but this doesnt handle nesting
 
 * Requiring code
 We require files - not modules or namespaces
@@ -182,7 +386,6 @@ Basically a few ways to do this:
 ** Use Rails::Engine inheritance
  - Generate a fake gemspec and whack it in the plugin root directory
  - 
-
 
 * Is it possible to tell which gems an app is *actually* using?
  - in short - no
@@ -288,20 +491,45 @@ along with Rails 3.2.1
 
 
 * Specific Rails errors and solutions
-If you get this:\\
-=User(#70180561615400) expected, got ActiveSupport::HashWithIndifferentAccess(#70180531877120)=\\
-you may need\\
-=accepts_nested_attributes_for :user=\\
+If you get this:
+: User(#70180561615400) expected, got ActiveSupport::HashWithIndifferentAccess(#70180531877120)
+you may need
+: accepts_nested_attributes_for :user
 in your =UserProfile= declaration.
 and in your form, make sure you have
 #+BEGIN_SRC web
-
+      <%= f.fields_for :user do |user| %>
 #+END_SRC web
 and not:
 #+BEGIN_SRC web
       <%= f.fields_for @user_profile.user do |user| %>
 #+END_SRC web
 also may need =attr_accessible :user_attributes=
+
+
+* From Hunome - Rails Tips & Explanations
+** Namespaces in Routes and forms
+?
+** Forms
+ - We are creating an HTML form that will update/create/edit a specific instance of a Rais model
+ - So we have to specify fields for different model attributes we wish to edit.
+  
+   We have 3 basic ways to build form helpers:
+   1. =form_tag= - completely manual form construction
+      - takes two args: path and options
+      - can form a complete form with the help of these others
+	- =label_tag=
+	- =text_field_tag=
+	- =submit_tag=
+   2. something like =<% text_field(model, model_property) %>= which takes two args
+      - first is a model instance that is being edited
+      - second is an attribute of the model (doesnt have to be attribute though - just property type pair of methods)
+   3. =form_for(:model_instance)=
+      - yields a form builder
+      - methods called on form builder to build the specific form
+      - effectively a shorthand for method
+   4. =fields_for()= is same as 3 except does not create outer HTML form tags
+      - therefore can be used to add form fields for other models in the same form 
 
 
 * How forms in Rails work
@@ -342,3 +570,20 @@ also may need =attr_accessible :user_attributes=
       - therefore can be used to add form fields for other models in the same form 
 
 
+
+
+* Compiling stuff for Production Mode
+: bundle exec rake assets:precompile
+: git add public/assets
+: git commit -m "vendor compiled assets"
+** To put on heroku
+If not on =master= branch
+: git push heroku yourbranch:master --force
+
+
+* TODO PROBLEMS
+** How to log *anything* from configuration file
+i.e. from development.rb or Hunome::Application.configure
+** DONE How to get remote debugger to work for me
+Why doesnt start_remote/start_server seem to get called?
+My =./.rdebugrc= file was mispelled as =./.redbug.rc=

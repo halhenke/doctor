@@ -1,0 +1,4 @@
+#+TITLE: Tips for Working With iTerm
+
+* Bash History and multiple tabs
+http://code.google.com/p/iterm2/issues/detail?id=1183

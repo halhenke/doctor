@@ -1,8 +1,10 @@
-Keyboard Settings & Keymappings
+#+TITLE: Keyboard Settings & Keymappings in Linux
 
-Xmodmaps maps keycodes (the actual output of the physical keyboard) to KeySyms (Logical/Virtual names)
+* Basic Figuring out how things work in Linux
 
-Important Files:
+ - Xmodmaps maps keycodes (the actual output of the physical keyboard) to KeySyms (Logical/Virtual names)
+
+** Important Files:
 default keyboard...thing:
 /etc/default/keyboard
 xorg global input settings:
@@ -14,7 +16,7 @@ Lowlevel Modifier key mask stuff:
 Available KeySym names:
 /usr/include/X11/keysymdef.h
 
-Important Keyboard Tools:
+** Important Keyboard Tools:
 See the base linux mappings with:
 xmodmap
 See the output of various keys with:
@@ -26,34 +28,40 @@ xkeycaps
 Is called to modify the way terminal prcesses key inputs:
 loadkeys
 
+** Some web Info
 ftp://ftp.lyx.org/pub/sgml-tools/website/HOWTO/Keyboard-and-Console-HOWTO/t1659.html
 
-How Does This All fit Together?
+
+* How Does This All fit Together?
 http://forums.gentoo.org/viewtopic.php?t=51783
 loadkeys is for the console (and cannot be used in X), xmodmap is for use in X, and xkb, which is loaded with command "xsetkbmap", is a newer method for for making changes in the keymap under X. 
 
-Xkb comes with a set of predefined "rules" for changing the keyboard layout and is quite modular (i.e. you may defined your keymap using as may rules as you like, one after the other), so as long as you want to do something somebody has done before (e.g. use dvorak, turn off "Caps Lock" or swap the Ctrl and Caps Lock keys) it's easy. Redefining the keymap from ground up seems a bit more complex though (haven't tried this myself yet though). 
+Xkb comes with a set of predefined "rules" for changing the keyboard layout and is quite modular (i.e. you may defined your keymap using as many rules as you like, one after the other), so as long as you want to do something somebody has done before (e.g. use dvorak, turn off "Caps Lock" or swap the Ctrl and Caps Lock keys) it's easy. Redefining the keymap from ground up seems a bit more complex though (haven't tried this myself yet though). 
 
 Xmodmaps are hardware-specific (i.e. if you change your [hardware] keyboard into something else, or use it on a different architecture, you may have to make changes for your xmodmap to work -- using xkb you would just change the rule specifying what keyboard hardware you got)If you want to produce an xmodmap, take a look at the program xkeycaps -- a graphical xmodmap editor which much simplifies making your own. 
 
 The format of loadkeys and xmodmap files are similar, but they're *not* compatible (sigh!).
 
-In KDE:
+
+* In KDE:
 khotkeys ?
-~/.kde/share/config/kglobalshortcutsrc
-~/.kde/share/config/khotkeysrc
+: ~/.kde/share/config/kglobalshortcutsrc
+: ~/.kde/share/config/khotkeysrc
 
+
+* In different linux distros 
 Debian - new:
-/etc/default/keyboard
+: /etc/default/keyboard
 Debian - old:
-/etc/console-tools/remap
+: /etc/console-tools/remap
 Ubuntu - virtual consoles
-/etc/default/console-setup 
+: /etc/default/console-setup 
 
-PROBLEMS:
+
+* PROBLEMS:
 In KDE, in Emacs the super key only works with some keys
-* For some keys such as s-f it will say s-f is undefined despite it showing up in emacs keybindings
-* For other keys such as s-up the input just wont register to emacs at all
+** For some keys such as s-f it will say s-f is undefined despite it showing up in emacs keybindings
+** For other keys such as s-up the input just wont register to emacs at all
 
 Appears to be a bug in KDE:
 https://bugs.kde.org/show_bug.cgi?id=157468
@@ -142,34 +150,46 @@ https://wiki.archlinux.org/index.php/KEYMAP
 
 Configuring the Console Keymap
 Edit personal.map using your favorite editor. Examples:
-* Make the Right Alt key same as Left Alt key (Emacs)
-change the line include "linux-with-alt-and-altgr" to include "linux-with-two-alt-keys"
-* Swap CapsLock with Escape (Vim)
+
+
+* How-To
+** Make the Right Alt key same as Left Alt key (Emacs)
+change the line
+: include "linux-with-alt-and-altgr" 
+to 
+: include "linux-with-two-alt-keys"
+** Swap CapsLock with Escape (Vim)
 make keycode 1 = Caps_Lock and keycode 58 = Escape
-* Make CapsLock another Control key
-change the line keycode 58 = Caps_Lock to keycode 58 = Control
-* Swap CapsLock with Left Control key
+** Make CapsLock another Control key
+  change the line 
+: keycode 58 = Caps_Lock 
+to 
+: keycode 58 = Control
+** Swap CapsLock with Left Control key
 make keycode 29 = Caps_Lock and keycode 58 = Control
 
-These directives associate a keycode with a keysym
+
+* These directives associate a keycode with a keysym
 dumpkeys
 loadkeys
 showkeys
 
-Using third-party programs
+
+* Using third-party programs
 keytouch
 actkbd
 xbindkeys
 
 
-kde - Maybe edit the following files while kde is not running
+* I got the Super Key working in KDE
+** kde - Maybe edit the following files while kde is not running
 and maybe disable the "Start the Input Action Daemons on Login" option under
 System Settings -> Custom Shortcuts -> 
 vim ~/.kde/share/config/khotkeysrc
 vim ~/.kde/share/config/kglobalshortcutsrc 
 
 
-WAIT - In KDE 
+** WAIT - In KDE 
 Settings -> Input Device -> Keyboard -> Layout
 If you tick 'Configure Layout' and press on the Shortcut area  and 
 input the keys "Super" + "right Arrow" it shows fucking "Meta + Right"
@@ -179,6 +199,7 @@ Shortcut 'Meta + Right' in Application KWin for action Move Right" !!!!!!!!
 
 To the Batmobile!!!!!!!!!!!! 
 
+** The solution
 OK - 
 Settings -> Shortcuts & Gestures -> Global Keyboard Shortcuts
 and THEN under 'KDE component' you can select different KDE things 
@@ -187,3 +208,9 @@ Fingers crossed.....
 
 AAAAAWWWWWWWWWWWWW   YEEEEEEEEEEEEEEEEEEEEEEEAAAAAAAAAAHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 
+
+
+* This is kinda interesting - X-Keys + contollerMate?
+
+http://www.xkeys.com/xkeys.php
+http://www.orderedbytes.com/controllermate/xkeys/

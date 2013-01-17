@@ -1,3 +1,5 @@
+#+TITLE: Postgres/psql Related Tips, Docs etc
+
 * Mysql, Psql Equivalents
 
 mysql: SHOW TABLES
@@ -15,6 +17,7 @@ postgresql: SELECT column_name FROM information_schema.columns WHERE table_name 
 mysql: DESCRIBE TABLE
 postgresql: \d+ table
 postgresql: SELECT column_name FROM information_schema.columns WHERE table_name ='table';
+
 * Logging into a psql client on a system you arent a user (but you do have sudo)
 sudo su postgres -c "psql -l"
 sudo su postgres -c "psql moodle-kincoppal"
@@ -387,16 +390,23 @@ createuser -DSRP ducere-training-totara-moodle
 =$ psql total_moodle_bullshit -c "\dg"=
 
 
-* Dropping a Database
-Cant be connected to it...
+* Dropping/Creating/Backing Up Databases
+** Create a Database
+This will create the database mynbcs and specify the owner as =mynbcs-rails-dev=
+: createdb -O mynbcs mynbcs-rails-dev
+** Backing Up a Database
+: pg_dump dbname > outfile
+ or with macports: 
+: /opt/local/lib/postgresql92/bin/pg_dump -U postgres hunome_development > ../database_backups/hunome_development_early_data.sql
+** Dropping a Database
+Cant be connected to it while you do it
+
 From bash shell:
-$ dropdb databasename
-* ...and recreating it
-$ createdb -O mynbcs mynbcs-rails-dev
-$ psql mynbcs-rails-dev < dumped_data.sql
-
-
-
+: dropdb databasename
+** ...and recreating it
+   This will create a database =mynbcs-rails-dev= owned by mynbcs
+: createdb -O mynbcs mynbcs-rails-dev
+: psql mynbcs-rails-dev < dumped_data.sql
 
 
 

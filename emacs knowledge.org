@@ -19,8 +19,11 @@ C-x k / C-x 0 / s-w
 =\M-: (buffer-file-name)=
 ** reload buffer from disk
 s-u 
-** MODES
-=C-h m= or =M-x describe-mode= shows all the active minor modes (and major mode) and a brief description of each.
+** Modes
+=C-h m= or 
+: M-x describe-mode 
+shows all the active minor modes (and major mode) and a brief description of each.
+
 Also: =M-:= describe-mode or describe-minor-mode 
 ** Package management
 el-get in combination with built in package management for github goodness
@@ -45,20 +48,33 @@ in an interactive lisp session, evaluating it with <Command-r> and then moving t
 
 * HowTos (not necessarily that cool...)
 ** Cancel a command while in the middle of it
-=\C-g=
-* EDEBUG
-=M-x edebug-eval-top-level-form=
-or go to the source and do =C-u C-M-x= (<Control u> <Control Alt x>) to set up a function for edebugging
-last-command and this-command
-Normally, whenever a function is executed, Emacs sets the value of this-command to the function being executed (which in this case would be copy-region-as-kisll). At the same time, Emacs sets the value of last-command to the previous value of this-command.
-diff-buffer-with-file to see if a buffers contents are different from the file
-M-: buffer-file-name ; to see the file name for the current buffer...
+: \C-g
+** Associate a particular filetype with a particular mode
+: (add-to-list 'auto-mode-alist '("\\.rake\\'" . ruby-mode))
+** See which files are currently associated with which modes
+Check the value of auto-mode-alist
+** See which modes are currently enabled
+: C-h m
 ** Open multiple shells
 =C-u M-x shell= will let you open multiple shells
-** Lisp source files for emacs and packages
+
+** Make every word start with a capital letter
+: upcase-initials-region
+The above only works with lower case words so downcase first if you want to capitalize everything 
+** To see the file name for the current buffer...
+: M-: buffer-file-name 
+** To check if a buffers contents are different from the file
+: diff-buffer-with-file 
+* edebug
+: M-x edebug-eval-top-level-form
+or go to the source and do 
+: C-u C-M-x 
+(<Control u> <Control Alt x>) to set up a function for edebugging
+* last-command and this-command
+Normally, whenever a function is executed, Emacs sets the value of this-command to the function being executed (which in this case would be copy-region-as-kisll). At the same time, Emacs sets the value of last-command to the previous value of this-command.
+* Lisp source files for emacs and packages
 All the lisp files for the current installation of emacs are in:
- /Applications/Emacs.app/Contents/Resources/lisp:
-;----------------------------------------------------------------------
+: /Applications/Emacs.app/Contents/Resources/lisp/
 
 * Version Control
 *** See differences between the file and the last commit (changes you have made)
@@ -74,7 +90,9 @@ M-x vc-annotate
 
 * ediff
 Can be done on regions as well as files
-
+: ediff-regions-linewise 
+or 
+: ediff-regions-wordwise 
 * Org mode
 ** Getting and inserting hyperlinks to other sections of a document
 *** Get link to current section
@@ -84,11 +102,36 @@ M-x org-store-link
 M-x org-insert-link 
  - bound to <C-c C-l> i think
 
+*** Type of link - relative or absolute?
+You can do both.
+
+The variable you want to mess with if you wish to change the default behaviour is =org-link-file-path-type=
+
+**** Valid values are:
+
+relative  Relative to the current directory, i.e. the directory of the file
+          into which the link is being inserted.
+absolute  Absolute path, if possible with ~ for home directory.
+noabbrev  Absolute path, no abbreviation of home directory.
+adaptive  Use relative path for files in the current directory and sub-
+          directories of it.  For other files, use an absolute path.
+** Block types and how they are shown
+*** '#+BEGIN_EXAMPLE'
+No markup will be applied to anything within these tage
+*** '#+BEGIN_QUOTE'
+Everything within will be indented in document.
+
+Only seems to apply to the first paragraph
+*** '#+BEGIN_VERSE'
+ - Everything within gets shown in a 'block', probably of white on black text.
+ - Seems to be equivalent to prepending every line with ": "
+*** '#+BEGIN_SRC lang'
+Like '#+BEGIN_VERSE' but everything within gets syntax-highlighted according to the mode associated with the string "lang".
 ** On Github
 Org-mode support on Github is provided by the ~org-ruby~ gem.\\
 Its a bit patchy.\\
 In particular paragraph\newline support is not great - ~\\~ does not work and a blank line to separate paragraphs insets a blank line in the document.
-** ORG MODE - Bindings and Customisations
+** TODO ORG MODE - Bindings and Customisations
 *** TODO Change the <M-up>/<M-down> bindings so that we dont move stuff around inadvertantly
 *** TODO Change the <M-left>/<M-right> bindings so that we dont change header levels inadvertantly
 *** DONE Get shift select mode working somehows*
@@ -97,6 +140,16 @@ In particular paragraph\newline support is not great - ~\\~ does not work and a 
 ; Ways to jump between predefined points in a file (function definitions etc)
 ;----------------------------------------------------------------------
 
+*** TODO Create a binding/command that will automatically insert Code source blocks
+#+BEGIN_SRC a-lang
+#+END_SRC
+where a-lang is an argument
+*** TODO Create a binding/command to "comment" a region or line with ": " 
+so as to put it in a #+BEGIN_VERSE block
+
+Basically should be almost identical to the 
+: comment-or-uncomment-lines
+command I defined in init file 
 ** Export to MediaWiki & Defining new export modes
 In the el-get package org-mode-experimental,
 in =contrib/lisp/org-export-generic.el= there is a rough mediawiki export mode I believe.
@@ -127,7 +180,7 @@ Other wise you are supposed to define a new one using =contrib/lisp/org-export.e
 ** DONE A comment-region that comments out all lines that are being "touched" by the current region
 ** DONE A select-region and type that simultaneously deletes the previously selected region and inserts the new text instead of deselecting and inserting text
   - SOLVED -  (set delete-selection-mode t)
-** DONE Line NUmbering package.
+** DONE Line Numbering package.
 ** TODO Follow links in directories in current window
 ** TODO Save window and frame configuration 
 ** DONE A function bound to "s-4" (Command 4) that creates a "square" set of 4 windows in the current frame.
@@ -154,10 +207,13 @@ command history - so that we dont get irb commands in our bash history and vice 
 ** TODO Interactive lisp - call eval-print-last-sexp such that it evals the S-expression that the cursor is inside of OR the last one if not inside one
      - could be a little dangerous - we might be in an "implicit lisp environment"
 ** TODO A function to evaluate a region of lisp functions (a la eval-region) but then capture the output of each s-expression (a la eval-print-last-sexp) in a new buffer
-** TODO If not available - create a means of navigating in directoory mode similar to in Mac OSX Finder - 
+** TODO If not available - create a means of navigating in directory mode similar to in Mac OSX Finder - 
 - <Command-up> up a directory
 - <Command-right> open a directory
 - Should still allow global buffer/frame/window navigation as much as possible so will have to think hard about bindings to use
+
+* Ways to jump between predefined points in a file (function definitions etc)
+** Outline Mode
 
 * Defining Comments
 If comments are undefined for a particular mode or file type you can define them yourself 
@@ -166,7 +222,7 @@ by evaluating:
 (set 'comment-start "<!--")
 (set 'comment-end "-->")
 #+END_SRC elisp
-* BUGS
+* Bugs
 ** A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
 ** delete-selection-mode stopped working when i saved a new buffer and text mode was enabled. 
 Started working again after i deactivated and re-activated the mode
@@ -174,6 +230,10 @@ Started working again after i deactivated and re-activated the mode
 as normal but would move me to a currently open window in another frame which was already showing the buffer. 
 Not necessarily a bad thing but would like this behaviour to be consistent. 
 
+** Ido-Mode does Not play well with ssh/tramp - causes whole of emacs to hang
+ - Seems to happen only with local connections to BigMac
+ - Cant open when ido-mode is on
+ - If I have an old connection that TRAMP presumably tries to re-authenticate while ido-mode is enabled then emacs effectively crashes - it hangs indefinitely
 * Regular Expressions in Emacs
 See here for more info
 http://ergoemacs.org/emacs/emacs_regex.html
@@ -287,3 +347,91 @@ Make sure you dont muck this up too much as you wont get in!
 ** Didnt work when ido-mode was enabled and i was trying to login to BigMac - Would hang indefinitely
 : /ssh:Noches@BigMac:
 would ask me for my password and would then hang forever. Forced me to kill emacs.
+* elpa
+* el-get
+** How it works...sort of
+#+BEGIN_SRC elisp
+;; ................................................................................
+;; INSTRUCTIONS FOR ABOVE
+;; once we set a recipe in the el-get-sources list it becomes available for installation
+;; we can check it is known to el-get by running "el-get-list-packages" and using tab completion
+;; on the value of :name
+;; Then to install it you just eval "el-get-install" on the packagename
+;; ................................................................................
+;; (setq my:el-get-packages ())
+;; (setq my:el-get-packages
+;;       (append
+;;        my:el-get-packages
+;;        (loop for src in el-get-sources collect (el-get-source-name src))))
+;; (el-get 'sync my:el-get-packages)
+;; Call this on a list of package names and el-get will install them if they are not already installed
+;; e.g. 
+;; (setq packlist '(p1 p2 p3))
+;; (el-get 'sync packlist)
+;----------------------------------------------------------------------
+#+END_SRC elisp
+** Finding out about the syntax and options available for recipes
+ - Strangely theres not much about this in the info section on el-get
+ - But  
+: C-h v el-get-sources
+seems to give you the definitions.
+** If you wish to see more examples
+Then display the package list with
+: el-get-list-packages
+and then (first step is optional really) get a description of a package including recipe with
+: el-get-describe
+
+* SLIME Mode
+** Moving from self instllation to el-get automated packagae management
+I chucked out my old SLIME directory (which was just dumped in =.emacs.d=) and reloaded it via el-get.
+Now it has the latest version from git and can be updated easily.
+Previously I had this in my init file:
+#+BEGIN_SRC elisp
+(setq inferior-lisp-program "/usr/homebrew/bin/sbcl") ; your Lisp system
+(add-to-list 'load-path "/Users/Hal/Code/Packages/slime") ; your SLIME directory
+(require 'slime)
+(slime-setup)
+#+END_SRC
+Now however, el-get runs slime-setup on post:init and sets the path:
+#+BEGIN_SRC elisp
+ (:name slime :description "Superior Lisp Interaction Mode for Emacs" :type github :features slime-autoloads :info "doc" :pkgname "nablaone/slime" :load-path ("." "contrib") :compile (".") :build ("make -C doc slime.info") :post-init (slime-setup))
+#+END_SRC
+So all I should have in my .emacs file now is
+#+BEGIN_SRC elisp
+;(setq inferior-lisp-program "/opt/local/bin/clisp") ; your Lisp system
+#+END_SRC
+
+** Some old SLIME config code i had from somewhere
+This was the sole content of my =.emacs.d/Noches.el= file before...
+
+Could be some useful default settings
+#+BEGIN_SRC elisp
+;; SLIME setup:
+ (add-to-list 'load-path "~/.emacs.d/slime")
+ (add-to-list 'load-path "~/.emacs.d/slime/contrib")
+ ;;(add-to-list ‘load-path "~/.emacs.d/slime")
+ ;;(add-to-list ‘load-path "~/.emacs.d/slime/contrib")
+ (setq slime-backend "~/.emacs.d/slime/swank-loader.lisp")
+ (load "slime-autoloads")
+ (require ‘slime)
+ (require ‘slime-autoloads)
+ (eval-after-load "slime"
+ `(progn
+ (slime-setup ‘(slime-repl))
+ (custom-set-variables
+ ‘(inhibit-splash-screen t)
+ ‘(slime-complete-symbol*-fancy t)
+ ‘(slime-complete-symbol-function ‘slime-fuzzy-complete-symbol)
+ ‘(slime-net-coding-system ‘utf-8-unix)
+ ‘(slime-startup-animation nil)
+‘(slime-lisp-implementations ‘((sbcl ("/usr/local/bin/sbcl")))))))
+ ;; Stop SLIME’s REPL from grabbing DEL,
+ ;; which is annoying when backspacing over a ‘(‘
+ (defun override-slime-repl-bindings-with-paredit ()
+ (define-key slime-repl-mode-map
+ (read-kbd-macro paredit-backward-delete-key) nil))
+ (add-hook ‘slime-repl-mode-hook ‘override-slime-repl-bindings-with-paredit)
+ ;; User’s stuff:
+ (zenburn)
+ (slime)
+#+END_SRC

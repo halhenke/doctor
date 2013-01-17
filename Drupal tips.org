@@ -1,3 +1,67 @@
+#+TITLE: Drupal Notes, KnowHow & Tips
+
+Some of this is Catalyst Specific and not really refactored properly
+
+* Drupal Setup With Postgres - FRESH INSTALL
+
+Important last step - Grant all:
+
+: CREATE DATABASE drupaldb;
+: CREATE USER drupalapp WITH PASSWORD 'lapurd';
+: GRANT ALL ON DATABASE drupalbd TO drupalapp;
+
+But also - if you have already set =$db_url= in =settings.php=
+then drupal assumes the site is already setup and tries to read the presumably empty database
+See: 
+http://drupal.org/node/965028
+So you have to go to 
+: your_site_root_url/install.php
+to call the setup explicitly
+** Do you have the PHP postgres driver?
+
+Need the php postgres driver
+: sudo apt-get install php5-pgsql
+php log in:
+...
+
+* Logging into A Drupal Site as admin
+
+Go to
+
+: domain-name/user/login
+
+and input the info gained as described in section
+\\do org-mode inner link here\\
+* Drush
+
+** Upgrading modules
+Use 
+: drush dl modulename 
+rather than 
+: drush pm-updatecode modulename
+as the latter does a lot more stuff we dont necessarily want.
+
+** Drush Problems
+
+You should make sure you have the Catalyst version.
+The one from git is more recent than the one from the Catalyst stable/unstable repository
+
+If you get the error 
+: "No valid version control or backup engine found (the --version-control option was set to "git")"
+Then you are probably not working in a git repository
+ - if you didnt clone it somewhere then just 'git ini't
+
+*** version number fuck up
+See also [internal link]
+Drush will ask you if you want to bump (and tag) the package
+Inside your site directory there will be a .debian directory with a changelog file
+i.e.
+: .debian/changelog
+You can edit this and manually change the version number.
+drush will then build the package with this version number 
+AND you dont have to bump when you do 
+: drush dh-make
+
 * Forms
 * Nodes
 

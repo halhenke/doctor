@@ -1,0 +1,88 @@
+
+* Planning/Design
+
+** Some is usually a good thing.
+
+** If it is a problem that you are very familiar with or have tackled before you probably dont need to plan much and will get more done by just diving in
+ - In this case the process of planning will detract from the progress of executing.
+** Problems
+ - Some things are too complex to be fully, and properly planned out.
+ - It can be very difficult to imagine situations/problems that might seem trivially obvious when you have a prototype of the product in front of you. 
+
+
+* Rapid Iteration
+** Can Be a Good Thing
+ - Ameliorates the problem with committing verything to one design only to face unanticipated problems.
+** If its a problem you dont know how to solve then skipping the design/planning stage might result in a lot of code that needs to be rewritten
+ - Iteration in this case becomes a case of "design by doing" or "learning on the job" i.e. trial and error
+
+
+* Many people working together on the one problem/codebase
+ - It would sem that they have to be separated in a way that they can work 'concurrently'
+ - The dangers here are different than the ones involved in concurrent software?
+ - A project that can be decomposed into independent problems is a good thing. 
+
+** Version Control Software
+
+
+* Expertise Sharing
+ - Regular efforts should be made to let people know more efficient ways to do something.
+** This isnt the same as saying "everyone should declare where their areas of expertise are" in the team
+   - Thats intimidating
+     - what if you don't have an area where you are better than anyone else?
+     - If you have two experts this encourages pissing matches
+** The point is to make other people aware of a better way of doing something they do every day or a better tool to do it with
+** The point is not to try and force everyone to do things the same way /unless/ its actually important to code safety/consistency
+ - If something doesnt matter then the individual should decide
+   - vim vs emacs
+   - for loop vs while loop
+   - etc
+** The idea is to make available the good knowledge that others /might not even be aware existed/ that will inevitably be distributed amongst your team and to do so in a non-confrontational way such that it might prove hugely useful in the future
+** Sorts of stuff that should get shared
+ - Cool shell commands
+ - Cool libraries or frameworks
+ - Pitfalls and gotchas that people may run into
+
+
+** Agile tries to do this by having frequent meeting, everyone scrutinising everybody and micro-managing individual programmers
+ - If someone knows how to solve a problem while someone else doesnt we wait until they fail
+
+
+* Dont create "false incentives" or punishments
+** You will inevitably distort the system in undesirable ways
+ -  If you try to push people into communicating by punishing non-communicators or rewarding communicators then people will find ways to /look like/ they are communicating
+** Instead - you want to remove impediments towards desirable behaviours
+** Its perfectly fine to create rewards and incentives for things that are actually desirable in and of themselves - i.e. shipping a working product
+ - However when you reward /intermediate behaviours/ that are /often but not always/ associated with desirable outcomes you will end up with people devoting their time and mental energy to gaming a system - for gain or just survival - that is not related to anything good.
+
+
+* Hotshot Devleopers & Heroic Programming
+ - How much autonomy should one guy get?
+ - 
+
+* Thoughts
+** Agile is a pretty good way to organically reach a compromise between the three competing goals of
+   1. Price
+   2. Quality
+   3. Time To Completion
+   
+
+   - Generally it wont tip too far out of whack to anyones displeasure    
+   - Because there is "always a working product" the process can be stopped at any time
+   
+
+** Agile has a number of different, orthogonal uses/benefits
+By understanding this we can understand cases where some aspects might be decomposable from others.
+
+1. Customer Management
+   1. Legal/Contractual Aspect
+   2. "Expectation Management"
+   3. A Design Process
+2. Software Development Project Management
+   1. Iterative Development
+3. Worker Management?
+** Quantitaive Factors to Explain which Situations/industries where Agile might be suitable/not suitable
+1. Cost of iteration
+   - It Better be cheap to create a working design - if it costs you a million dollars to deploy its probably not a viable method
+2. Well Understood Problem
+   - If you dont know how to solve the problem before you start then you are problem just commiting yourself to needless iteration 
