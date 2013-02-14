@@ -1,3 +1,5 @@
+#+TITLE: VIM related Settings, Config, Tips & Tricks
+
 * NERD tree Mappings             
 | Default Key |  Description                                         | help-tag |
 |-
@@ -43,3 +45,26 @@
 | A....... | Zoom (maximize/minimize) the NERDTree window.............| NERDTree-A |
 | ?....... | Toggle the display of the quick help.....................| NERDTree-? |
 |-
+
+* Installing and switching between the amix and spf-13 Ultimate VIM setups
+** Amix
+  - amix uses pathogen to manage vim plugins and spf13 uses vundle which seems superior and closer to el-get
+  - Amix chucks everything in the vim runtime directory and sources that from the main .vimrc
+** SPF-13
+ - SPF-13 adds everything to a directory ~/spf13-vim-3 and symlinks the important files to there
+** Coexist?
+ - Perhaps can move AMIX to its own directory and switch simlinks between the two.
+ - Or create a vimrc that switches between the two.
+ - Have to have my own .vimrc.local file that i can rdaw from also..
+** Solution
+ - spf13 renamed old .vimrc and =.vim/= to .vimrc.amix and =.vim.amix/=
+ - Symlinked =hals_vim_config_file.vim= to =.vimrc.local=
+ - basically installed all the rest of the spf13 stuff
+* Shift Select can be enabled in MacVim/ Vims with GUIs with the following code
+#+BEGIN_SRC vim-script
+if has("gui_macvim")
+    let macvim_hig_shift_movement = 1
+endif
+#+END_SRC
+
+

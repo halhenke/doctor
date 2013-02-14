@@ -1,24 +1,71 @@
 #+TITLE: Emacs KnowHow
+* HowTos (not necessarily that cool...)
+** Cancel a command while in the middle of it
+: \C-g
+** Associate a particular filetype with a particular mode
+: (add-to-list 'auto-mode-alist '("\\.rake\\'" . ruby-mode))
+** See which files are currently associated with which modes
+Check the value of auto-mode-alist
+** See which modes are currently enabled
+: C-h m
+** Open multiple shells
+=C-u M-x shell= will let you open multiple shells
+
+** Save/Restore the current window/frame layout
+You can get the current frame layout with
+: (current-frame-configuration)
+and restore it with
+: (set-frame-configuration configuration &optional nodelete)
+
+Therefore I imagine by going
+: ( (current-frame-configuration))
+** Make every word start with a capital letter
+: upcase-initials-region
+The above only works with lower case words so downcase first if you want to capitalize everything 
+** To see the file name for the current buffer...
+: M-: buffer-file-name 
+** To check if a buffers contents are different from the file
+: diff-buffer-with-file 
+** Recover files after a crash
+: M-x recover-session
+Select what is probably the most recent session and 
+: C-c C-c
+** Print to the minibuffer from a lisp function
+: (print "Hey there pal!!") 
+
+** Change the way something is interpreted in the syntax table
+e.g. Make `$' have the syntax of punctuation in Text mode.  Note the use of a character constant for `$'.
+: (modify-syntax-entry ?\$ "." text-mode-syntax-table)
+** Change whether emacs asks for confirmation or not for certain commands
+e.g. Enable the use of the command `narrow-to-region' without  confirmation.
+:  (put 'narrow-to-region 'disabled nil)
 * Cool Things I Have Learned About Emacs
-** prints out a Python style docstring
-(documentation 'foo)
-** takes you to the file for a given lib name of the type (require foo_mod)
-(find-library foo_mod)
+** print out a Python style docstring
+: (documentation 'foo)
+** open the file for a given library/feature 
+i.e. given a package/feature of the type 
+: (require 'foo_mod)
+we can open that file with
+: (find-library "foo_mod")
 ** Compile file
-(byte-compile-file foo.el) 
+: (byte-compile-file foo.el) 
 Will use current buffer file by default (with prompt) and compile.
 Will probably be useful when package management fails to build something properly - you can probably cmopile files manually yourself
 ** To reload .emacs file after changes
-M-x load-file ~/.emacs
+: M-x load-file ~/.emacs
 *OR* it is probably safer to select changes that you have made and then
-M-x eval-region RET
+: M-x eval-region RET
 ** Close current bufer/window/frame:
-C-x k / C-x 0 / s-w
+: C-x k 
+or
+: C-x 0 
+or
+: s-w
 ** Get filename/path of current buffer
  - eval =bufferfile-name= function
 =\M-: (buffer-file-name)=
 ** reload buffer from disk
-s-u 
+: s-u 
 ** Modes
 =C-h m= or 
 : M-x describe-mode 
@@ -32,67 +79,770 @@ window-system
 it will be "pc" or "ns" (OS X) or if in terminal nil
 ** Check emacs version
 emacs-version
-** Changing Font
-  (set-face-attribute 'default (selected-frame) :height 100)
- (set-frame-font
-    "-outline-Courier New-normal-normal-normal-mono-11-*-*-*-c-*-iso8859-1")
 ** Rectangles and associated commands e.g. 
 =C-x r k= - Kill the text of the region-rectangle, saving its contents as the “last killed rectangle” (kill-rectangle). 
+Copy a rectangle to a register
+: C-x r r
+Paste the resulting rectangle
+: C-x r g
 ** Display literal input - what emacs is seeing
-=C-q= runs the command quoted-insert, which reads the next input character/event and inserts it.
- - The best way to see what is getting sent to emacs is by writing
-=(read-event)=
-in an interactive lisp session, evaluating it with <Command-r> and then moving the mouse/pressing a key whatever
+: C-q 
+runs the command quoted-insert, which reads the next input character/event and inserts it.
+
+A more raw way to see what is getting sent to emacs is by writing
+: (read-event)
+in an interactive lisp session, evaluating it with <Command-r> and then moving 
+the mouse/pressing a key whatever
+Also 
+: (read-key)
+to go through decoding and translations
 ** See what a function name is bound to
-=(symbol-function 'function-name)= to find out what a function name is bound to
+: (symbol-function 'function-name)
+to find out what a function name is bound to
+* /Really/ Cool Things
+** Running an arbitrarily complex command every time you save a file
+From http://puntoblogspot.blogspot.com/2013/01/a-simple-pattern-to-shorten-feedback.html
 
-* HowTos (not necessarily that cool...)
-** Cancel a command while in the middle of it
-: \C-g
-** Associate a particular filetype with a particular mode
-: (add-to-list 'auto-mode-alist '("\\.rake\\'" . ruby-mode))
-** See which files are currently associated with which modes
-Check the value of auto-mode-alist
-** See which modes are currently enabled
-: C-h m
-** Open multiple shells
-=C-u M-x shell= will let you open multiple shells
+Incredibly cool. Can be used to automate tedious compilation/checking stuff that you do over and over again. 
 
-** Make every word start with a capital letter
-: upcase-initials-region
-The above only works with lower case words so downcase first if you want to capitalize everything 
-** To see the file name for the current buffer...
-: M-: buffer-file-name 
-** To check if a buffers contents are different from the file
-: diff-buffer-with-file 
+First put something like this at the top of your file:
+: # -*- run-command: "/opt/openresty/nginx/sbin/nginx -c /home/rgrau/workspace/nginx-translator/config_nginx.conf -p /tmp/nginx/  -s reload"; -*
+Whenever the file is opened from then on, ='run-command= will be set to that value.
+
+Next define your command to be run in a shell (this should be done in your normal emacs file rather than the buffer):
+#+BEGIN_SRC
+For more fancyness, there's also add-file-local-variable-prop-line which can help you. 
+And the tiny code to hook the command to after-save hook. 
+(defun rgc/run-command ()
+  (interactive)
+  (when (boundp 'run-command)
+    (shell-command run-command)))
+#+END_SRC
+
+Finally add itb to the "after-save" hook (.emacs file again):
+: (add-to-list 'after-save-hook 'rgc/run-command)
+
+Now whenever you are in a buffer where that variable is defined it will be run when you save!
+
+** You can run emacs as a 'server'/daemon and connect to the same session from multiple clients (share buffers from emacs in a GUI or a terminal)
+Start the server
+: emacs --daemon
+Connect as a GUI
+: emacsclient -c
+Connect from the command line
+: emacsclient -t
+* Key Binding
+** Recover the normal function of a key if you destroy its binding
+For instance I rebound the "b" key with 
+: (global-set-key [98] (some-weird-function))
+because [98] is the 'b' key.
+
+To fix:
+: (global-set-key "b" 'self-insert-command)
+** Redefiine a all keys which call one function to call another
+ Redefine all keys which now run `next-line' in Fundamental mode so that they run `forward-line' instead.
+:  (substitute-key-definition 'next-line 'forward-line global-map)
+** Unset the binding of a key globally
+Make `C-x C-v' undefined.
+:  (global-unset-key "\C-x\C-v")
+* kbd and read-key
+: kbd ("M-b")
+gives 
+: [134217826]
+Calling
+: (read-key)
+and typing 
+: M-b
+Gives
+: 134217826 (#o1000000142, #x8000062)
+* An emacs lisp REPL
+: M-x ielm
+* Keeping straight the differnces between lists and functions and symbols in what is expected
+** lambdas/anonymous functions are essentiall 'self-quoting'
+So if i understand correctly
+: (global-set-key KEY (lambda ARG BODY))
+is equivalent to
+: (global-set-key KEY 'a-func)
+
+#+BEGIN_VERSE
+ -- Macro: lambda args body...
+     This macro returns an anonymous function with argument list ARGS
+     and body forms given by BODY.  In effect, this macro makes
+     `lambda' forms "self-quoting": evaluating a form whose CAR is
+     `lambda' yields the form itself:
+
+          (lambda (x) (* x x))
+               => (lambda (x) (* x x))
+
+     The `lambda' form has one other effect: it tells the Emacs
+     evaluator and byte-compiler that its argument is a function, by
+     using `function' as a subroutine (see below).
+#+END_VERSE
+** add-hook
+Defined as:
+: (add-hook HOOK FUNCTION &optional APPEND LOCAL)
+In this case, FUNCTION should be a "raw function call" - not a list/symbol
+
+If you need to add more, use a lambda:
+#+BEGIN_SRC elisp
+(add-hook 'org-mode-hook 
+	  (lambda ()
+	     (define-key org-mode-map (kbd "M-P") 'org-insert-BEGIN-region)
+	     (define-key org-mode-map (kbd "C-c l") 'org-store-link)
+	     ))
+#+END_SRC
+** Binding Commands to functions
+*** define-key
+As defined:
+: (define-key KEYMAP KEY DEF)
+DEF can be a _symbol_ /or/ a _function_.
+If it is a symbol then it must link to a function definition:
+#+BEGIN_VERSE
+DEF is anything that can be a key's definition:
+ nil (means key is undefined in this keymap),
+ a command (a Lisp function suitable for interactive calling),
+ a string (treated as a keyboard macro),
+ a keymap (to define a prefix key),
+ a symbol (when the key is looked up, the symbol will stand for its
+    function definition, which should at that time be one of the above,
+    or another symbol whose function definition is used, etc.),
+ a cons (STRING . DEFN), meaning that DEFN is the definition
+    (DEFN should be a valid definition in its own right),
+ or a cons (MAP . CHAR), meaning use definition of CHAR in keymap MAP,
+ or an extended menu item definition.
+ (See info node `(elisp)Extended Menu Items'.)
+#+END_VERSE
+*** global-set-key
+With the syntax
+: (global-set-key KEY COMMAND)
+From the help:
+#+BEGIN_VERSE
+COMMAND is the command definition to use; usually it is
+a symbol naming an interactively-callable function.
+#+END_VERSE
+So we might use
+: (global-set-key (kbd "C-a") 'a-command)
+or 
+: (global-set-key (kbd "C-a") (lambda () (interactive) (do-something)))
+**** Binding to a command with argument can be tricky.
+If you do it without the quote e.g.
+: (global-set-key (kbd "C-a") (do-something "arg1" "arg2"))
+then the function will be called when the key itself is defined.
+However if you quote it 
+: (global-set-key (kbd "C-a") '(do-something "arg1" "arg2"))
+then nothing seems to happen when the key is pressed - perhaps because the function called is actually
+: (quote (do-something "arg1" "arg2"))
+
+Binding it as part of a lambda function works: 
+: (global-set-key (kbd "C-a") (lambda () (interactive) (do-something "arg1" "arg2")))
+
+Maybe a quasiquote?
+* last-command and this-command
+Normally, whenever a function is executed, Emacs sets the value of this-command to the function being executed (which in this case would be copy-region-as-kisll). At the same time, Emacs sets the value of last-command to the previous value of this-command.
+
+* Rectangle Stuff
+** Insert a string to the left of every line of the rectanle
+M-x string-insert-rectangle
+* Ways to jump between predefined points in a file (function definitions etc)
+** Outline Mode
+* Editing files on remote machines from EMACS via TRAMP
+
+Emacs will work the same on remote machines as when you are editing a file as root on the local machine.
+As long as the hostname is in /etc/hosts and the machine unnderstands the scpc protocol 
+(means you can do stuff without constantly using password as in scp) then you go
+C-x C-f /user@host:/path/to/file
+
+*Important* - You will probably be asked for your passphrase as well as/instead of the password
+Make sure you dont muck this up too much as you wont get in!
+
+** Didnt work when ido-mode was enabled and i was trying to login to BigMac - Would hang indefinitely
+: /ssh:Noches@BigMac:
+would ask me for my password and would then hang forever. Forced me to kill emacs.
+* Defining a mode
+** Some really quick tricks
+You can bind a regular expression to a particular 'face' (a face is like a font)
+: ("blockquote" . 'bold)
+This can be done most simply:
+#+BEGIN_SRC elisp
+(define-derived-mode vine-mode html-mode
+  "ComicVine mode" "Major mode for editing posts destined to be published on Comicvine"
+  (font-lock-add-keywords nil 
+  			  '(("blockquote" . 'bold))))
+#+END_SRC elisp
+could chuck in something like
+:  (set-face-attribute 'bold (selected-frame) :height 100)
+though this would effect everything in that frame...
+** Using generic-mode
+Defined as
+: (define-generic-mode MODE COMMENT-LIST KEYWORD-LIST FONT-LOCK-LIST
+: AUTO-MODE-LIST FUNCTION-LIST &optional DOCSTRING)
+** Using derived-mode
+Basically in terms of syntax you are going to be associating regular expressions with fonts/faces
+*** To get syntax highlighting you have a few variables that you can set to regular expressions.
+Here is a list of some program syntactic structures you can declare lists of keywords for that will be highlighted in different ways:
+: (defvar font-lock-comment-face 'font-lock-comment-face  "Face name to use for comments.")
+: (defvar font-lock-comment-delimiter-face 'font-lock-comment-delimiter-face  "Face name to use for comment delimiters.")
+: (defvar font-lock-string-face		'font-lock-string-face  "Face name to use for strings.")
+: (defvar font-lock-doc-face		'font-lock-doc-face  "Face name to use for documentation.")
+: (defvar font-lock-keyword-face		'font-lock-keyword-face  "Face name to use for keywords.")
+: (defvar font-lock-builtin-face		'font-lock-builtin-face  "Face name to use for builtins.")
+: (defvar font-lock-function-name-face	'font-lock-function-name-face  "Face name to use for function names.")
+: (defvar font-lock-variable-name-face	'font-lock-variable-name-face  "Face name to use for variable names.")
+: (defvar font-lock-type-face		'font-lock-type-face  "Face name to use for type and class names.")
+: (defvar font-lock-constant-face		'font-lock-constant-face  "Face name to use for constant and label names.")
+: (defvar font-lock-warning-face		'font-lock-warning-face  "Face name to use for things that should stand out.")
+: (defvar font-lock-negation-char-face	'font-lock-negation-char-face  "Face name to use for easy to overlook negation.")
+: (defvar font-lock-preprocessor-face	'font-lock-preprocessor-face  "Face name to use for preprocessor directives.")
+: (defvar font-lock-reference-face	'font-lock-constant-face)
+: (make-obsolete-variable 'font-lock-reference-face 'font-lock-constant-face "20.3")
+: (defvar font-lock-keywords nil  "A list of the keywords to highlight.")
+: (defvar font-lock-keywords-alist nil  "Alist of additional `font-lock-keywords' elements for major modes.")
+
+*** Procedure
+1. Create a list of keywords that you want to be recognized as a particular type of keyword
+   1. If you want to interactively redefine this then you will need setq rather than defvar - defvar cannot redefine something already defined
+: (defvar comic-quotes '("[quote]" "[/quote]") "Alvaro quote tags")
+2. Generate a regular expression from that list
+   1. Dont use 'words as an option for =regexp-opt= - wont match the first keyword on a line etc.
+: (defvar comic-quotes-regexp (regexp-opt comic-quotes))
+3. Create a list of cons between the regular expressions and the variable types
+#+BEGIN_SRC elisp
+ (setq comicboard-font-lock-keywords
+      `(
+	(,comic-quotes-regexp . font-lock-type-face)
+	(,comic-markup-regexp . font-lock-constant-face)
+	(,comic-image-regexp . font-lock-function-name-face)
+	))
+#+END_SRC 
+4. Declare the derived mode and set 'font-lock-defaults' to your list of syntactic declarations
+   1. Can declare other stuff like keybindings etc here
+#+BEGIN_SRC elisp
+(define-derived-mode comicboard-mode fundamental-mode
+  "Comicboards mode"
+  "Major mode for editing posts destined to be published on Alvaros boards at comicboards.com"
+  (setq font-lock-defaults '(comicboard-font-lock-keywords)))
+#+END_SRC 
+5. Alternatively to overwriting everything by resetting =font-lock-defaults=, if you want to make the most of the parent modes existing syntax highlighting, you can add keywords to the parent modes =font-lock-keywords= e.g. 
+#+BEGIN_SRC elisp
+(define-derived-mode comicboard-mode fundamental-mode
+  "Comicboards mode"
+  "Major mode for editing posts destined to be published on Alvaros boards at comicboards.com"
+  (make-face 'username-font)
+  (set-face-attribute 'username-font nil :weight 'bold :foreground "red")
+  (font-lock-add-keywords nil 
+  			  `(
+			    ("<.*?blockquote>" . font-lock-warning-face)
+			    (,vine-username 1 'username-font)
+			    ("^\\s *def\\s +\\([^( ]+\\)" 1 font-lock-function-name-face)
+  			    ))))
+#+END_SRC 
+** Properly defining a mode
+Basically you are defining a normal lisp function. 
+
+This function will probably
+1. Destroy the previous local keymap and create a new one
+   1. Including a new menu entry
+2. Define functions for indenting the current code
+3. Set the values of =font-lock-defaults= or =font-lock-keywords= in order to get highlighting as desired
+4. Define a series of mode specific functions and bind them to mode specific bindings, set in the local keymap
+5. Run a hook function to allow users to do their own setup.
+** font-lock stuff and syntax highlighting
+*** font-lock-defaults
+font-lock-defaults is a variable defined in `font-core.el'.
+Some sample values:
+#+BEGIN_SRC elisp
+((lisp-font-lock-keywords lisp-font-lock-keywords-1 lisp-font-lock-keywords-2)
+ nil nil
+ (("+-*/.<>=!?$%_&~^:@" . "w"))
+ nil
+ (font-lock-mark-block-function . mark-defun)
+ (font-lock-syntactic-face-function . lisp-font-lock-syntactic-face-function))
+;; or in org-mode
+(org-font-lock-keywords t nil nil backward-paragraph)
+;; or in ruby-mode
+((ruby-font-lock-keywords) nil nil)
+#+END_SRC 
+It automatically becomes buffer-local when set in any fashion.
+
+This variable is potentially risky when used as a file local variable.
+*** font-lock-mode
+    Heres some other info from the =font-lock-mode= docstring
+#+BEGIN_VERSE
+  "Toggle syntax highlighting in this buffer (Font Lock mode).
+With a prefix argument ARG, enable Font Lock mode if ARG is
+positive, and disable it otherwise.  If called from Lisp, enable
+the mode if ARG is omitted or nil.
+
+When Font Lock mode is enabled, text is fontified as you type it:
+
+ - Comments are displayed in `font-lock-comment-face';
+ - Strings are displayed in `font-lock-string-face';
+ - Certain other expressions are displayed in other faces according to the
+   value of the variable `font-lock-keywords'.
+
+To customize the faces (colors, fonts, etc.) used by Font Lock for
+fontifying different parts of buffer text, use \\[customize-face].
+
+You can enable Font Lock mode in any major mode automatically by turning on in
+the major mode's hook.  For example, put in your ~/.emacs:
+
+ (add-hook 'c-mode-hook 'turn-on-font-lock)
+
+Alternatively, you can use Global Font Lock mode to automagically turn on Font
+Lock mode in buffers whose major mode supports it and whose major mode is one
+of `font-lock-global-modes'.  For example, put in your ~/.emacs:
+
+ (global-font-lock-mode t)
+
+Where major modes support different levels of fontification, you can use
+the variable `font-lock-maximum-decoration' to specify which level you
+generally prefer.  When you turn Font Lock mode on/off the buffer is
+fontified/defontified, though fontification occurs only if the buffer is
+less than `font-lock-maximum-size'.
+
+To add your own highlighting for some major mode, and modify the highlighting
+selected automatically via the variable `font-lock-maximum-decoration', you can
+use `font-lock-add-keywords'.
+
+To fontify a buffer, without turning on Font Lock mode and regardless of buffer
+size, you can use \\[font-lock-fontify-buffer].
+
+To fontify a block (the function or paragraph containing point, or a number of
+lines around point), perhaps because modification on the current line caused
+syntactic change on other lines, you can use \\[font-lock-fontify-block].
+
+You can set your own default settings for some mode, by setting a
+buffer local value for `font-lock-defaults', via its mode hook.
+
+The above is the default behavior of `font-lock-mode'; you may specify
+your own function which is called when `font-lock-mode' is toggled via
+`font-lock-function'. "
+#+END_VERSE
+*** font-lock-keywords
+#+BEGIN_VERSE
+A list of the keywords to highlight.
+There are two kinds of values: user-level, and compiled.
+
+A user-level keywords list is what a major mode or the user would
+set up.  Normally the list would come from `font-lock-defaults'.
+through selection of a fontification level and evaluation of any
+contained expressions.  You can also alter it by calling
+`font-lock-add-keywords' or `font-lock-remove-keywords' with MODE = nil.
+
+Each element in a user-level keywords list should have one of these forms:
+
+ MATCHER
+ (MATCHER . SUBEXP)
+ (MATCHER . FACENAME)
+ (MATCHER . HIGHLIGHT)
+ (MATCHER HIGHLIGHT ...)
+ (eval . FORM)
+
+where MATCHER can be either the regexp to search for, or the function name to
+call to make the search (called with one argument, the limit of the search;
+it should return non-nil, move point, and set `match-data' appropriately if
+it succeeds; like `re-search-forward' would).
+MATCHER regexps can be generated via the function `regexp-opt'.
+
+FORM is an expression, whose value should be a keyword element, evaluated when
+the keyword is (first) used in a buffer.  This feature can be used to provide a
+keyword that can only be generated when Font Lock mode is actually turned on.
+
+HIGHLIGHT should be either MATCH-HIGHLIGHT or MATCH-ANCHORED.
+
+For highlighting single items, for example each instance of the word "foo",
+typically only MATCH-HIGHLIGHT is required.
+However, if an item or (typically) items are to be highlighted following the
+instance of another item (the anchor), for example each instance of the
+word "bar" following the word "anchor" then MATCH-ANCHORED may be required.
+#+END_VERSE
+etc
+
+Here is font-lock-keywords for lisp-interactive-mode
+#+BEGIN_SRC elisp
+(t (("(\\(def\\(\\(advice\\|alias\\|generic\\|macro\\*?\\|method\\|setf\\|subst\\*?\\|un\\*?\\|ine-\\(condition\\|\\(?:derived\\|\\(?:global\\(?:ized\\)?-\\)?minor\\|generic\\)-mode\\|method-combination\\|setf-expander\\|skeleton\\|widget\\|function\\|\\(compiler\\|modify\\|symbol\\)-macro\\)\\)\\|\\(const\\(ant\\)?\\|custom\\|varalias\\|face\\|parameter\\|var\\)\\|\\(class\\|group\\|theme\\|package\\|struct\\|type\\)\\)\\)\\>[ 	'(]*\\(setf[ 	]+\\sw+\\|\\sw+\\)?" (1 font-lock-keyword-face) (9 (cond ((match-beginning 3) font-lock-function-name-face) ((match-beginning 6) font-lock-variable-name-face) (t font-lock-type-face)) nil t)) ("^;;;###\\([-a-z]*autoload\\)" 1 font-lock-warning-face prepend) ("\\[\\(\\^\\)" 1 font-lock-negation-char-face prepend) ("(\\(co\\(?:mbine-after-change-calls\\|nd\\(?:ition-case\\(?:-unless-debug\\)?\\)?\\)\\|eval-\\(?:a\\(?:fter-load\\|nd-compile\\)\\|next-after-load\\|when\\(?:-compile\\)?\\)\\|i\\(?:f\\|nline\\)\\|l\\(?:ambda\\|et\\(?:\\*\\|rec\\)?\\)\\|prog[*12nv]?\\|save-\\(?:current-buffer\\|excursion\\|match-data\\|restriction\\|selected-window\\|window-excursion\\)\\|track-mouse\\|unwind-protect\\|w\\(?:hile\\(?:-no-input\\)?\\|ith-\\(?:c\\(?:a\\(?:\\(?:se\\|tegory\\)-table\\)\\|urrent-buffer\\)\\|demoted-errors\\|electric-help\\|local-quit\\|no-warnings\\|output-to-\\(?:string\\|temp-buffer\\)\\|s\\(?:elected-\\(?:frame\\|window\\)\\|ilent-modifications\\|yntax-table\\)\\|t\\(?:emp-\\(?:buffer\\|\\(?:fil\\|messag\\)e\\)\\|imeout\\(?:-handler\\)?\\)\\|wrapper-hook\\)\\)\\)\\>" . 1) ("(\\(b\\(?:\\(?:loc\\|rea\\)k\\)\\|c\\(?:ase\\|case\\|ompiler-let\\|typecase\\)\\|d\\(?:e\\(?:cla\\(?:im\\|re\\)\\|structuring-bind\\)\\|o\\(?:\\*\\|list\\|times\\)?\\)\\|e\\(?:\\(?:type\\)?case\\)\\|flet\\|go\\|handler-\\(?:bind\\|case\\)\\|i\\(?:gnore-errors\\|n-package\\)\\|l\\(?:abels\\|e\\(?:tf\\|xical-let\\*?\\)\\|o\\(?:cally\\|op\\)\\)\\|m\\(?:acrolet\\|ultiple-value-\\(?:bind\\|prog1\\)\\)\\|proclaim\\|re\\(?:start-\\(?:bind\\|case\\)\\|turn\\(?:-from\\)?\\)\\|symbol-macrolet\\|t\\(?:agbody\\|\\(?:h\\|ypecas\\)e\\)\\|unless\\|w\\(?:hen\\|ith-\\(?:accessors\\|co\\(?:mpilation-unit\\|ndition-restarts\\)\\|hash-table-iterator\\|input-from-string\\|o\\(?:pen-\\(?:file\\|stream\\)\\|utput-to-string\\)\\|package-iterator\\|s\\(?:imple-restart\\|lots\\|tandard-io-syntax\\)\\)\\)\\)\\>" . 1) ("(\\(catch\\|throw\\|featurep\\|provide\\|require\\)\\>[ 	']*\\(\\sw+\\)?" (1 font-lock-keyword-face) (2 font-lock-constant-face nil t)) ("(\\(abort\\|assert\\|warn\\|check-type\\|cerror\\|error\\|signal\\)\\>" 1 font-lock-warning-face) ("\\\\\\\\\\[\\(\\sw+\\)\\]" 1 font-lock-constant-face prepend) ("`\\(\\sw\\sw+\\)'" 1 font-lock-constant-face prepend) ("\\<:\\sw+\\>" 0 font-lock-builtin-face) ("\\<\\&\\sw+\\>" . font-lock-type-face) ((lambda (bound) (catch (quote found) (while (re-search-forward "\\(\\\\\\\\\\)\\(?:\\(\\\\\\\\\\)\\|\\((\\(?:\\?[0-9]*:\\)?\\|[|)]\\)\\)" bound t) (unless (match-beginning 2) (let ((face (get-text-property (1- (point)) (quote face)))) (when (or (and (listp face) (memq (quote font-lock-string-face) face)) (eq (quote font-lock-string-face) face)) (throw (quote found) t))))))) (1 (quote font-lock-regexp-grouping-backslash) prepend) (3 (quote font-lock-regexp-grouping-construct) prepend))) ("(\\(def\\(\\(advice\\|alias\\|generic\\|macro\\*?\\|method\\|setf\\|subst\\*?\\|un\\*?\\|ine-\\(condition\\|\\(?:derived\\|\\(?:global\\(?:ized\\)?-\\)?minor\\|generic\\)-mode\\|method-combination\\|setf-expander\\|skeleton\\|widget\\|function\\|\\(compiler\\|modify\\|symbol\\)-macro\\)\\)\\|\\(const\\(ant\\)?\\|custom\\|varalias\\|face\\|parameter\\|var\\)\\|\\(class\\|group\\|theme\\|package\\|struct\\|type\\)\\)\\)\\>[ 	'(]*\\(setf[ 	]+\\sw+\\|\\sw+\\)?" (1 font-lock-keyword-face) (9 (cond ((match-beginning 3) font-lock-function-name-face) ((match-beginning 6) font-lock-variable-name-face) (t font-lock-type-face)) nil t)) ("^;;;###\\([-a-z]*autoload\\)" (1 font-lock-warning-face prepend)) ("\\[\\(\\^\\)" (1 font-lock-negation-char-face prepend)) ("(\\(co\\(?:mbine-after-change-calls\\|nd\\(?:ition-case\\(?:-unless-debug\\)?\\)?\\)\\|eval-\\(?:a\\(?:fter-load\\|nd-compile\\)\\|next-after-load\\|when\\(?:-compile\\)?\\)\\|i\\(?:f\\|nline\\)\\|l\\(?:ambda\\|et\\(?:\\*\\|rec\\)?\\)\\|prog[*12nv]?\\|save-\\(?:current-buffer\\|excursion\\|match-data\\|restriction\\|selected-window\\|window-excursion\\)\\|track-mouse\\|unwind-protect\\|w\\(?:hile\\(?:-no-input\\)?\\|ith-\\(?:c\\(?:a\\(?:\\(?:se\\|tegory\\)-table\\)\\|urrent-buffer\\)\\|demoted-errors\\|electric-help\\|local-quit\\|no-warnings\\|output-to-\\(?:string\\|temp-buffer\\)\\|s\\(?:elected-\\(?:frame\\|window\\)\\|ilent-modifications\\|yntax-table\\)\\|t\\(?:emp-\\(?:buffer\\|\\(?:fil\\|messag\\)e\\)\\|imeout\\(?:-handler\\)?\\)\\|wrapper-hook\\)\\)\\)\\>" (1 font-lock-keyword-face)) ("(\\(b\\(?:\\(?:loc\\|rea\\)k\\)\\|c\\(?:ase\\|case\\|ompiler-let\\|typecase\\)\\|d\\(?:e\\(?:cla\\(?:im\\|re\\)\\|structuring-bind\\)\\|o\\(?:\\*\\|list\\|times\\)?\\)\\|e\\(?:\\(?:type\\)?case\\)\\|flet\\|go\\|handler-\\(?:bind\\|case\\)\\|i\\(?:gnore-errors\\|n-package\\)\\|l\\(?:abels\\|e\\(?:tf\\|xical-let\\*?\\)\\|o\\(?:cally\\|op\\)\\)\\|m\\(?:acrolet\\|ultiple-value-\\(?:bind\\|prog1\\)\\)\\|proclaim\\|re\\(?:start-\\(?:bind\\|case\\)\\|turn\\(?:-from\\)?\\)\\|symbol-macrolet\\|t\\(?:agbody\\|\\(?:h\\|ypecas\\)e\\)\\|unless\\|w\\(?:hen\\|ith-\\(?:accessors\\|co\\(?:mpilation-unit\\|ndition-restarts\\)\\|hash-table-iterator\\|input-from-string\\|o\\(?:pen-\\(?:file\\|stream\\)\\|utput-to-string\\)\\|package-iterator\\|s\\(?:imple-restart\\|lots\\|tandard-io-syntax\\)\\)\\)\\)\\>" (1 font-lock-keyword-face)) ("(\\(catch\\|throw\\|featurep\\|provide\\|require\\)\\>[ 	']*\\(\\sw+\\)?" (1 font-lock-keyword-face) (2 font-lock-constant-face nil t)) ("(\\(abort\\|assert\\|warn\\|check-type\\|cerror\\|error\\|signal\\)\\>" (1 font-lock-warning-face)) ("\\\\\\\\\\[\\(\\sw+\\)\\]" (1 font-lock-constant-face prepend)) ("`\\(\\sw\\sw+\\)'" (1 font-lock-constant-face prepend)) ("\\<:\\sw+\\>" (0 font-lock-builtin-face)) ("\\<\\&\\sw+\\>" (0 font-lock-type-face)) ((lambda (bound) (catch (quote found) (while (re-search-forward "\\(\\\\\\\\\\)\\(?:\\(\\\\\\\\\\)\\|\\((\\(?:\\?[0-9]*:\\)?\\|[|)]\\)\\)" bound t) (unless (match-beginning 2) (let ((face (get-text-property (1- (point)) (quote face)))) (when (or (and (listp face) (memq (quote font-lock-string-face) face)) (eq (quote font-lock-string-face) face)) (throw (quote found) t))))))) (1 (quote font-lock-regexp-grouping-backslash) prepend) (3 (quote font-lock-regexp-grouping-construct) prepend)) ("^\\s(" (0 (if (memq (get-text-property (match-beginning 0) (quote face)) (quote (font-lock-string-face font-lock-doc-face font-lock-comment-face))) (list (quote face) font-lock-warning-face (quote help-echo) "Looks like a toplevel defun: escape the parenthesis")) prepend)))
+#+END_SRC
+for vine-mode
+#+BEGIN_SRC elisp
+(t (("<.*?blockquote>" . font-lock-warning-face) ("<\\([!?][_:[:alpha:]][-_.:[:alnum:]]*\\)" 1 font-lock-keyword-face) ("</?\\([_[:alpha:]][-_.[:alnum:]]*\\)\\(?::\\([_:[:alpha:]][-_.:[:alnum:]]*\\)\\)?" (1 ...) (2 font-lock-function-name-face nil t)) ("\\(?:^\\|[ 	]\\)\\([_[:alpha:]][-_.[:alnum:]]*\\)\\(?::\\([_:[:alpha:]][-_.:[:alnum:]]*\\)\\)?=[\"']" (1 ...) (2 font-lock-variable-name-face nil t)) ("[&%][_:[:alpha:]][-_.:[:alnum:]]*;?" . font-lock-variable-name-face) (eval cons (concat "<" ... "\\([ 	][^>]*\\)?>\\([^<]+\\)</\\1>") (quote ...))) ("<.*?blockquote>" (0 font-lock-warning-face)) ("<\\([!?][_:[:alpha:]][-_.:[:alnum:]]*\\)" (1 font-lock-keyword-face)) ("</?\\([_[:alpha:]][-_.[:alnum:]]*\\)\\(?::\\([_:[:alpha:]][-_.:[:alnum:]]*\\)\\)?" (1 (if ... sgml-namespace-face font-lock-function-name-face)) (2 font-lock-function-name-face nil t)) ("\\(?:^\\|[ 	]\\)\\([_[:alpha:]][-_.[:alnum:]]*\\)\\(?::\\([_:[:alpha:]][-_.:[:alnum:]]*\\)\\)?=[\"']" (1 (if ... sgml-namespace-face font-lock-variable-name-face)) (2 font-lock-variable-name-face nil t)) ("[&%][_:[:alpha:]][-_.:[:alnum:]]*;?" (0 font-lock-variable-name-face)) ("<\\(b\\(?:ig\\|link\\)\\|cite\\|em\\|h[1-6]\\|rev\\|s\\(?:mall\\|trong\\)\\|t\\(?:itle\\|t\\)\\|var\\|[bisu]\\)\\([ 	][^>]*\\)?>\\([^<]+\\)</\\1>" (3 (cdr ...) prepend)))
+#+END_SRC
+for ruby-mode
+#+BEGIN_SRC elisp
+(t (("^\\s *def\\s +\\([^( 	
+]+\\)" 1 font-lock-function-name-face) ("\\(^\\|[^_:.@$]\\|\\.\\.\\)\\b\\(defined\\?\\|\\(a\\(?:lias\\(?:_method\\)?\\|nd\\)\\|b\\(?:egin\\|reak\\)\\|c\\(?:a\\(?:se\\|tch\\)\\|lass\\)\\|d\\(?:ef\\|o\\)\\|e\\(?:ls\\(?:e\\|if\\)\\|n\\(?:d\\|sure\\)\\)\\|f\\(?:ail\\|or\\)\\|i[fn]\\|module\\(?:_function\\)?\\|n\\(?:\\(?:ex\\|o\\)t\\)\\|or\\|p\\(?:r\\(?:ivate\\|otected\\)\\|ublic\\)\\|r\\(?:aise\\|e\\(?:do\\|scue\\|t\\(?:ry\\|urn\\)\\)\\)\\|super\\|th\\(?:en\\|row\\)\\|un\\(?:def\\|less\\|til\\)\\|wh\\(?:en\\|ile\\)\\|yield\\)\\)\\_>" . 2) ("\\(<\\)<\\(-\\)?\\(\\([a-zA-Z0-9_]+\\)\\|[\"]\\([^\"]+\\)[\"]\\|[']\\([^']+\\)[']\\)" 0 font-lock-string-face) ("\\(^\\|[^_:.@$]\\|\\.\\.\\)\\b\\(nil\\|self\\|true\\|false\\)\\>" 2 font-lock-variable-name-face) ("\\(\\$\\([^a-zA-Z0-9 
+]\\|[0-9]\\)\\)\\W" 1 font-lock-variable-name-face) ("\\(\\$\\|@\\|@@\\)\\(\\w\\|_\\)+" 0 font-lock-variable-name-face) ("\\(^\\|[[ 	
+<+(,=]\\)\\(%[xrqQwW]?\\([^<[{(a-zA-Z0-9 
+]\\)[^
+\\\\]*\\(\\\\.[^
+\\\\]*\\)*\\(\\3\\)\\)" (2 font-lock-string-face)) ("\\(^\\|[^_]\\)\\b\\([A-Z]+\\(\\w\\|_\\)*\\)" 2 font-lock-type-face) ("\\(^\\|[^:]\\)\\(:\\([-+~]@?\\|[/%&|^`]\\|\\*\\*?\\|<\\(<\\|=>?\\)?\\|>[>=]?\\|===?\\|=~\\|\\[\\]=?\\|\\(\\w\\|_\\)+\\([!?=]\\|\\b_*\\)\\|#{[^}
+\\\\]*\\(\\\\.[^}
+\\\\]*\\)*}\\)\\)" 2 font-lock-reference-face) ("#\\({[^}
+\\\\]*\\(\\\\.[^}
+\\\\]*\\)*}\\|\\(\\$\\|@\\|@@\\)\\(\\w\\|_\\)+\\)" 0 font-lock-variable-name-face t)) ("^\\s *def\\s +\\([^( 	
+]+\\)" (1 font-lock-function-name-face)) ("\\(^\\|[^_:.@$]\\|\\.\\.\\)\\b\\(defined\\?\\|\\(a\\(?:lias\\(?:_method\\)?\\|nd\\)\\|b\\(?:egin\\|reak\\)\\|c\\(?:a\\(?:se\\|tch\\)\\|lass\\)\\|d\\(?:ef\\|o\\)\\|e\\(?:ls\\(?:e\\|if\\)\\|n\\(?:d\\|sure\\)\\)\\|f\\(?:ail\\|or\\)\\|i[fn]\\|module\\(?:_function\\)?\\|n\\(?:\\(?:ex\\|o\\)t\\)\\|or\\|p\\(?:r\\(?:ivate\\|otected\\)\\|ublic\\)\\|r\\(?:aise\\|e\\(?:do\\|scue\\|t\\(?:ry\\|urn\\)\\)\\)\\|super\\|th\\(?:en\\|row\\)\\|un\\(?:def\\|less\\|til\\)\\|wh\\(?:en\\|ile\\)\\|yield\\)\\)\\_>" (2 font-lock-keyword-face)) ("\\(<\\)<\\(-\\)?\\(\\([a-zA-Z0-9_]+\\)\\|[\"]\\([^\"]+\\)[\"]\\|[']\\([^']+\\)[']\\)" (0 font-lock-string-face)) ("\\(^\\|[^_:.@$]\\|\\.\\.\\)\\b\\(nil\\|self\\|true\\|false\\)\\>" (2 font-lock-variable-name-face)) ("\\(\\$\\([^a-zA-Z0-9 
+]\\|[0-9]\\)\\)\\W" (1 font-lock-variable-name-face)) ("\\(\\$\\|@\\|@@\\)\\(\\w\\|_\\)+" (0 font-lock-variable-name-face)) ("\\(^\\|[[ 	
+<+(,=]\\)\\(%[xrqQwW]?\\([^<[{(a-zA-Z0-9 
+]\\)[^
+\\\\]*\\(\\\\.[^
+\\\\]*\\)*\\(\\3\\)\\)" (2 font-lock-string-face)) ("\\(^\\|[^_]\\)\\b\\([A-Z]+\\(\\w\\|_\\)*\\)" (2 font-lock-type-face)) ("\\(^\\|[^:]\\)\\(:\\([-+~]@?\\|[/%&|^`]\\|\\*\\*?\\|<\\(<\\|=>?\\)?\\|>[>=]?\\|===?\\|=~\\|\\[\\]=?\\|\\(\\w\\|_\\)+\\([!?=]\\|\\b_*\\)\\|#{[^}
+\\\\]*\\(\\\\.[^}
+\\\\]*\\)*}\\)\\)" (2 font-lock-reference-face)) ("#\\({[^}
+\\\\]*\\(\\\\.[^}
+\\\\]*\\)*}\\|\\(\\$\\|@\\|@@\\)\\(\\w\\|_\\)+\\)" (0 font-lock-variable-name-face t)))
+#+END_SRC
+** What about indentation?
+A mode has to have its own functions that can calculate the proper indentation 
+for a line and apply it.
+
+Here are some examples from Ruby Mode
+#+BEGIN_SRC ruby
+defun ruby-current-indentation ()
+    "Return the indentation level of current line."
+  (save-excursion
+    (beginning-of-line)
+    (back-to-indentation)
+    (current-column)))
+
+(defun ruby-indent-line (&optional flag)
+  "Correct the indentation of the current ruby line."
+  (interactive)
+  (ruby-indent-to (ruby-calculate-indent)))
+
+(defun ruby-indent-to (column)
+  "Indent the current line to COLUMN."
+  (when column
+    (let (shift top beg)
+      (and (< column 0) (error "invalid nest"))
+      (setq shift (current-column))
+      (beginning-of-line)
+      (setq beg (point))
+      (back-to-indentation)
+      (setq top (current-column))
+      (skip-chars-backward " \t")
+      (if (>= shift top) (setq shift (- shift top))
+        (setq shift 0))
+      (if (and (bolp)
+               (= column top))
+          (move-to-column (+ column shift))
+        (move-to-column top)
+        (delete-region beg (point))
+        (beginning-of-line)
+        (indent-to column)
+        (move-to-column (+ column shift))))))
+
+defun ruby-calculate-indent (&optional parse-start)
+  "Returns the proper indentation level of the current line."
+#+END_SRC
+=ruby-calculate-indent= is a massive function
+** Troubleshooting
+*** Why cant i get things captured patterns or things between tags to be highlighted?
+eg this does nothing
+: ("<blockquote>\\(\\(.\\|\n\\)*?\\)</blockquote>" . 'weird-to-read-font)
+However this single line example works (highlights tags and everything between them):
+: ("<ck>.*?</ck>" . 'weird-to-read-font)	   
+and this highlights only the captured bit
+: ("<ck>\\(.*?\\)</ck>" 1 'weird-to-read-font)	   
+and as you might expect this
+: ("<ck>\\(.*?\\)h\\(a\\).*?</ck>" 2 'weird-to-read-font)
+captures only the a in this expression
+: <ck>  the boss lives  ha hell is back  </ck>	  
+i.e. - the number gives the captured expression to match.
+
+With nested expressions 1 gets the outermost expression and the count goes up as we go inwards e.g.
+: ("<ck>\\(\\(.*?\\)able\\)</ck>" 1 'weird-to-read-font)	    
+gets "  the boss lives  h hell is back  " from this
+: <ck>  the boss lives  h hell is back  able</ck>
+**** Basically it sometimes works but it seems to become unreliable
+
+* Defining Comments
+If comments are undefined for a particular mode or file type you can define them yourself 
+by evaluating:
+#+BEGIN_SRC elisp
+(set 'comment-start "<!--")
+(set 'comment-end "-->")
+#+END_SRC elisp
+
 * edebug
 : M-x edebug-eval-top-level-form
 or go to the source and do 
 : C-u C-M-x 
 (<Control u> <Control Alt x>) to set up a function for edebugging
-* last-command and this-command
-Normally, whenever a function is executed, Emacs sets the value of this-command to the function being executed (which in this case would be copy-region-as-kisll). At the same time, Emacs sets the value of last-command to the previous value of this-command.
-* Lisp source files for emacs and packages
-All the lisp files for the current installation of emacs are in:
-: /Applications/Emacs.app/Contents/Resources/lisp/
 
-* Version Control
-*** See differences between the file and the last commit (changes you have made)
-C-x v =
-and when in the generated diff buffer
-C-c C-c
-will take you to the appropriate line in the file
-*** See a commit history of what everyone ahs done to the file by  and commit committor
-M-x vc-annotate
-*To see instructions on further commands in vc mode do C-h m to bring up minor mode command list*
-*** C-x v l 
-*** C-x v d 
+* Regular Expressions
+See here for more info
+http://ergoemacs.org/emacs/emacs_regex.html
+** Easy way to automatically generate a rege exp with regexp-opts
+If you give a list of words/strings to this function it will return a regular expression that will
+automatically parse it for you
+e.g. the list
+: (defvar hulk-words '("strong" "powerful" "PIS" "Thor" "healing factor") "list of hulkish keywords")
+Then this will match all of them
+: (regexp-opt hulk-words 'words)
+The 'words options creates a regex that will match only if it is a complete word. 
+Therefore when a word is contained inside a longer word, it will not be highlighted.\\
+e.g. will match "strong" but not "strongest"
+** *GOTCHA!s*
+*** Number of backslashes is different in "string-mode" and "command-mode"
+Emacs needs /double the normal number of backslashes/ to be inputted when in string form
+e.g.
+to match this pattern
 
-* ediff
-Can be done on regions as well as files
-: ediff-regions-linewise 
+=**Sunday 16 Dec 2012**=
+=**Tuesday 11 Dec 2012**=
+
+instead of the following:
+: \*\*\(.*\)\*\*
+
+we actually need:
+: \\*\\*\\(.*\\)\\*\\*
+
+*However* when done interactively we only need single backslashes..
+ - e.g. when we call =query-replace-regexp= we only need single backslashes for the query
+ - and /no backslashes/ for the replace, except to indicate captured text
+
+
+So to replace:
+: **Tuesday 11 Dec 2012**
+with 
+: *Tuesday 11 Dec 2012*
+its 
+: query-replace-regexp \*\*\(.*\)\*\*
+: *\1*
+
+In other words
+#+BEGIN_QUOTE
+Backslashes must be double-quoted when used in Lisp code. Regular expressions are often specified using strings in EmacsLisp. Some abbreviations are available: \n for newline, \t for tab, \b for backspace, \u3501 for character with unicode value 3501, and so on. Backslashes must be entered as \\. Here are two ways to replace the decimal point by a comma (e.g. 1.5 -> 1,5), first by an interactive command, second by executing Lisp code (type C-x C-e after the expression to get it executed).
+           M-x replace-regexp RET \([0-9]+\)\. RET \1, RET
+          (while (re-search-forward "\\([0-9]+\\)\\." nil t)
+                        (replace-match "\\1,"))
+#+END_QUOTE
+
+*** Dont use pattern matching things in the "replace" part of your regexp Query-Replace
+*** Matching Newlines and patterns that span multiple lines - super inconsistent
+ - *First* - remember the =.= operator only matches /non-newline characters/ - if you use something like =.*= to match stuff then by default you are restricting /that part of the match/ to one line.
+ - In string mode =\n= works to match a newline
+ - In command mode =\n= will not work as either a query or replace
+   - Instead you need to use =\C-q \C-j= to produce a newline in your reg-exp
+So something like 
+: \\(.\\|\n\\)*?
+will capture over multiple lines. 
+*** Regular expression matches too much
+A question mark at the end means it will match as little as possible e.g.
+: .*? 
+rather than
+: .*
+** Impossible Ones - SOLVED
+*** Replace everything between > at the beginning of a line and an empty line with
+: \1 
+close:
+: "^>\\(.*\n\\)*?\n"
+basically you need a \n to match a newline
+*apparently* in the query-replace version \n doesnt work and you need
+=C-q C-j= instead.
+
+*this is it i think*
+: ^>\\(\\(.*\n\\)*?\\)\n
+\\and match against\\
+
+#+BEGIN_QUOTE\n
+\1\n
+#+END_QUOTE\n
+
+We get something like
+=(default ^>\(\(.*^J\)*?\)^J -> #+BEGIN_QUOTE^J\1#+END_QUOTE^J^J=
+
+** Examples
+=M-x regexp-builder=
+ - Build experssion inside quotes...
+e.g.
+="|NERDTree-.*|"=
+ - Copy if necessary:
+=C-c C-w=
+ - Search-replace regexp
+C-M-%
+ - When pasting response - remove quotation marks e.g.
+=|NERDTree-.*|=
+** Useful ones
+*** query-replace ERB to HAML
+change "<%= link_to "code", place %>" to " = link_to "code", place "
+: <%= \(.*\) %>
+to 
+: = \1
+
+change "<% temp = User.get_nums() %>" to " - temp = User.get_nums() "
+: <% \(.*\) %>
+to 
+: - \1
+
+change "<h1>My Title</h1>" to "%h1 My Title"
+: <\(.*\)>\(.*\)</.*>
+to
+: %\1 \2
+
+change "<div class="red train">" to ".red.train"
+: <div class="\(.*\)"
+to
+: .\1
+*** Matching quotes and/or everything between them
+Needs a single backslash to escape:
+: "\""
+Everything in between two quotes
+: "\"\\(.*?\\)\""
+Match multiline strings also:
+: "\"\\(.\\|\n\\)*?\""
+
+**** These arent perfect
+They only *capture* the last character before the last quote because of the "?".
+Need to be cleverer.
+*** Matching html/xml style tags
+Match any tag:
+: "<.*?>"
+Match both the opening and closing tags of a specific tag
+: "\\<.*?quote\\>"
 or 
-: ediff-regions-wordwise 
+: : "\\[.*?quote\\]"
+tags with attributes:
+: "\\<.*?quote .*?\\>"
+match everything between the tags:
+: "\\<quote\\>\\(.*\\)\\</quote\\>"
+** HowTos
+*** Capturing a sub-expression
+\(captured\)
+*** Outputting a captured sub-expression
+\n
+where n is the nth captured sub-expression
+
+** Regexpbuilder/Re-builder
+Also called as
+: M-x re-builder
+Useful stuff.\\
+Operates in string mode so you will want to convert syntax (backslashes & newlines) if you are going to use in a command.
+*NOTE* - you can customize this
+: reb-re-syntax 
+is a variable determining the syntax for the REs in the RE Builder.
+Can either be `read', `string', or `rx'.
+The default value is 'read'.
+* Ido_Mode
+** When you want to open a new file but ido is suggesting an existing file with a similar name 
+You can either:\\
+revert to normal mode temporarily
+: C-f
+Force ido-mode to accept your new file name
+: C-j
+Or revert the minibuffer to what you have typed
+: C-z
+** Controls behaviour when opening a file which may already be visible in another frame 
+Controlled by the value of
+: ido-default-file-method
+#+BEGIN_VERSE
+ido-default-file-method is a variable defined in `ido.el'.
+Its value is raise-frame
+
+Documentation:
+How to visit a new file when using `ido-find-file'.
+Possible values:
+`selected-window' Show new file in selected window
+`other-window'    Show new file in another window (same frame)
+`display'     Display file in another window without selecting to it
+`other-frame'     Show new file in another frame
+`maybe-frame'     If a file is visible in another frame, prompt to ask if you
+                  you want to see the file in the same window of the current
+                  frame or in the other frame
+`raise-frame'     If a file is visible in another frame, raise that
+                  frame; otherwise, visit the file in the same window
+#+END_VERSE
+* Fonts & Faces
+** Make a new face
+: (make-face 'hard-to-read-font)
+: (set-face-attribute 'hard-to-read-font nil :background "darkgrey" :foreground "grey")
+** Set one face for the current buffer
+Have to enable
+: (buffer-face-mode t)
+then set the variable buffer-face-mode-face with
+: (buffer-face-set 'hard-to-read-font)
+** Unset/Reset to default one aspect of a face
+For example if you accidentaly set bold to a specific height with 
+: (set-face-attribute 'bold (selected-frame) :height 100)
+you can reverse it with:
+: (set-face-attribute 'bold (selected-frame) :height 'unspecified)
+** Change attributes of the face in the current frame.
+In this case we are altering the height of the default font:
+:  (set-face-attribute 'default (selected-frame) :height 100)
+** To list all faces
+: M-x list-faces-display
+will show you all the stuff that is set in font-lock and all that jazz...
+** A full font decalaration or "face" can be pretty complex e.g.
+#+BEGIN_SRC elisp
+(defface error
+  '((((class color) (min-colors 88) (background light)) (:foreground "Red1" :weight bold))
+    (((class color) (min-colors 88) (background dark)) (:foreground "Pink" :weight bold))
+    (((class color) (min-colors 16) (background light)) (:foreground "Red1" :weight bold))
+    (((class color) (min-colors 16) (background dark)) (:foreground "Pink" :weight bold))
+    (((class color) (min-colors 8)) (:foreground "red"))
+    (t (:inverse-video t :weight bold)))
+  "Basic face used to highlight errors and to denote failure."
+  :version "24.1"
+  :group 'basic-faces)
+#+END_SRC
+so might be best to choose from one of the existing ones listed 
+by =list-faces-display=
+** List available fonts
+List font families
+: font-family-list 
+Doesnt seem to show much - only currently active fonts i think
+: list-fontsets
+Dunno about this one
+: list-fonts
+Or use the menu function under 
+: Options -> Set Default Fonts
+Which links to 
+: menu-set-font
+** Check the current font
+    To check what font you're currently using, the 
+: C-u C-x =
+    command can be helpful.  It describes the character at point, and names the font that it's rendered in.
+** List properties of the current font
+: describe-font
+** Font changing Commands
+This is a pretty good reference
+http://ergoemacs.org/emacs/emacs_switching_fonts.html
+This is now obsolete:
+: set-default-font
+Use this instead:
+: set-frame-font
+Or via the menu:
+ : menu-set-font
+*** After you change the font you may need to redisplay the frame to have windows etc display properly
+This is apparently due to a bug.
+
+To resize everything properly though you can change the scrollbar from the left or right side.
+Do this either via the menu
+: Options -> Show/Hide -> Scrol-Bar -> On the Left
+or via lisp code:
+#+BEGIN_SRC elisp
+(setq scroll-bar-mode 'right)
+(scroll-bar-mode)
+#+END_SRC
+** Change the emacs frame/system font:
+: (set-frame-font
+:    "-outline-Courier New-normal-normal-normal-mono-11-*-*-*-c-*-iso8859-1")
+** Change the font for a given face
+: set-face-font
+* Themes
+** List themes
+: M-x customize-themes
+* Info Mode
+** Where are Info files loaded from?
+Hard to find stuff through help commands because they start with capital letters
+So look at the variable:
+: Info-directory-list
+
+Basically Info will look for a file called dir in each of these directories.
+This dir file will contain an info formatted menu thing.
+** Searching for info on a particular topic
+: M-x info-apropos
+* Skewer Mode
+See [[file:Javascript%20Tips,%20Tricks%20&%20Troubleshooting.org::*Skewer-Mode%20in%20Emacs][Skewer-Mode in Emacs]] in the Javascript org Doc for info/setup
 * Org mode
 ** Getting and inserting hyperlinks to other sections of a document
 *** Get link to current section
@@ -176,152 +926,9 @@ You can make a new one with =org-set-generic-type=
 Other wise you are supposed to define a new one using =contrib/lisp/org-export.el= with something like
 : (defmacro org-export-define-backend (backend translators &rest body)
 
-* TO DO
-** DONE A comment-region that comments out all lines that are being "touched" by the current region
-** DONE A select-region and type that simultaneously deletes the previously selected region and inserts the new text instead of deselecting and inserting text
-  - SOLVED -  (set delete-selection-mode t)
-** DONE Line Numbering package.
-** TODO Follow links in directories in current window
-** TODO Save window and frame configuration 
-** DONE A function bound to "s-4" (Command 4) that creates a "square" set of 4 windows in the current frame.
-** TODO Fix the require stuff for rinari - stuff should be in util subdirectory?
-** DONE <Command Tab> for tab completion or something like it
-** Some form of command binding to help - (global-set-key (remap 'x) 'y) ? ;x and y have to be functions not key bindings in that case
-** DONE Find a good <Command> Binding for C-x C-f
-** DONE Good binding for Keyboard Macro invocation
-** Bind Set mark - <Command Spacebar> ? (Prob not as necessary now that shift select is working good)
-** DONE Binding for global and regional indent - <s-\>
-** KEYBINDINGS - Good available keybindings:
--  <s-Return>
--  <s-spacebar> - system bound to spotlight - UNBOUND!
--  <s-escape> - system bound to Front Row - UNBOUND!
--  <s-TAB> - system bound to expose
--  <s-+>
--  <s-=>
--  <s-Delete>
--  function key?
-** TODO An irb/interpreter mode for running irb (and perhaps Python) over a shell. The main thing would be to start a new interactive
-command history - so that we dont get irb commands in our bash history and vice versa
-** TODO Bindings for the trackpad multitouch gestures?
-** TODO Get search to automatically wrap.
-** TODO Interactive lisp - call eval-print-last-sexp such that it evals the S-expression that the cursor is inside of OR the last one if not inside one
-     - could be a little dangerous - we might be in an "implicit lisp environment"
-** TODO A function to evaluate a region of lisp functions (a la eval-region) but then capture the output of each s-expression (a la eval-print-last-sexp) in a new buffer
-** TODO If not available - create a means of navigating in directory mode similar to in Mac OSX Finder - 
-- <Command-up> up a directory
-- <Command-right> open a directory
-- Should still allow global buffer/frame/window navigation as much as possible so will have to think hard about bindings to use
-
-* Ways to jump between predefined points in a file (function definitions etc)
-** Outline Mode
-
-* Defining Comments
-If comments are undefined for a particular mode or file type you can define them yourself 
-by evaluating:
-#+BEGIN_SRC elisp
-(set 'comment-start "<!--")
-(set 'comment-end "-->")
-#+END_SRC elisp
-* Bugs
-** A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
-** delete-selection-mode stopped working when i saved a new buffer and text mode was enabled. 
-Started working again after i deactivated and re-activated the mode
-** When I used <Command b> or tried to switch to a buffer it would not change the buffer in the current window
-as normal but would move me to a currently open window in another frame which was already showing the buffer. 
-Not necessarily a bad thing but would like this behaviour to be consistent. 
-
-** Ido-Mode does Not play well with ssh/tramp - causes whole of emacs to hang
- - Seems to happen only with local connections to BigMac
- - Cant open when ido-mode is on
- - If I have an old connection that TRAMP presumably tries to re-authenticate while ido-mode is enabled then emacs effectively crashes - it hangs indefinitely
-* Regular Expressions in Emacs
-See here for more info
-http://ergoemacs.org/emacs/emacs_regex.html
-
-** *GOTCHA!s*
-*** Number of backslashes is different in "string-mode" and "command-mode"
-Emacs needs /double the normal number of backslashes/ to be inputted when in string form
-e.g.
-to match this pattern
-
-=**Sunday 16 Dec 2012**=
-=**Tuesday 11 Dec 2012**=
-
-instead of the following:
-=\*\*\(.*\)\*\*=
-
-we actually need:
-=\\*\\*\\(.*\\)\\*\\*=
-
-*However* when done interactively we only need single backslashes..
- - e.g. when we call =query-replace-regexp= we only need single backslashes for the query
- - and /no backslashes/ for the replace, except to indicate captured text
-
-
-So to replace:
-=**Tuesday 11 Dec 2012**=
-with 
-=*Tuesday 11 Dec 2012*=
-its 
-=query-replace-regexp \*\*\(.*\)\*\*=
-=*\1*=
-
-In other words
-#+BEGIN_QUOTE
-Backslashes must be double-quoted when used in Lisp code. Regular expressions are often specified using strings in EmacsLisp. Some abbreviations are available: \n for newline, \t for tab, \b for backspace, \u3501 for character with unicode value 3501, and so on. Backslashes must be entered as \\. Here are two ways to replace the decimal point by a comma (e.g. 1.5 -> 1,5), first by an interactive command, second by executing Lisp code (type C-x C-e after the expression to get it executed).
-           M-x replace-regexp RET \([0-9]+\)\. RET \1, RET
-          (while (re-search-forward "\\([0-9]+\\)\\." nil t)
-                        (replace-match "\\1,"))
-#+END_QUOTE
-
-*** Dont use pattern matching things in the "replace" part of your regexp Query-Replace
-*** Matching Newlines and patterns that span multiple lines - super inconsistent
- - *First* - remember the =.= operator only matches /non-newline characters/ - if you use something like =.*= to match stuff then by default you are restricting /that part of the match/ to one line.
- - In string mode =\n= works to match a newline
- - In command mode =\n= will not work as either a query or replace
-   - Instead you need to use =\C-q \C-j= to produce a newline in your reg-exp
-** Impossible Ones - SOLVED
-*** Replace everything between > at the beginning of a line and an empty line with
-#+BEGIN_QUOTE \1 #+END_QUOTE
-
-close\\
-="^>\\(.*\n\\)*?\n"=
-\\basically you need a \n to match a newline
-*apparently in the query-replace version \n doesnt work and you need
-=C-q C-j= instead.
-
-*this is it i think*
-"^>\\(\\(.*\n\\)*?\\)\n"
-\\and match against\\
-
-#+BEGIN_QUOTE\n
-\1\n
-#+END_QUOTE\n
-
-We get something like
-=(default ^>\(\(.*^J\)*?\)^J -> #+BEGIN_QUOTE^J\1#+END_QUOTE^J^J=
-
-** Examples
-=M-x regexp-builder=
- - Build experssion inside quotes...
-e.g.
-="|NERDTree-.*|"=
- - Copy if necessary:
-=C-c C-w=
- - Search-replace regexp
-C-M-%
- - When pasting response - remove quotation marks e.g.
-=|NERDTree-.*|=
-** HowTos
-*** Capturing a sub-expression
-\(captured\)
-*** Outputting a captured sub-expression
-\n
-where n is the nth captured sub-expression
-
-** Regexpbuilder
-Useful stuff.\\
-Operates in string mode so you will want to convert syntax (backslashes & newlines) if you are going to use in a command.
+** Defined my own org-mode block helper 'org-insert-BEGIN-region
+Pretty cool. Its in 
+: (require 'hals_mode_customizations)
 * Outline-minor-mode
  - With the below for example you can hide or show functions with hide/show sub-trees
 ;; Better for PHP mode
@@ -330,57 +937,6 @@ Operates in string mode so you will want to convert syntax (backslashes & newlin
 	     (outline-minor-mode)
 	     (setq outline-regexp " *\\(private funct\\|public funct\\|funct\\|class\\|#head\\)")
 	     (hide-sublevels 1)))
-
-* Rectangle Stuff
-** Insert a string to the left of every line of the rectanle
-M-x string-insert-rectangle
-* Editing files on remote machines from EMACS via TRAMP
-
-Emacs will work the same on remote machines as when you are editing a file as root on the local machine.
-As long as the hostname is in /etc/hosts and the machine unnderstands the scpc protocol 
-(means you can do stuff without constantly using password as in scp) then you go
-C-x C-f /user@host:/path/to/file
-
-*Important* - You will probably be asked for your passphrase as well as/instead of the password
-Make sure you dont muck this up too much as you wont get in!
-
-** Didnt work when ido-mode was enabled and i was trying to login to BigMac - Would hang indefinitely
-: /ssh:Noches@BigMac:
-would ask me for my password and would then hang forever. Forced me to kill emacs.
-* elpa
-* el-get
-** How it works...sort of
-#+BEGIN_SRC elisp
-;; ................................................................................
-;; INSTRUCTIONS FOR ABOVE
-;; once we set a recipe in the el-get-sources list it becomes available for installation
-;; we can check it is known to el-get by running "el-get-list-packages" and using tab completion
-;; on the value of :name
-;; Then to install it you just eval "el-get-install" on the packagename
-;; ................................................................................
-;; (setq my:el-get-packages ())
-;; (setq my:el-get-packages
-;;       (append
-;;        my:el-get-packages
-;;        (loop for src in el-get-sources collect (el-get-source-name src))))
-;; (el-get 'sync my:el-get-packages)
-;; Call this on a list of package names and el-get will install them if they are not already installed
-;; e.g. 
-;; (setq packlist '(p1 p2 p3))
-;; (el-get 'sync packlist)
-;----------------------------------------------------------------------
-#+END_SRC elisp
-** Finding out about the syntax and options available for recipes
- - Strangely theres not much about this in the info section on el-get
- - But  
-: C-h v el-get-sources
-seems to give you the definitions.
-** If you wish to see more examples
-Then display the package list with
-: el-get-list-packages
-and then (first step is optional really) get a description of a package including recipe with
-: el-get-describe
-
 * SLIME Mode
 ** Moving from self instllation to el-get automated packagae management
 I chucked out my old SLIME directory (which was just dumped in =.emacs.d=) and reloaded it via el-get.
@@ -435,3 +991,425 @@ Could be some useful default settings
  (zenburn)
  (slime)
 #+END_SRC
+* Version Control
+*** See differences between the file and the last commit (changes you have made)
+C-x v =
+and when in the generated diff buffer
+C-c C-c
+will take you to the appropriate line in the file
+*** See a commit history of what everyone ahs done to the file by  and commit committor
+M-x vc-annotate
+*To see instructions on further commands in vc mode do C-h m to bring up minor mode command list*
+*** C-x v l 
+*** C-x v d 
+* Magit
+** Check which version of a package is installed
+: el-get-update
+If you have a git package that is installed by git this will give you the commit
+** Upate/Upgrade a pakage
+: el-get-update
+** Upate/Upgrade el-get
+: el-get-self-update
+
+** Troubleshooting
+
+*** A very annoying error - magit-show gives the error "branchname is not a commit or tree."
+It still mostly seems to work - but only in the one frame. 
+If you try magit-show from other frames then you get this error.
+**** Trying to track it down/debug
+Problem is in one of these functions i think:
+#+BEGIN_SRC elisp
+(defun magit-show-commit (commit &optional scroll inhibit-history select)
+  "Show information about a commit in the buffer named by
+`magit-commit-buffer-name'.  COMMIT can be any valid name for a commit
+in the current Git repository.
+
+When called interactively or when SELECT is non-nil, switch to
+the commit buffer using `pop-to-buffer'.
+
+Unless INHIBIT-HISTORY is non-nil, the commit currently shown
+will be pushed onto `magit-back-navigation-history' and
+`magit-forward-navigation-history' will be cleared.
+
+Noninteractively, if the commit is already displayed and SCROLL
+is provided, call SCROLL's function definition in the commit
+window.  (`scroll-up' and `scroll-down' are typically passed in
+for this argument.)"
+  (interactive (list (magit-read-rev "Show commit (hash or ref)")
+                     nil nil t))
+  (when (magit-section-p commit)
+    (setq commit (magit-section-info commit)))
+  (unless (eql 0 (magit-git-exit-code "cat-file" "commit" commit))
+    (error "%s is not a commit" commit))
+  (let ((dir default-directory)
+#+END_SRC
+
+#+BEGIN_SRC elisp
+(defun magit-tree-contents (treeish)
+  "Return a list of all files under TREEISH.
+TREEISH can be a tree, a commit, or any reference to one of
+those."
+  (let ((return-value nil))
+    (with-temp-buffer
+      (magit-git-insert (list "ls-tree" "-r" treeish))
+      (if (eql 0 (buffer-size))
+          (error "%s is not a commit or tree." treeish))
+      (goto-char (point-min))
+      (while (search-forward-regexp "\t\\(.*\\)" nil 'noerror)
+        (push (match-string 1) return-value)))
+    return-value))
+#+END_SRC
+* ediff
+Can be done on regions as well as files
+: ediff-regions-linewise 
+or 
+: ediff-regions-wordwise 
+* shell-mode
+** "Dumb terminals" and staggered output
+If you wish to avoid the problems with dumb/non-standard terminal and output such as from the man command when running a shell in emacs then pipe the output of such commands to the 'tee' command e.g.
+:  man tee | tee
+Have been told that this can help also in the case of git diffs
+: git-config --global core.pager ""
+** Bash completion
+http://www.masteringemacs.org/articles/2012/01/16/pcomplete-context-sensitive-completion-emacs/
+* etags
+** Install etags/ctags & build a TAGS file
+First you will need to get a more recent version of etags
+: sudo port install ctags
+By default there is no etags alias to this new command so to generate emacs compatible tags call like this
+: ctags -eR app/
+the '-R' flag is recursive
+** Invoke etags
+** Find all TAGS tables
+: M-x locate <RET> TAGS <RET>
+If you have never generated the "locate" database before you will be prompted to run
+: sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.locate.plist
+to create it
+** Load a particular TAGS table
+: M-x visit-tags-table
+** Find the source of a function with etags
+To find function "function_name":
+: M-. function_name
+** List all tags in a file that has been tagged by etags
+To be accurate clearer - if you have tagged all files in a directory then this command 
+will show you all the functions etc defined in a file that you select - not just all files 
+in a particular TAGS file.
+: M-x list-tags <RET> FILE <RET>
+* el-get
+** How it works...sort of
+This info is pretty old...
+#+BEGIN_SRC elisp
+;; ................................................................................
+;; INSTRUCTIONS FOR ABOVE
+;; once we set a recipe in the el-get-sources list it becomes available for installation
+;; we can check it is known to el-get by running "el-get-list-packages" and using tab completion
+;; on the value of :name
+;; Then to install it you just eval "el-get-install" on the packagename
+;; ................................................................................
+;; (setq my:el-get-packages ())
+;; (setq my:el-get-packages
+;;       (append
+;;        my:el-get-packages
+;;        (loop for src in el-get-sources collect (el-get-source-name src))))
+;; (el-get 'sync my:el-get-packages)
+;; Call this on a list of package names and el-get will install them if they are not already installed
+;; e.g. 
+;; (setq packlist '(p1 p2 p3))
+;; (el-get 'sync packlist)
+;----------------------------------------------------------------------
+#+END_SRC elisp
+** Customization options
+Three of them:
+*** Post package initialization code stored in "el-get-user-package-directory"
+ - You can store custom post package initialisation instructions in this directory in 
+a file/files called 'init-package.el'. 
+ - This is an alternative to having :after properties in your el-get-source list
+ - To be clear, we are talking about separate init files for each package ('init-rinari.el') rather than lots of instructions in one big file that is literally called 'init-package.el'
+*** Local recipes stored in "el-get-recipe-path"
+ - This is a list of directories in which to look for recipes
+ - Allows you to have your own local ones as well as remote automatically loaded ones
+*** Either new recipes or customization of existing recipes in "el-get-sources"
+el-get-sources is both a source of new recipes and a place for customizing existing recipes
+
+You can add stuff to other recipes here and it will be automaically merged by el-get:
+#+BEGIN_VERSE
+   It's also possible to setup `el-get-sources' with recipe
+information. As long as the `type' property is not filled in
+`el-get-sources', El-Get will first find the recipe as usual and then
+merge the recipe content with the recipe skeleton provided by the
+matching `el-get-sources' stanza.
+#+END_VERSE
+Much like the :after property.
+** Using el-get to get stuff from elpa!
+Not sure how this works - does it install via elpa in elpa directory or in the el-get directory?
+#+BEGIN_VERSE
+   The command `el-get-elpa-build-local-recipes' downloads the list of
+Emacs Lisp Packages from the ELPA archives you have setup, and make
+them automatically available for El-Get.
+#+END_VERSE
+*** This seemed good to me because I thought you could use elpa to get around el-gets lack of package versioning
+Bigger differences between el-get and elpa
+ - el-get deals with recipes, much like portfiles
+ - elpa deals with packages which essentially are tar files of the code that will be installed
+** Using el-get-sources
+ -  (describe-variable el-get-sources) describes it as "Additional package recipes"
+*** Can be used to add your own customizations to other recipes
+**** With the :before and :after properties
+Looking at code like this example from the el-get info pages:
+#+BEGIN_SRC elisp
+     ;; local sources
+     (setq el-get-sources
+      '((:name magit
+         :after (global-set-key (kbd "C-x C-z") 'magit-status))
+.....
+#+END_SRC
+You can for example set a custom keybinding to be performed after the magit package gets set up and installed.
+
+For instance the actual magit recipe is:
+#+BEGIN_SRC elisp
+(:name magit
+       :website "https://github.com/magit/magit#readme"
+       :description "It's Magit! An Emacs mode for Git."
+       :type github
+       :pkgname "magit/magit"
+       :info "."
+       :autoloads ("50magit")
+       :build (("make" "all"))
+       :build/darwin `(,(concat "make EMACS=" el-get-emacs " all")))
+#+END_SRC
+
+But the "after" recipe property is unique to el-get-sources
+
+From the el-get-sources help page on recipes:
+#+BEGIN_QUOTE
+:after
+
+    This exactly like the `:post-init' property, but is reserved
+    for user customizations in `el-get-sources'.  Recipe files
+    should not use this property.  It will be run just after
+    `:post-init' and after any per-package user-init-file (see
+    `el-get-user-package-directory').
+#+END_QUOTE
+
+**** By simply adding properties that el-get will merge with existing recipes
+See [[*el-get-sources][el-get-sources customization]]
+**** Here's how it is used in the el-get info pages
+#+BEGIN_SRC elisp
+     ;; local sources
+     (setq el-get-sources
+      '((:name magit
+         :after (global-set-key (kbd "C-x C-z") 'magit-status))      
+       ;; package customizations
+
+      ))
+
+     (setq my-packages
+           (append
+            '(cssh el-get switch-window vkill google-maps nxhtml xcscope yasnippet)
+            (mapcar 'el-get-source-name el-get-sources)))
+
+     (el-get 'sync my-packages)
+#+END_SRC
+So this does
+1. Makes a list of packages called my-packages
+2. Appends all the package-names in el-get-sources to that list
+3. Makes sure they are installed with =(el-get 'sync my-packages)=
+** Can use it to automatically manage your emacs setup across many machines
+Create a list of packages that emacs will install on any machine.
+
+Heres how its shown in the el-get documentation.
+el-get-source-name returns the :name of a file in a recipe from el-get-source
+#+BEGIN_SRC elisp
+     (setq my-packages
+           (append
+            '(cssh el-get switch-window vkill google-maps nxhtml xcscope yasnippet)
+            (mapcar 'el-get-source-name el-get-sources)))
+
+     (el-get 'sync my-packages)
+#+END_SRC
+** Finding out about the syntax and options available for recipes
+ - Strangely theres not much about this in the info section on el-get
+ - But  
+: C-h v el-get-sources
+seems to give you the definitions.
+** If you wish to see more examples of recipes
+Then display the package list with
+: el-get-list-packages
+and then (first step is optional really) get a description of a package including recipe with
+: el-get-describe
+
+** List installed packages (or packages with other statuses)
+: (el-get-list-package-names-with-status "installed")
+* elpa
+** List of installed packages
+Evaluate the following variable
+: package-alist
+** Local packages
+You can add a local repository to the list of elpa repositories stored in 'package-archives
+#+BEGIN_SRC elisp
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/") t) 
+#+END_SRC
+
+Heres some more info on package-archives format and what a package archive can be:
+
+#+BEGIN_VERSE
+     Each alist element corresponds to one archive, and should have the
+     form `(ID . LOCATION)', where ID is the name of the archive (a
+     string) and LOCATION is its "base location" (a string).
+
+     If the base location starts with `http:', it is treated as a HTTP
+     URL, and packages are downloaded from this archive via HTTP (as is
+     the case for the default GNU archive).
+
+     Otherwise, the base location should be a directory name.  In this
+     case, Emacs retrieves packages from this archive via ordinary file
+     access.  Such "local" archives are mainly useful for testing.
+
+     A package archive is simply a directory in which the package files,
+     and associated files, are stored.  If you want the archive to be
+     reachable via HTTP, this directory must be accessible to a web server.
+#+END_VERSE
+** Automatic package creation
+If you do 
+: (require package-x)
+you can also have emacs automatically create and upload/store packages for you with 
+the following commands. They all require a variable called "package-archive-upload-base" to 
+be defined where packages will be stored (can be local or remote)
+: (package-upload-buffer)
+uploads the current buffer if a single file or package if from a tar file
+: (package-upload-file filename)
+uploads either a simple package (a `.el' file) or a multi-file package (a `.tar' file); 
+otherwise, an error is raised. The package attributes are automatically extracted, 
+and the archive's contents list is updated with this information.
+** Simple package format
+An elisp file can be a valid package in and of itself if it has the following format
+#+BEGIN_SRC elisp
+     ;;; superfrobnicator.el --- Frobnicate and bifurcate flanges
+
+     ;; Copyright (C) 2011 Free Software Foundation, Inc.
+
+     ;; Author: J. R. Hacker <jrh@example.com>
+     ;; Version: 1.3
+     ;; Package-Requires: ((flange "1.0"))
+     ;; Keywords: frobnicate
+
+     ...
+
+     ;;; Commentary:
+
+     ;; This package provides a minor mode to frobnicate and/or
+     ;; bifurcate any flanges you desire.  To activate it, just type
+     ...
+
+     ;;;###autoload
+     (define-minor-mode superfrobnicator-mode
+     ...
+#+END_SRC
+so package will automatically extract the name, author, version, dependencies, short description
+and long description from this one file.
+** Can we use a single elisp file to create a fake elpa package that el-get can then use for versioning?
+Should be possible.
+ - We /can/ have a local directory with user defined packages.
+ - We /can/ create what is essentially a single file with nothing other than a package declaration
+For example - i have an el-get recipe/package, rails-el, that requires a number of packages that the recipe does not mention.
+Thus it fails to launch.
+How to deal with this? 
+*** Customise the recipe in el-get-sources
+Add an entry in el-get-sources that adds a :depends property to the recipe and add those packages to it.
+*** Create a local ELPA dummy package to load the dependecies you need 
+Create an elisp file called "el-rails-forgotten.el" add the "Package-Requires:" line and add the names of all packages you need.
+Upload it to your local repo automatically as described [[*Automatic%20package%20creation][here]] and then create an el-get recipe 
+that will install this dummy package, and more importantly its dependencies. You can add this package as a :depends property of the original.
+
+The dummy package should only need the following info (or just the name and :type declaration at bare minimum):
+#+BEGIN_SRC elisp
+       :name ruby-mode
+       :description "Major mode for editing Ruby files. RubyMode provides font-locking, indentation support, and navigation for Ruby code."
+       :type elpa)
+#+END_SRC
+
+   1. The advantage of this is that you can specify versions and elpa will recognise them whereas in el-get you can only declare dependencies on the :name property of another recipe, not the :checksum or version (el-get doesnt recognise package versions
+   2. The disadvantage is the dependencies must be in an elpa repo
+   3. You are creating another two packages (a recipe and an elpa dummy package) to solve the problem.
+* Lisp source files for emacs and packages
+All the lisp files for the current installation of emacs are in:
+: /Applications/Emacs.app/Contents/Resources/lisp/
+* Emacs Modules - (requires/features/provides) - How does it work
+See http://ergoemacs.org/emacs/elisp_library_system.html for more info
+
+: C-h v features
+Tells us that the features variable is:\\
+"A list of symbols which are the features of the executing Emacs.
+Used by `featurep' and `require', and altered by `provide'."
+
+** 'provide' - declaring that a file/feature has been loaded
+: (provide 'feature) 
+tells us that a feature is present and, more specifically that a file has been loaded.
+** 'featurep' - checking if a file/feature has been loaded
+: (featurep 'feature) 
+checks the feature variable to see if a file has been loaded
+** 'require' - checking if a file/feature has been loaded and loading if not
+: (require 'feature) 
+checks the feature list to see if a file has been loaded and if not 
+it will try to load the file feature.el
+Alternatively it can take a filename optional argument to load.
+
+* TO DO
+** DONE A comment-region that comments out all lines that are being "touched" by the current region
+** DONE A select-region and type that simultaneously deletes the previously selected region and inserts the new text instead of deselecting and inserting text
+  - SOLVED -  (set delete-selection-mode t)
+** DONE Line Numbering package.
+** TODO Follow links in directories in current window
+** TODO Save window and frame configuration 
+** DONE A function bound to "s-4" (Command 4) that creates a "square" set of 4 windows in the current frame.
+** TODO Fix the require stuff for rinari - stuff should be in util subdirectory?
+** DONE <Command Tab> for tab completion or something like it
+** Some form of command binding to help - (global-set-key (remap 'x) 'y) ? ;x and y have to be functions not key bindings in that case
+** DONE Find a good <Command> Binding for C-x C-f
+** DONE Good binding for Keyboard Macro invocation
+** Bind Set mark - <Command Spacebar> ? (Prob not as necessary now that shift select is working good)
+** DONE Binding for global and regional indent - <s-\>
+** KEYBINDINGS - Good available keybindings:
+-  <s-Return>
+-  <s-spacebar> - system bound to spotlight - UNBOUND!
+-  <s-escape> - system bound to Front Row - UNBOUND!
+-  <s-TAB> - system bound to expose
+-  <s-+>
+-  <s-=>
+-  <s-Delete>
+-  function key?
+** TODO An irb/interpreter mode for running irb (and perhaps Python) over a shell. The main thing would be to start a new interactive
+command history - so that we dont get irb commands in our bash history and vice versa
+** TODO Bindings for the trackpad multitouch gestures?
+** TODO Get search to automatically wrap.
+** TODO Interactive lisp - call eval-print-last-sexp such that it evals the S-expression that the cursor is inside of OR the last one if not inside one
+     - could be a little dangerous - we might be in an "implicit lisp environment"
+** TODO A function to evaluate a region of lisp functions (a la eval-region) but then capture the output of each s-expression (a la eval-print-last-sexp) in a new buffer
+** TODO If not available - create a means of navigating in directory mode similar to in Mac OSX Finder - 
+- <Command-up> up a directory
+- <Command-right> open a directory
+- Should still allow global buffer/frame/window navigation as much as possible so will have to think hard about bindings to use
+** TODO Get Lisp-interaction-mode running by default in .el files
+*** Tried adding lisp-interactio-mode as a hook in the elisp-mode-hook
+I got the following bug
+: File mode specification error: (error "Lisp nesting exceeds `max-lisp-eval-depth'")
+See [[*Something%20in%20init%20file%20giving%20the%20error%20"File%20mode%20specification%20error:%20(error%20"Lisp%20nesting%20exceeds%20`max-lisp-eval-depth'")"][this bug report]] 
+*** Probably easier to add .el files to the 'auto-mode-alist for lisp-interaction-mode
+* Bugs
+** A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
+** delete-selection-mode stopped working when i saved a new buffer and text mode was enabled. 
+Started working again after i deactivated and re-activated the mode
+** When I used <Command b> or tried to switch to a buffer it would not change the buffer in the current window
+as normal but would move me to a currently open window in another frame which was already showing the buffer. 
+Not necessarily a bad thing but would like this behaviour to be consistent. 
+
+** Ido-Mode does Not play well with ssh/tramp - causes whole of emacs to hang
+ - Seems to happen only with local connections to BigMac
+ - Cant open when ido-mode is on
+ - If I have an old connection that TRAMP presumably tries to re-authenticate while ido-mode is enabled then emacs effectively crashes - it hangs indefinitely
+
+** Something in init file giving the error "File mode specification error: (error "Lisp nesting exceeds `max-lisp-eval-depth'")"
+Tracked down to this line of code in an initialization file:
+: (add-hook 'emacs-lisp-mode-hook 'lisp-interaction-mode)
+Can see why that wouldn't work

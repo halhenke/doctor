@@ -15,6 +15,7 @@ Otherwise you are supposed to do
 : bundle exec gem uninstall whatever
 but this doesnt seem to work
 
+
 * Rake
 Show all tasks
 : rake -T
@@ -30,10 +31,60 @@ http://stackoverflow.com/questions/3028653/difference-between-collection-route-a
 member          /photos/1/preview   preview_photo_path(photo)   Acts on a specific resource so required id (preview specific photo)
 collection      /photos/search      search_photos_url           Acts on collection of resources(display all photos)
 
+* Ruby/Rails & nil & iterating over it
+** The Problem
+Because Ruby uses blocks for iteration can cause problems when the class is nil.
+Whereas in Python if one iterated over a collection that was nil
+: for i in cool_guys
+it would just terminate in Ruby
+: cool_guys.each { |i| ... }
+would throw an exception.
+** Solutions
+*** cool_guys && cool_guys.name()
+*** cool_guys ? cool_guys.name() : nil
+*** Using 'try'
+Try is like send and can be called by itself, with args and/or blocks
+**** cool_guys.try(:name)
+**** cool_guys.try(:find, "hal")
+**** cool_guys.try(:collect) {|g| g.name}
 
-* Diagnostics
+
+* Commenting out Stuff in a Rails web template
+Comments out both HTML and Ruby logic
+#+BEGIN_SRC web
+<%# if false %>
+  ...old bit here
+<% end %>
+#+END_SRC web
+
+
+* IRB
+** Configuration
+http://www.rubycentral.org/pickaxe/irb.html
+http://tagaholic.me/2009/05/29/exploring-how-to-configure-irb.html
+** Get configuration values from within IRB itself
+enter
+: conf
+or
+: irb_context
+on the irb command line
+** Set Prompt values
+The normal Prompt (interactive) is nested in a number of hashes
+: IRB.conf[:PROMPT][:DEFAULT][:PROMPT_I] = "bacon: "
+The default prompt is =:DEFAULT=
+
+** Getting access to BASH env variables
+See [[file:Shell%20Scripting%20Magic.org::*Capture%20the%20output%20and%20then%20manipuate%20it%20in%20Ruby%20via%20IRB][Manipuating bash variables in Ruby via IRB]] for more details
+
+But basically they will be available from the array ENV
+: ENV['HOME']
+Must be a string and not a symbol key
+* Diagnostics & How to See Whats Going On
 inspect?
 : @object.inspect
+** Check to see if a variable is defined
+To check variable 'var'
+: defined? var
 ** Rails
 *** Print a message from a controller/view
 #+BEGIN_SRC ruby
@@ -107,14 +158,71 @@ or if port and host specified earlier
 
 *** Checking for the eistance of a =params= key/value
 : if params[:country_list].present?
-* Commenting out Stuff in a Rails web template
-Comments out both HTML and Ruby logic
-#+BEGIN_SRC web
-<%# if false %>
-  ...old bit here
-<% end %>
-#+END_SRC web
 
+
+* Modules and loading/accessing their inards
+** See loaded modules
+=Module.included_modules=
+
+For more:
+http://www.ruby-doc.org/core-1.9.3/Module.htm
+
+** Getting at an included module from
+use =const_get= \\
+ - ActiveSupport::Deprecation is a submodule
+=ActiveSupport.const_get(:Deprecation).methods=
+
+** Defining a module vs acccessing it
+To define a module the first time we need to decalre the full module bit
+#+BEGIN_SRC ruby
+module LRD
+  module FormHelper
+    def labeled_input(object_name, method, options = {})
+      input = text_field(object_name, method, options)
+      label = label(object_name, method, options)
+      content_tag(:div, (label+input), { :class =&gt; 'labeled_input' }
+    end
+  end
+end
+#+END_SRC ruby
+
+Whereas to access it you just need something like:
+#+END_SRC ruby
+module LRD::FormBuilder
+  # ActionPack's metaprogramming would have done this for us, if FormHelper#labeled_input 
+  # had been defined  at load.   Instead we define it ourselves here.
+  def labeled_input(method, options = {})
+    @template.labeled_input(@object_name, method, objectify_options(options))
+  end
+end
+#+END_SRC ruby
+
+* Introspection - from the command line
+** Check an objects methods minus inhereited stuff
+obj.methods - Object.methods
+** Look for specific methods
+#+BEGIN_SRC ruby
+=obj.methods.grep /to_/=
+#+END_SRC ruby
+or like above
+#+BEGIN_SRC ruby
+(UserProfile.find(3).knowtypes.methods - Object.methods).grep /create/ 
+#+END_SRC ruby
+
+Could even do some clever stuff like look for only methods that are not defined on parent:
+#+BEGIN_SRC ruby
+(obj_1.methods - obj_1.parent.methods).grep /create/ 
+#+END_SRC ruby
+or...
+#+BEGIN_SRC ruby
+#+END_SRC ruby
+** Instance & Class Variables
+obj.instance_variables
+obj.class_variables
+
+** Check which environment the rails console is being run in
+: Rails.env
+=> "development"
 
 * Gem Commands
 ** Check which gems a gem depends on (i.e. it needs)
@@ -158,72 +266,11 @@ sudo update_rubygems
 gem env
 
 
-* Modules and loading/accessing their inards
-** See loaded modules
-=Module.included_modules=
-
-For more:
-http://www.ruby-doc.org/core-1.9.3/Module.htm
-
-** Getting at an included module from
-use =const_get= \\
- - ActiveSupport::Deprecation is a submodule
-=ActiveSupport.const_get(:Deprecation).methods=
-
-** Defining a module vs acccessing it
-To define a module the first time we need to decalre the full module bit
-#+BEGIN_SRC ruby
-module LRD
-  module FormHelper
-    def labeled_input(object_name, method, options = {})
-      input = text_field(object_name, method, options)
-      label = label(object_name, method, options)
-      content_tag(:div, (label+input), { :class =&gt; 'labeled_input' }
-    end
-  end
-end
-#+END_SRC ruby
-
-Whereas to access it you just need something like:
-#+END_SRC ruby
-module LRD::FormBuilder
-  # ActionPack's metaprogramming would have done this for us, if FormHelper#labeled_input 
-  # had been defined  at load.   Instead we define it ourselves here.
-  def labeled_input(method, options = {})
-    @template.labeled_input(@object_name, method, objectify_options(options))
-  end
-end
-#+END_SRC ruby
-
-
-* Introspection - from the command line
-** Check an objects methods minus inhereited stuff
-obj.methods - Object.methods
-** Look for specific methods
-#+BEGIN_SRC ruby
-=obj.methods.grep /to_/=
-#+END_SRC ruby
-or like above
-#+BEGIN_SRC ruby
-(UserProfile.find(3).knowtypes.methods - Object.methods).grep /create/ 
-#+END_SRC ruby
-
-Could even do some clever stuff like look for only methods that are not defined on parent:
-#+BEGIN_SRC ruby
-(obj_1.methods - obj_1.parent.methods).grep /create/ 
-#+END_SRC ruby
-or...
-#+BEGIN_SRC ruby
-#+END_SRC ruby
-** Instance & Class Variables
-obj.instance_variables
-obj.class_variables
-
-** Check which environment the rails console is being run in
-: Rails.env
-=> "development"
-
-
+* map command - block vs function syntax
+Apparently these are equivalent
+: Background.all.map(&:id)
+and
+: Background.all.map{ |bg| bg.id }
 * Rails
 ** Console
 *** Start the console in a particuar environment
@@ -239,6 +286,24 @@ which should prob be:
 : Rails.env="production"
 on the console command line
 
+*** Get the path for a particular route
+Evaluate:
+: app.show_profile_path(1)
+or
+: app.show_profile_path(User.find(1))
+or if you want the url
+: app.show_profile_url(1)
+or if you dont want the path for a particular record (assuming thats permissible for that route):
+: app.show_profile_path()
+*** Show which version of migration you are on
+From console
+: ActiveRecord::Migrator.current_version
+:    (0.7ms)  SELECT `schema_migrations`.`version` FROM `schema_migrations` 
+: => 20130120061135
+This is the last migration file prefix we have done
+*** Show how Rails will convert form Key/Value Pairs into a params hash
+On the command line do this:
+: Rack::Utils.parse_query "user[]=baby&user[]=non&name=fred&phone=0123456789"
 ** Sprockets
  - =app/assets/stylesheets/application.css/= and =app/assets/javascripts/application.js/=
 *** Comments
@@ -259,7 +324,76 @@ is "commented out". while
 :  *= require_tree .
 is not.
 
+** Migrations
+*** See which migrations have been done and which haven't yet
+: bundle exec rake db:migrate:status
+*** Recreate Database from beginning of migrations
+Sort of thing you might do after changing branches...
+: bundle exec rake db:schema:load
+May have to do db reset first
+Can check which migrations have been done - 
+: bundle exec rake db:migrate:status
+If your database is effectively "ahead" of your migrations then you will see output like
+#+BEGIN_VERSE
+ Status   Migration ID    Migration Name
+--------------------------------------------------
+   up     20130115094713  Create users
+   up     20130115094727  Create sparks
+   up     20130115094738  Create ignites
+   up     20130115094815  Create connections
+   up     20130115095012  Create interests
+   up     20130115095054  Create countries
+   up     20130115095641  Add devise to users
+   up     20130116093555  Add demographic to user
+   up     20130119050547  Add username to user
+   up     20130120053352  Add spark fields
+   up     20130120055047  Create knowtypes
+   up     20130120060738  Acts as taggable on migration
+   up     20130120061135  Alter spark
+   up     20130121101800  ********** NO FILE **********
+   up     20130121150741  ********** NO FILE **********
+   up     20130121164811  ********** NO FILE **********
+   up     20130121174637  ********** NO FILE **********
+#+END_VERSE 
+*** Actually i think this is best way to scrap and recreate database
+: bundle exec rake db:migrate:drop
+: bundle exec rake db:migrate:create
+: bundle exec rake db:migrate:setup
+*** Actually no just use reset
+: bundle exec rake db:migrate:reset
+*** Dont use 'type' as a column name
+Its reserved
 
+*** Dealing with Identical migrations in Different branches
+e.g. both of you do a CreateUser migration in different branches and this gets pushed to the repo
+1. Dont delete
+2. Find out which order the two are run in by looking at the file prefix timestamp e.g.
+: 20130121175043_create_user.rb
+: 20130122546355_create_user.rb
+1. rename the second one
+: 20130122546355_alter_user.rb
+2. edit the second one so that the Class name matches the filename
+: class CreateUser < ActiveRecord::Migration
+becomes
+: class AlterUser < ActiveRecord::Migration
+*The file name and class name must match*
+1. Make sure that whatever happens inside (perhaps nothing) leaves the db in a state you want
+2. Rebuild db
+: bundle exec rake db:reset
+: bundle exec rake db:migrate
+
+*** Rollback Migrations
+Rollback two migrations
+: rake db:rollback STEP=2
+Rollback to a specific version
+: rake db:migrate:down VERSION=20100905201547
+** Models & Associations
+*** Set table of a model to an arbitrary name
+#+BEGIN_SRC ruby
+Class Countries < ActiveRecord::Base
+  set_table_name "cc"
+#+END_SRC 
+    
 * Ruby Meta/Magic Stuff
 ** You can call methods based on strings with the send method
 : object.send("add_#{@type_of_fruit}", d)
@@ -321,6 +455,22 @@ Apparently for Ruby you use
 : Module.const_get
 but this doesnt handle nesting
 
+* How to reset a users password from the command line in a Rails app using devise
+Get the user
+: user = User.where(:email => email).first
+or whatever.
+
+Then you need to set both =password= and =password_confirmation=
+#+BEGIN_SRC ruby
+if user
+  user.password = new_password
+  user.password_confirmation = new_password
+  user.save
+end
+#+END_SRC ruby
+To check do:
+: irb(main):049:0> User.find(1).valid_password?('hunomerocks')
+on the Rails console it returns "true"
 * Requiring code
 We require files - not modules or namespaces
 i.e.
@@ -490,8 +640,8 @@ along with Rails 3.2.1
 
 
 
-* Specific Rails errors and solutions
-If you get this:
+* Troubleshooting Rails - Specific errors & solutions
+** If you get this:
 : User(#70180561615400) expected, got ActiveSupport::HashWithIndifferentAccess(#70180531877120)
 you may need
 : accepts_nested_attributes_for :user
@@ -506,6 +656,26 @@ and not:
 #+END_SRC web
 also may need =attr_accessible :user_attributes=
 
+** "uninitialized constant HunomeDev" where HunomeDev is the /new name/ of our app
+We changed from "Hunome" to "HunomeDev"
+
+To get rid of this error I had to restart apache (restarting passenger was not sufficient)...
+
+** Rails update forms mysteriously fail and =User.update_attributes(params[:user])= always return false
+By putting error messages in my rails edit view/form and rendering edit on the 
+failure of =update_attributes= I found that Rails was always reporting that the password was too short
+
+In short the problem is the validation code is running when it shouldn't be.\\
+This can be fixed by changing
+#+BEGIN_SRC ruby
+  validates :password,    :presence => { :on => :create },
+              :length => { :minimum =>  6 }
+#+END_SRC 
+to:
+#+BEGIN_SRC ruby
+  validates :password,    :presence => { :on => :create },
+              :length => { :minimum =>  6, :on => :create }
+#+END_SRC 
 
 * From Hunome - Rails Tips & Explanations
 ** Namespaces in Routes and forms
@@ -571,7 +741,24 @@ also may need =attr_accessible :user_attributes=
 
 
 
-
+** How =form_for= and =fields_for= relate to specific FormHelper fields/emthods
+The basic idea with =forms_for= is that it yields a FormHelper that works like this:
+: <%= form_for :person do |f| %>
+:   <%= f.text_field :first_name %>
+gets expanded to:
+: <%= text_field :person, :first_name %>
+where =ActionView::Helpers::FormHelper= defines =text_field= as:
+: text_field(object_name, method, options = {})
+In turn, a FormHelper has the =fields_for= method that yields a FormBuilder.\\
+A FormBuilder.checkbox seems to call a FormHelper.checkbox on the object that form_for is called on
+#BEGIN_SRC ruby
+def check_box(method, options = {}, checked_value = "1", unchecked_value = "0")
+  @template.check_box(@object_name, method, objectify_options(options), checked_value, unchecked_value)
+end
+#END_SRC
+i.e. with the code
+: <%= form_for :person do |f| %>
+=@object_name= is :person and =@template= is f
 * Compiling stuff for Production Mode
 : bundle exec rake assets:precompile
 : git add public/assets
@@ -587,3 +774,7 @@ i.e. from development.rb or Hunome::Application.configure
 ** DONE How to get remote debugger to work for me
 Why doesnt start_remote/start_server seem to get called?
 My =./.rdebugrc= file was mispelled as =./.redbug.rc=
+
+* Rails Learning Resources
+Code Academy
+Rails 4 Zombies

@@ -48,6 +48,8 @@ Git will prevent you from pushing older changes over newer changes (?)
    git-show - Show various types of objects
    git-show-branch - Show branches and their commits
 
+* Bash Completion
+: sudo port install git-core +bash_completion
 
 * Git Notes (from Mac/Hunome)
 ** Git Config
@@ -212,7 +214,13 @@ USING Git 1.7.0:
 
 
 * Git
-
+** Syntax in referring to previous commits
+The commit 3 before this one
+: HEAD~3
+or 
+: HEAD^^^
+commit just before current one
+: HEAD^
 ** As compared to Mercurial
 http://stackoverflow.com/questions/1598759/git-and-mercurial-compare-and-contrast/1599930#1599930
 ** Terminology and features
@@ -269,6 +277,10 @@ in your file git wont work
 ** Cloning a bare repository
 This checks out the repo but doesnt create working directory based on it:
 : git clone --bare gitname.git
+** "Grepping" a branch that is not currently checked out
+: git grep "action_url" macbook 
+Or restrict only to certain paths
+: git grep "action_url" macbook:app/models/ 
 ** Pushing to a bare repository
 You need the command 
 : git init --bare gitname.git
@@ -284,7 +296,7 @@ You need the command
 ~/project $ git remote add origin ~/Google\ Drive/git/project.git
 ~/project $ git push -u origin master
 #+END_VERSE
-** Gitignore
+** gitignore
 *** Comments
 Any line beginning with #
 : # a comment
@@ -311,7 +323,36 @@ Trying to work with "negated include" syntax like this:
  - e.g. its invisible to us......FUCK
  - I kind of need that my_config file inside there - should it be symlinked from =vim_runtime= to somewhere else?
  - is there a better solution?
+** Configuring git push defaults
+I think this is probably the best:
+: git config --global push.default upstream
+Better than
+: git config --global push.default simmple
+at least.
 ** Removing/"Untracking" stuff
+*** Problems with untracking something as if it had never been tracked in the first place
+http://stackoverflow.com/questions/4124792/have-git-stop-tracking-a-file
+#+BEGIN_VERSE
+If you were also hoping to make the repo look as if it had never tracked that file, that is much more complicated and highly discouraged as it not only creates brand new commits for every single commit in your history, thus destroying interoperability in a nasty way between other people who have cloned your repo, but it also leaves every one of those commits untested (assuming you test your commits before making them).
+
+With that caveat in mind, the tool you're looking for if that's your goal is filter-branch. The first example does exactly what I'm describing.
+#+END_VERSE
+
+Because gitignore doesnt apply to files already tracked a simple
+: git rm --cached file
+and commit can lead to trouble when switching between branches
+**** However this guy on Stack Exchange says it works if done in a separate commit
+: the process that worked for me was 1. commit pending changes first 2. git rm --cached <file> and commit again 3. add the file to .gitignore, check with git status and commit again – mataal Aug 13 '09 at 21:07	
+: Very important adding. If file that is ignored would be modified (but in spite of this should be not committed), after modifying and executing git add . it would be added to index. And next commit would commit it to repository. To avoid this execute right after all that mataal said one more command: git update-index --assume-unchanged <path&filename> – Dao Aug 24 '11 at 16:39 	
+: mataal's comment is very important. Commit pending changes first, THEN git rm --cached and commit again. If the rm is part of another commit it doesn't work as expected.
+**** Probably easiest if you just update the other branch so that 
+the file is no longer tracked via
+: git rm --cached file
+either. Then theres no problem swithcing between branches.
+*** Someone says this is the way to do it
+: git update-index --assume-unchanged <file>
+If you wanna start tracking changes again run the following command:
+: git update-index --no-assume-unchanged <file>
 *** A good Summary or =git rm=, =git rm --CACHED=, =git reset HEAD= etc
 #+BEGIN_VERSE
 git rm will remove entries from the staging area. This is a bit different from git reset HEAD which "unstages" files. By "unstage" I mean it reverts the staging area to what was there before we started modifying things. git rm on the other hand just kicks the file off the stage entirely, so that it's not included in the next commit snapshot, thereby effectively deleting it.
@@ -320,12 +361,27 @@ By default, a git rm file will remove the file from the staging area entirely an
 #+END_VERSE
  - =git rm file= pretty much equivalent of deleting something, adding that deletion to the index and then committing
 *** Removing Stuff you have added to the branch/index without deleting it from your "working tree"
+**** So that you can restage the file again
+: git reset HEAD file
+which is equivalent to 
+: git reset --mixed HEAD file
+**** So that git stops following changes to the file
 : git rm --CACHED
 This will effectively delete stuff from the working index so that you need to 
 : git add -u
-so that these files are not included in the next commit.
+so that these files are not included in the next commit.\\
+And then add to .gitignore file.
 
-But although they are lsited by =git status= as being deleted they will still exist on your normal filesystem.
+But although they are listed by =git status= as being deleted they will still exist on your normal filesystem.
+
+However you can have problems if you checkout a branch from before you unstaged the file and then checkout this bracnch again in which the file "no longer exists" as far as git is concerned. Because the diff between the two commits is that the file has been deleted Git will delete the file from your disk rather than just no longer tracking it. 
+
+A .gitignore entry wont protect you here.
+** Delete a remote branch
+Delete the branch "newfeature" on remote "origin"
+: git push origin :newfeature
+or with alternative syntax:
+: git push origin --delete newfeature
 ** Checkout a branch for inspection but not for adding any permanent work
 =HEAD= will not be pointed at branchref
 : git checkout --detach branch
@@ -357,7 +413,7 @@ The reason for this is that git checkout has two very different modes of operati
 ** Tags 
 - are like alternate names, references.
 - Must be unique on both remote and local branches
-** Git reset - soft vs hard etc
+** git reset - soft vs hard etc
 The syntax is 
 : git reset [<mode>] [<commit>]
  - A 'soft' commit will just point the =HEAD= ref at the commit
@@ -466,6 +522,8 @@ rename the folder a couple of times
 or more properly
 : git rm --cached  /path/to/directory
 
+*** Git deleting a file/path that you want untracked when you checkout a branch because it was once deleted in that branch
+http://stackoverflow.com/questions/1407638/git-merge-removing-files-i-want-to-keep
 ** Recovering from a bad git commit
 *** The naughty way
 
@@ -476,11 +534,12 @@ checkout that branch
 : git checkout 6gfgsgdhsghjghjgsy78798
 do 
 : git clean -fd 
-to delete later commits (i think)
-do 
+to delete later commits (i think)\\
+ - no - it deletes files that arent being tracked i think
+
+Then delete the current branch 
 : git branch -D updates_2012_11
-To delete the current branchx
-create a new branch
+recreate the branch
 : git branch  updates_2012_11
 checkout that branch
 : git checkout  updates_2012_11

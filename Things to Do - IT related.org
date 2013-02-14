@@ -1,6 +1,6 @@
 * TODO emacs
 Also see [[file:emacs%20knowledge.org::*TO%20DO][Emacs Knowledge: TO DO]]
-** TODO Learn Mode creation
+** DONE Learn Mode creation
 ** Org-Mode
 ** TODO Reorganise my docs
  - split stuff like *git*, *apache* etc out into separate org docs
@@ -28,6 +28,7 @@ Also see [[file:emacs%20knowledge.org::*TO%20DO][Emacs Knowledge: TO DO]]
      - =Tab= & =Shift Tab= to =<Command-<= & =<Command->=
    - get =alt left= and =right= going to =back= and =word= in insert mode
 
+** Try Vundle
 * TODO linux
 ** TODO learn cronjobs
 ** TODO learn about POSIX filesystem/inode stuff 
@@ -41,7 +42,10 @@ that Alex/Brendan/Edward were talking about the other night
  - You have to install the "Guest Additions" and then do something like:
 : sudo mount -t vboxsf blabla /mnt
  - Not sure what blabla is - arbitrary name?
+* Web Development
+** TODO  Learn and Install nginx
 * TODO OS X
+** TODO Configure dnsmasq properly
 ** TODO Get some linux features on to a Mac
 *** Alt Drag and Alt Resize
    - apparently possible with some plugin
@@ -66,6 +70,8 @@ http://www.orderedbytes.com/controllermate/
 Hmmm
 http://www.xkeys.com/xkeys.php
 
+*** FunctionFlip - Change some media keys to function keys but not all
+    http://kevingessner.com/software/functionflip/
 * TODO Catalyst
 ** TODO Add stuff to my user package
  - .inputrc

@@ -2,22 +2,59 @@
  - Also see [[file:linux%20mode%20help.org][Unix Help]] for other stuff
 * Cool commands & Tricks
 ** How to add extension to all files in a folder in Unix/Linux
-
-# extension = .xml
-# Dont think this is recursive...is it?
-find . -type f -exec mv {} {}.xml ';'
-
+extension = .xml
+ - Dont think this is recursive...is it?
+: find . -type f -exec mv {} {}.xml ';'
 ** Find any file containing a specific piece of text in the path of the current directory
-find . -exec grep "findThisString" '{}' \; -print
-
+: find . -exec grep "findThisString" '{}' \; -print
 ** Copy a files contents to the clipboard
 : pbcopy < ~/.ssh/id_rsa.pub
 
+** Shortcut to run previous command
+: !!
+To do last command as sudo 
+: sudo !!
+** Shortcut for last used command argument
+: !$
+e.g.
+: cd !$
+* Changing betwen emacs and vi mode
+To go to vi mode
+: set -o vi
+* Undertsanding the syntax of man page descriptions of command arguments
+From 
+http://limpet.net/mbrubeck/2009/10/30/compleat.html
+#+BEGIN_VERSE
+The syntax should be familiar to long-time Unix users. Optional arguments are enclosed in square brackets; alternate choices are separated by vertical pipes. An ellipsis following an item means it may be repeated, and parentheses group several items into one. Words in angle brackets are parameters for the user to fill in.
+#+END_VERSE
+* Bash Completion
+** list completion
+list possible user completion
+: C-x ~
+list possible filename completion
+: C-x / 
+lists possible bash variable completion
+: C-x $ 
+list possible hostname completion
+: C-x @
+list possible command completion
+: C-x ! 
+** do completion
+do filename completion
+: Meta-/ 
+do bash variable completion
+: Meta-$ 
+do hostname completion and
+: Meta-@ 
+do command completion
+: Meta-! 
+** How it works behind the scenes
+   Uses the builtin commands =complete= and =compgen=
 * Sudo/su etc
 To become another user
-$ sudo su - username
+: sudo su - username
 To become another user for just one task
-$ sudo su - username -c "command_example arg_example"
+: sudo su - username -c "command_example arg_example"
 
 * ps to show user id and group id
 ** ps with output specific to show UID, GID and args
@@ -91,6 +128,19 @@ Will create the file named
 ~/Documents/A bad day for leisure
 to get
 A bad day for leisure
+** In scp - avoiding the =scp: ambiguous target= message
+To copy to a path with spaces in it you need to both wrap the whole target path in quotes and use backslashes before the spaces.
+
+Otherwise you will get the error message "scp: ambiguous target" error
+
+e.g. This won't work:
+: scp Supernatural.5x08.Changing\ Channels.HDTV.XviD-NoTV.avi  Noches@BigMac:/Volumes/My\ Book/BACK-UP/TV/ONGOING\ SERIES/Supernatural/Supernatural\ -\ Season\ 5/
+Nor this:
+: scp Supernatural.5x08.Changing\ Channels.HDTV.XviD-NoTV.avi  Noches@BigMac:"/Volumes/My Book/BACK-UP/TV/ONGOING SERIES/Supernatural/Supernatural - Season 5/"
+But this will:
+: scp Supernatural.5x08.Changing\ Channels.HDTV.XviD-NoTV.avi  Noches@BigMac:"/Volumes/My\ Book/BACK-UP/TV/ONGOING\ SERIES/Supernatural/Supernatural\ -\ Season\ 5/"
+And apparently inside a shell script you need two backslashes:
+: scp Supernatural.5x08.Changing\ Channels.HDTV.XviD-NoTV.avi  Noches@BigMac:"/Volumes/My\\ Book/BACK-UP/TV/ONGOING\\ SERIES/Supernatural/Supernatural\\ -\\ Season\\ 5/"
 * Redirecting outputs
 0 stdin
 1 stdout
@@ -111,6 +161,24 @@ hal@philemon:~/upgrade/rake_deprecate$ cat rake_output
 mynbcs (rails):RAILS_ENV=production: Queuing delayed job to touch file.
 #+END_SRC bash
 
+* Capture the output of a function
+Enclose the command in $() :
+: echo $(defaults domains)
+: echo $(ls -al)
+Can then be captured in a variable
+:  ALL_IN_THIS_DIR=$(ls -al)
+** Capture the output and then manipuate it in Ruby via IRB
+Firstly 
+#+BEGIN_SRC bash
+APPLE_DOMAINS=$(defaults domains)
+export APPLE_DOMAINS
+#+END_SRC
+then start irb and the variable will be available via
+: ENV['APPLE_DOMAINS']
+e.g.
+#+BEGIN_SRC ruby
+ENV['APPLE_DOMAINS'].split(",")
+#+END_SRC
 * Execute commands in a subshell
 =( export RAILS_ENV=development; /usr/local/bin/rake --silent delayed_job:touch_file)=
 ** as SUDO
@@ -119,7 +187,13 @@ when that syntax is used.
 Use this instead:
 =sudo bash -c " export RAILS_ENV=production; cd /app/mynbcs/current/; /usr/local/bin/rake --silent delayed_job:touch_file "=
 
-
+* Read basic bash documentation in Emacs
+Use Emacs Info mode
+* See bash environment/system variables
+either do
+: env
+or 
+: set
 * User Info
 ** Show who is logged in
 : who
@@ -190,3 +264,40 @@ Sudo or sudon't?
 
 In almost all cases you should not be using the sudo command with git. If you have a very good reason you must use sudo, then ensure you are using it with every command (it's probably just better to use su to get a shell as root at that point). If you generate ssh keys without sudo, then when you try to use a command like sudo git push, you won't be using the ssh key you generated.
 #+END_VERSE
+
+* Command history
+See [[http://www.gnu.org/software/bash/manual/bashref.html#Bash-History-Builtins][GNU bash documentation - external site]]
+** see command history
+: history
+** Clear Command History
+: history –c
+** Disable History
+: HISTSIZE=0
+** Ignore commands that begin with a space
+: HISTCONTROL=ignorespace
+** Ignore duplicate commands
+: HISTCONTROL=ignoredups
+To also ignore spaces you need
+: HISTCONTROL=ignoreboth
+** Important variables
+: HISTCONTROL=ignoredups
+: HISTSIZE=10000
+: HISTFILE
+: HISTFILESIZE
+A colon separated list of regexes of commands to ignore
+: HISTIGNORE
+** write/append to history file
+The following could be set in a .bashlogout script
+*** Write Current History list to history file
+: history -w
+*** Append Current History list to history file
+: history -a
+
+** If your history doesnt seem to be saved between sessions
+Check the permissions on your $BASHHISTORYFILE \\
+Mine were like this
+: -rw-------  1 root  staff  653 24 Jan 00:55 .bash_history
+So i did
+: sudo chmod a+rw .bash_history 
+To make it world read/writable.\\
+Bad practice maybe but meh.
