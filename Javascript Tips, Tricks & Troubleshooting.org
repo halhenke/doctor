@@ -1,0 +1,62 @@
+#+TITLE: Javascript Tips Tricks & Troubleshooting
+
+* Javascript can be incredibly fiddly and error sensitive
+
+* Why things sometimes just don't work
+** An earlier syntactical error means that there is a "silent failure"
+Have to get everything right.
+** Order of execution/script placement is very important
+In the head of the document in the body etc. 
+Sometimes things will suddenly work if you just change the order.
+
+Some examples
+*** I had a $('form').submission() method before the form
+and it would never fire unti I placed it after the form.
+
+Not sure why.
+*** IN Rails the order you include scripts in the asset pipeline must be correct.
+
+* Skewer-Mode in Emacs
+** Load it from el-get or elpa
+Since the MELPA repository was down I added this to el-get-sources to install it:
+#+BEGIN_SRC elisp
+   (:name skewer-mode
+	  :type git
+	  :url "https://github.com/skeeto/skewer-mode"
+	  :depends (emacs-http-server js2-mode)	;; :depends (simple-httpd js2-mode)
+	  :features skewer-mode
+	  )
+   (:name emacs-http-server ;;This is subbing in for simple-httpd
+	  :type git
+	  :url "https://github.com/skeeto/emacs-http-server"
+	  :features simple-httpd
+    )
+#+END_SRC
+** You can then use it to evaluate javascript from any buffer in any browser tab
+*** What you need to do to setup
+ - Make sure the buffer is in js2-mode
+: M-x js2-mode
+ - If you want to run jscript in a new buffer then do the command
+: M-x run-skewer
+ - Otherwise if you want to have skewer-more interact with an arbitrary buffer then you will need to have the skewer script included in that page e.g.
+:  <script src="http://localhost:8080/skewer"></script>
+ - Turn on skewer-mode
+: M-x skewer-mode 
+ - To see if it works then try console.log() something and start a Developer console in that browser window
+ - Otherwise you can eval stuff with 
+: C-x C-e
+*** To test if its not working
+If when you do
+: M-x list-skewer-clients
+you get nothing you will have lost the connection
+or if you do 
+: skewer
+in console and get nothing...
+*** To reconnect
+Not really sure how to do this without refreshing the browser window....
+1. Refresh the browser window - you should see something in the client list when you call
+: M-x list-skewer-clients
+2. If still not working call 
+: skewer()
+from the browser console
+* Console

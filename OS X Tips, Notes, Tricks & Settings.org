@@ -1,0 +1,22 @@
+#+TITLE: OS X specific Configuration, Settings, Tricks etc
+
+See [[file:Mac%20Use%20of%20Unix.org][Unix on OS X]] for information specific to Unix/bash specific issues on OS X
+
+* Spaces
+Switching between them can be /very/ slow
+http://apple.stackexchange.com/questions/17929/how-can-i-disable-animation-when-switching-desktops-in-lion
+One can change the animation timings with
+: defaults write com.apple.dock expose-animation-duration -int 0; killall Dock
+And to go back to defaults run this command:
+: defaults delete com.apple.dock expose-animation-duration; killall Dock
+
+* defaults command
+Many settings can be accessed and changed from the command line with
+: defaults
+** Get a list of all domains
+: defaults domains
+** Get all the settings from a particular domain
+: defaults read example_domain 
+e.g.
+: defaults read com.apple.dashboard
+

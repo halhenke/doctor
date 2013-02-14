@@ -1,0 +1,10 @@
+#+TITLE: Apache Server Setup, Configuration, Tips, Notes & Troubleshooting
+
+* Comments
+Either # at beginning and backslash at end of line for multiline comments
+#+BEGIN_SRC apache
+# Comment goes here\
+  and here, and there,\
+  and everywhere
+#+END_SRC
+or just # at beginning of line.

@@ -1,0 +1,61 @@
+#+TITLE: MySQL Usage, Tips, Tricks & Info
+
+* Setup Related
+** New User
+: mysql --user=root
+: mysql> SELECT User FROM mysql.user; 
+For login without password:
+: mysql> create user 'Hal'@'localhost';
+To make a superuser
+: mysql> GRANT ALL ON *.* TO 'Hal'@'localhost';
+
+
+* Checking The Status of Stuff
+: mysqladmin extended-status
+
+* Macports installation Specific info
+Data location 
+: /opt/local/var/db/mysql55/
+Default socket location? (this hould be changed/overriden in config file)
+: /opt/local/var/run/mysql55/mysqld.sock
+Config file
+: /opt/local/etc/mysql55/my.cnf
+** Extra things you have to do in setup with Macports MySQL
+*** Configure MySQL to read/create the sock in the correct location
+After a fresh install of MySQL via macports I was getting the error messages: 
+: mysqladmin: connect to server at 'localhost' failed
+: error: 'Can't connect to local MySQL server through socket '/opt/local/var/run/mysql55/mysqld.sock' (2)'
+: Check that mysqld is running and that the socket: '/opt/local/var/run/mysql55/mysqld.sock' exists! 
+**** Solution - Edit the MySQL config file my.cnf
+I had to edit the file 
+: /opt/local/etc/mysql55/my.cnf
+to add the line
+: [mysqld_safe] socket = /tmp/mysql.sock
+after that I could do
+: sudo mysql55
+and the mySQL server would start ok....
+
+
+* mysql - using the client CLI
+** New Database
+: mysql> CREATE DATABASE hunome_development;
+Basic usage is 
+: mysql --user=user_name --password=your_password db_name
+** Troubleshooting
+*** Every time i press the character 'e' it starts spewing out "call.inputrc call.inputrc call.inputrc..."
+ 1. Might be something to do with my new settings from .inputrc file setup on konsole/KDE
+ 2. Or might be something to do with iTerm2
+    1. Happens with terminal also however...
+ 3. Or might be something to do with me not using the =system-readline= variant of the mysql55 port
+**** ANSWER - it was due to having =echo ".inputrc called...= in my .inputrc file
+
+* Troubleshooting
+I get:
+: mysqladmin: connect to server at 'localhost' failed
+: error: 'Can't connect to local MySQL server through socket '/opt/local/var/run/mysql55/mysqld.sock' (2)'
+: Check that mysqld is running and that the socket: '/opt/local/var/run/mysql55/mysqld.sock' exists! 
+But all i have is 
+: /opt/local/var/run/mysql55/.turd_mysql55-server
+and
+: /opt/local/var/db/mysql55/.turd_mysql55-server
+See [[*Extra%20things%20you%20have%20to%20do%20in%20setup%20with%20Macports%20MySQL][Extra things you have to do in setup with Macports MySQL]] 

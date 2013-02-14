@@ -1,0 +1,107 @@
+#+TITLE: Some OS X specific tips about unix and the shell/command line
+
+ - See [[file:Org-Docs/iTerm.org][iTerm]] for tips on working with the iTerm2 terminal emulator
+
+* Changing user settings - alternative to usermod
+In OS X use dscl
+** Adding a user to a group
+: dscl . append /Groups/the_group_you_want GroupMembership the_user
+** Deleting a user from a group
+: dscl . delete /Groups/admin GroupMembership usershortname
+** Reading the membership of the admin group:
+: dscl . read /Groups/admin GroupMembership
+* Use lsof instead of netstat:
+** When I am logged into hal9000 through ssh this is what lsof shows me
+$ sudo lsof -i tcp -nP
+ssh       51722      Hal    3u  IPv4 0xffffff8011dd2a40      0t0  TCP 192.168.1.3:64159->203.29.131.142:22 (ESTABLISHED)
+ssh       51722      Hal    6u  IPv4 0xffffff8011df1de0      0t0  TCP 127.0.0.1:9991 (LISTEN)
+ssh       51722      Hal    7u  IPv6 0xffffff800b0d7cc0      0t0  TCP [::1]:9991 (LISTEN)
+
+So we have a local port on 9991 which is the dynamic forwarding that enables FoxyProxy to work.
+And the remote machine:
+203.29.131.142:22
+is connecting to my machine, HAL9000 on
+192.168.1.3:64159
+as we told it to do in the ssh config
+
+Lets check:
+$ host office.catalyst-au.net
+office.catalyst-au.net is an alias for koshka.catalyst-au.net.
+koshka.catalyst-au.net has address 203.29.131.142
+
+* FoxyProxy
+** Security Certificates and Not being able to add exceptions
+You need to enable the FoxyProxy proxy setting for all sites to get this to work
+ - otherwise the certificate will not be sent through the proxy and we cant get it.
+
+* Git cloning from my remote machine
+$ git clone ssh://hal9000/home/hal/rails-sis hurricane
+* scp from my remote machine
+$ scp hal9000:~/password.txt.gpg .
+
+* Document Sharing
+ - You can make a file/folder shared in OS X by making it *both* readable and executable for =others=
+: chmod o+x Documents/
+: chmod o+r Documents/
+* The output of bind -V and the Meta/Super Key
+# output of iTerm2
+# $ bind -V | grep meta
+# convert-meta is set to `off'
+# enable-meta-key is set to `on'
+# input-meta is set to `on'
+# meta-flag is set to `on'
+# output-meta is set to `on'
+
+# output of Terminal
+# bind -V|grep meta
+# convert-meta is set to `on'
+# enable-meta-key is set to `on'
+# input-meta is set to `off'
+# meta-flag is set to `off'
+# output-meta is set to `off' 
+
+#-----------------------------------------------------------------------
+# OTHER INFO
+# don't strip characters to 7 bits when reading
+# set input-meta on
+
+# allow iso-latin1 characters to be inserted rather
+# than converted to prefix-meta sequences
+# set convert-meta off
+
+# display characters with the eighth bit set directly
+# rather than as meta-prefixed characters
+# set output-meta on
+#-----------------------------------------------------------------------
+
+* DNS
+** This will tell you the order of DNS are called from first resolver onwards
+: scutil --dns
+** Getting around the fact that apparently OS X 10.7+ does not resolve DNS servers in the expected order
+I setup dnsmasq
+: sudo port install dnsmasq
+and start with
+: sudo port load dnsmasq
+Set the DNS to
+: 127.0.0.1 
+in 
+: System Preferences -> Network -> Advanced Settings -> DNS -> DNS Servers
+and config file
+* Problems with hosts as set in =/etc/hosts= not resolving
+See [[http://www.justincarmony.com/blog/2011/07/27/mac-os-x-lion-etc-hosts-bugs-and-dns-resolution/]]
+** Solution
+*** Install DNSMasq?
+: sudo port install dnsmasq
+Then copy resolv.conf
+: sudo cp /etc/resolv.conf ~/resolv.dnsmasq.conf
+Then edit =/opt/local/etc/dnsmasq.conf= to set
+: resolv-file=/etc/resolv.dnsmasq.conf
+Then start dnsmasq with 
+: sudo port load dnsmasq
+and add localhost to the list of DNS servers via 
+: System Preferences > Network > (Select Connection, i.e. Wi-Fi) > Advanced > DNS
+and add 127.0.0.1
+Now i think you can add entries to your =/opt/local/etc/dnsmasq.conf= file like this:
+: address=/.local/127.0.0.1
+or is it
+: server=/hunomeOnApache/127.0.0.1
