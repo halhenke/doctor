@@ -1,7 +1,7 @@
 #+TITLE: Help for all Unix Related Things
 
 *Other Org-Mode files with relevant info*
- - See [[file:~/Documents/Mac%20Use%20of%20Unix.org][UNIX tips specific to OS X]] for mac related differences
+ - See [[file:Mac%20Use%20of%20Unix.org][UNIX tips specific to OS X]] for mac related differences
  - See [[file:Shell%20Scripting%20Magic.org][Shell Scripting Docs]] for some cool shell scripting commands and things that often trip me up
  - See [[file:psql%20commands.org][Postgres & psql]] for some more advice on that area (mostly psql atm)
  - See [[file:my%20emacs%20and%20keybinding%20dilemma.org][The Emacs/Linux/Super Key epic keybinding Odyssey.org]] for more info on changing keybindings in Linux
@@ -711,18 +711,15 @@ http://rubyforge.org/frs/download.php/66163/ruby-enterprise_1.8.7-2009.10_amd64.
 * SSH Stuff
 ** Adding my passphrase to my ssh shell settings
 used the command 
-ssh-add
-
-To make this work when you log into other machines
-I did ssh-add and then
+: ssh-add
+To make this work when you log into other machines I did ssh-add and then
 we created a file 
-~/.ssh/config
+: ~/.ssh/config
 that contained the following
 #+BEGIN_SRC 
 host *
    2     forwardAgent yes
 #+END_SRC 
-
 ** Getting ssh to forward your keys
 : shh -A you@wherever
 ** Being able to launch graphical X programs from another machine on your local machine
@@ -787,10 +784,10 @@ From stackoverflow:
 A valid ssh URL should look like ssh://{user}@host.xz/path/to/repo.git 
 [[http://oliver.net.au/?p=174][Git remote ssh syAZ9ERLzpF991ntax]]
 The ‘git remote add’ command takes in a html URL like parameter for even SSH like:
-ssh://<user>@<host>/<path to git repo>/
+: ssh://<user>@<host>/<path to git repo>/
 
 NOT the standard ssh scp syntax:
-ssh://<user>@<host>:<path to repo>/
+: ssh://<user>@<host>:<path to repo>/
 
 * HTTP basic Auth
 Seems to be something that prevents you accessing a web page without authorisation in the 

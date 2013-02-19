@@ -131,6 +131,12 @@ Connect as a GUI
 : emacsclient -c
 Connect from the command line
 : emacsclient -t
+* emacs-server & emacsclient
+** Doing it over a remote machine
+http://stackoverflow.com/questions/2231902/originate-edit-of-remote-file-using-emacs-tramp-from-ssh-session
+Cant get it working yet
+Its tricky as default config assumes you have a shared directory from which you can read/write to a serverfile
+
 * Key Binding
 ** Recover the normal function of a key if you destroy its binding
 For instance I rebound the "b" key with 
@@ -258,6 +264,9 @@ Make sure you dont muck this up too much as you wont get in!
 ** Didnt work when ido-mode was enabled and i was trying to login to BigMac - Would hang indefinitely
 : /ssh:Noches@BigMac:
 would ask me for my password and would then hang forever. Forced me to kill emacs.
+*** SOLUTION 
+Cancel command
+: C-g
 * Defining a mode
 ** Some really quick tricks
 You can bind a regular expression to a particular 'face' (a face is like a font)

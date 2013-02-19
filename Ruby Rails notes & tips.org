@@ -156,22 +156,31 @@ any page it doesnt matter
 or if port and host specified earlier
 : bundle exec rdebug -c -p 7000 -h 127.0.0.1
 
-*** Checking for the eistance of a =params= key/value
+*** Checking for the existance of a =params= key/value
 : if params[:country_list].present?
-
 
 * Modules and loading/accessing their inards
 ** See loaded modules
-=Module.included_modules=
+: Module.included_modules
 
 For more:
 http://www.ruby-doc.org/core-1.9.3/Module.htm
-
-** Getting at an included module from
-use =const_get= \\
+** See all modules and constants available from "Root"
+: Module.constants
+Can be used with submodules
+: Devise::constants
+*** An example of finding top level objects in a module after finding it with constants
+: Module.constants.grep /Dev/
+returns a couple of top level modules including "Devise"
+: Devise::constants
+or 
+: Devise.constants
+which can lead us down a chain of modues
+: Devise::Controllers::Helpers::ClassMethods.constants
+** Getting at an included module from IRB
+use =const_get= 
  - ActiveSupport::Deprecation is a submodule
-=ActiveSupport.const_get(:Deprecation).methods=
-
+: ActiveSupport.const_get(:Deprecation).methods
 ** Defining a module vs acccessing it
 To define a module the first time we need to decalre the full module bit
 #+BEGIN_SRC ruby
@@ -187,6 +196,7 @@ end
 #+END_SRC ruby
 
 Whereas to access it you just need something like:
+
 #+END_SRC ruby
 module LRD::FormBuilder
   # ActionPack's metaprogramming would have done this for us, if FormHelper#labeled_input 
@@ -197,6 +207,8 @@ module LRD::FormBuilder
 end
 #+END_SRC ruby
 
+** List all currently included modules
+: Module.included_modules
 * Introspection - from the command line
 ** Check an objects methods minus inhereited stuff
 obj.methods - Object.methods
@@ -224,6 +236,11 @@ obj.class_variables
 : Rails.env
 => "development"
 
+** List all objects in memory
+This will be pretty big....
+: ObjectSpace.each_object { |x| p x }
+** List all currently included modules
+: Module.included_modules
 * Gem Commands
 ** Check which gems a gem depends on (i.e. it needs)
 gem dependency  rails
@@ -382,6 +399,11 @@ becomes
 : bundle exec rake db:reset
 : bundle exec rake db:migrate
 
+*** Perform and undo specific migrations only
+to do:
+: bundle exec rake db:migrate:up VERSION=20130216040210
+and to undo:
+: bundle exec rake db:migrate:down VERSION=20130216040210
 *** Rollback Migrations
 Rollback two migrations
 : rake db:rollback STEP=2
