@@ -1,3 +1,7 @@
+#+TITLE: Things to Do
+
+ - See also [[file:Development%20&%20Apps.org][Ideas for Things to Develop]]
+
 * TODO emacs
 Also see [[file:emacs%20knowledge.org::*TO%20DO][Emacs Knowledge: TO DO]]
 ** DONE Learn Mode creation

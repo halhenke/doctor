@@ -109,7 +109,11 @@ Actually that might be outdated - the whole thing took ages but below instructio
 put 
 : gem 'debugger'
 in your Gemfile
-***** Other Configuration to be done once per app
+
+***** No configuration necesary if using a Rails server such as thin
+When you want to invoke the debugger in the code just add to the line
+: require 'debugger'; debugger
+***** Other Configuration to be done once per app - applies to Apache/Passenger
 ****** Whack this in config/environments/development.rb
 #+BEGIN_SRC ruby
   if File.exists?(File.join(Rails.root,'tmp', 'debug.txt'))
@@ -416,6 +420,9 @@ Class Countries < ActiveRecord::Base
   set_table_name "cc"
 #+END_SRC 
     
+** You can visit/find modules, classes and helpers by using tags
+i.e. place cursor on the module/class name and press
+: M-.
 * Ruby Meta/Magic Stuff
 ** You can call methods based on strings with the send method
 : object.send("add_#{@type_of_fruit}", d)
@@ -498,6 +505,38 @@ We require files - not modules or namespaces
 i.e.
 =require(''active_record/deprecation)=
 Unlike say elisp where we require a tag that is provided in a loadpath by a =provide= statement
+
+
+* Rspec
+** Be careful of scope
+Some stuff shoudl go in a 
+: before
+: after
+: it
+: let 
+block and not just in the describe section.
+Other stuff - such as including a module, should not go in these sections...
+** Rspec Rails
+*** Stubbing methods in views
+The following both used when I had a spec trying to render a view that was trying to call  a method 
+: real_user_is_admin?
+from ApplicationController
+either define the method in the spec e.g.
+#+BEGIN_SRC ruby
+def real_user_is_admin?
+  false
+end
+#+END_SRC
+or 
+: view.stub(:real_user_is_admin? => true)
+*** Stubbing current_contract
+Would work in main view but not in partial if i used
+: let (:current_contract) {jsa_contract}
+
+I needed to do 
+: before :each 
+the method
+: view.stub(:current_contract => jsa_contract)
 
 
 * How does Rake work
