@@ -58,6 +58,12 @@ Comments out both HTML and Ruby logic
 #+END_SRC web
 
 
+* Roles
+** To add an admin role
+Find admin role in Roles table
+: addy = Roles.where()
+: User.find(1).roles << addy
+
 * IRB
 ** Configuration
 http://www.rubycentral.org/pickaxe/irb.html
@@ -409,6 +415,12 @@ Rollback two migrations
 : rake db:rollback STEP=2
 Rollback to a specific version
 : rake db:migrate:down VERSION=20100905201547
+*** Perform Migration on a specific database
+If you do some migrations in dev and then you run rspec you are testing your "test" environment database
+where the migrations have not been performed.
+: bundle exec rake db:migrate RAILS_ENV=test
+Actually this generally broke and didn't work - instead use
+: bundle exec rake db:test:clone_structure
 ** Models & Associations
 *** Set table of a model to an arbitrary name
 #+BEGIN_SRC ruby

@@ -190,7 +190,7 @@ vim ~/.kde/share/config/kglobalshortcutsrc
 
 
 ** WAIT - In KDE 
-Settings -> Input Device -> Keyboard -> Layout
+: Settings -> Input Device -> Keyboard -> Layout
 If you tick 'Configure Layout' and press on the Shortcut area  and 
 input the keys "Super" + "right Arrow" it shows fucking "Meta + Right"
 and then says 
@@ -201,7 +201,7 @@ To the Batmobile!!!!!!!!!!!!
 
 ** The solution
 OK - 
-Settings -> Shortcuts & Gestures -> Global Keyboard Shortcuts
+: Settings -> Shortcuts & Gestures -> Global Keyboard Shortcuts
 and THEN under 'KDE component' you can select different KDE things 
 which have their own Keyboard Shortcuts - many of which are 'Meta' i.e. 'Super' o_o
 Fingers crossed.....

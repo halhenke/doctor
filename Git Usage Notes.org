@@ -214,6 +214,9 @@ USING Git 1.7.0:
 
 
 * Git
+
+** Seting up a global gitignore file
+: git config --global core.excludesfile ~/.gitignore_global
 ** Syntax in referring to previous commits
 The commit 3 before this one
 : HEAD~3
