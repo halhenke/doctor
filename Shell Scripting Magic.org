@@ -301,3 +301,13 @@ So i did
 : sudo chmod a+rw .bash_history 
 To make it world read/writable.\\
 Bad practice maybe but meh.
+* TODO Shebang lines & the better use of them
+Normally a shebang line does not undergo variable expansion.
+
+Is this a problem if we want to execute something, say a shell, but have it possibly change?
+e.g. 
+: /bin/sh
+might be linked to something else and we have no permisssion to change it
+
+** Use /usr/bin/env?
+** Wrapper script?

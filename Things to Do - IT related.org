@@ -42,6 +42,15 @@ that Alex/Brendan/Edward were talking about the other night
  - You have to install the "Guest Additions" and then do something like:
 : sudo mount -t vboxsf blabla /mnt
  - Not sure what blabla is - arbitrary name?
+** TODO Learn/Fix shebang thing with env variables
+   See [[file:Shell%20Scripting%20Magic.org::*Shebang%20lines%20&%20the%20better%20use%20of%20them][Shebang lines & the better use of them]] for a summary of the issue
+* TODO General Dev Tools/Help
+** TODO Make some scripts to automate tasks - possibly as a separate repo from standard tools one
+Should be in a 
+: ~/bin
+directory
+*** TODO e.g. automate some stuff after doing a git pull in rails
+Making a postpull script
 * Web Development
 ** TODO  Learn and Install nginx
 * TODO OS X

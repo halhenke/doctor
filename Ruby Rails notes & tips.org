@@ -2,6 +2,7 @@
 To restart passenger do
 : touch tmp/restart.txt
 
+
 * Bundler
 ** See local configuration options
 : bundle config --local
@@ -15,6 +16,11 @@ Otherwise you are supposed to do
 : bundle exec gem uninstall whatever
 but this doesnt seem to work
 
+** Execute multiple commands with =bundle exec=
+** TODO speed up commands run with =bundle exec=
+*** caching?
+*** Just organising everything into a script/subshell to be run with bundle exec?
+ - Might be hard to get back any results
 
 * Rake
 Show all tasks
@@ -22,6 +28,18 @@ Show all tasks
 or 
 : rake -D
 
+
+* Require arbitrary file in irb
+If you are in an arbitrary directory and you want to require a module 
+at a path relative to yourself of
+: app/helpers/des_client_helper.rb
+then the command from irb
+: require './app/helpers/des_client_helper'
+
+You gotta remember the 
+: "./"
+and leave off the
+: ".rb"
 
 * Routing
 ** member vs collection
@@ -48,6 +66,29 @@ Try is like send and can be called by itself, with args and/or blocks
 **** cool_guys.try(:find, "hal")
 **** cool_guys.try(:collect) {|g| g.name}
 
+
+* Ruby Class/Metaclass/Object/Module Hierarchy
+** Root Class
+Before Ruby 1.9 it was 
+: Object
+After it is
+: BasicObject
+
+** Parent vs Superclass?
+Superclass is  a Class instance method
+: File.superclass
+parent seems to be a module thing
+Also parents and ancestors
+* Running Shell commands from Ruby
+Several methods
+** %x(command)
+: %x(command)
+By default does not return stderr
+Can run 
+: %x(command 2>&1)
+to append stderr to stout
+** Open3 builtin module
+** Open4 gem
 
 * Commenting out Stuff in a Rails web template
 Comments out both HTML and Ruby logic
