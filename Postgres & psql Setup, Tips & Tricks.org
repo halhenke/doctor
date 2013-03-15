@@ -1,5 +1,40 @@
 #+TITLE: Postgres/psql Related Tips, Docs etc
 
+
+* Postgres Setup on Ubuntu/Debian - from Catalyst:
+First grant yourself superuser privileges:
+: sudo -su postgres createuser yourname
+list databases
+: psql -l
+Then login with 
+: psql -d databasename
+
+Databases live in
+: /var/lib/postgresql/9.1/main/
+Configuration lives in
+: /etc/postgresql/9.1/main/
+Log files live in:
+: /var/log/postgres
+
+To do a command as the postgres user
+: sudo -u postgres 
+Create Database and then
+: psql databasename < data_base_dump
+
+Restart postgres with
+: sudo /etc/init.d/postgresql restart
+
+Also - 
+in pg_hba.conf under: 
+: # IPv4 local connections:
+we changed:
+: host    all             all             127.0.0.1/32            md5
+to:
+: host    all             all             127.0.0.1/32            trust
+
+which meant we dont have to provide passwords for local connections (in drush at least)
+
+
 * Mysql, Psql Equivalents
 
 mysql: SHOW TABLES

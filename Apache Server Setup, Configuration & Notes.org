@@ -1,6 +1,74 @@
 #+TITLE: Apache Server Setup, Configuration, Tips, Notes & Troubleshooting
 
-* Comments
+* Server/Apache Management on Debian/Ubuntu
+** Getting rid of the "Could not reliably determine the server's fully qualified domain name" error 
+Add the following to =/etc/apache2/apache2.conf= 
+#+BEGIN_SRC conf
+# HAL - trying to get rid of 
+# "apache2: Could not reliably determine the server's fully qualified domain name" error...
+ServerName HALserver
+#+END_SRC
+** Restart the server
+$ sudo /etc/init.d/apache2 restart
+OR
+$ service apache2 reload
+OR
+$ apache2ctl restart
+
+other useful stuff maybe:
+check and modify which apache modules are available and enabled
+$ a2enmod
+copies a site from available to enabled directory of apache:
+$ a2ensite drupal-cat-au-website.conf  
+
+User name that runs apache etc is set in:
+/etc/apache2/envvars
+
+However are we restarting
+/etc/init.d/apache2
+OR
+ /usr/sbin/apache2
+
+** Available/Enabled Sites
+
+I edited the apache2 file:
+/etc/apache2/sites-available/default
+adding:
+    Alias /hal/ "/home/hal/work/"
+    <Directory "/home/hal/work/">
+        Options Indexes MultiViews FollowSymLinks
+        AllowOverride None
+        Order deny,allow
+        Deny from all
+        Allow from 127.0.0.0/255.0.0.0 ::1/128
+    </Directory>
+so that i can access my /home/hal/work folder at the URL:
+http://localhost/hal/
+
+Later we added
+a file:
+drupal-cat-au-website.conf 
+to the directory:
+/etc/apache2/sites-available
+This specified some site specific error/access logging in a new directory/file
+/var/log/sitelogs/drupal-site-cat-au-website/
+did:
+$ chgrp www-data /var/log/sitelogs/drupal-site-cat-au-website/
+$ chmod g+w /var/log/sitelogs/drupal-site-cat-au-website/
+$ a2ensite drupal-cat-au-website.conf 
+
+** Hosts file
+Also have to add the line:
+127.0.0.1 d.catalyst-au.net
+to /etc/hosts where d.catalyst-au.net is the SeverName from drupal-cat-au-website.conf 
+
+q
+
+** Apache on Debian uses a Non-Standard Configuration
+See here:
+http://www.control-escape.com/web/configuring-apache2-debian.html
+
+* Comments in Apache conf files
 Either # at beginning and backslash at end of line for multiline comments
 #+BEGIN_SRC apache
 # Comment goes here\

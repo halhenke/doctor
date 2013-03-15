@@ -1,35 +1,322 @@
-#+TITLE: Keyboard Settings & Keymappings in Linux
+#+TITLE: Keyboard Settings & Keymappings in Linux & Emacs
 
 * Basic Figuring out how things work in Linux
 
  - Xmodmaps maps keycodes (the actual output of the physical keyboard) to KeySyms (Logical/Virtual names)
+ - xkb is more complex and configurable...
 
 ** Important Files:
 default keyboard...thing:
-/etc/default/keyboard
+: /etc/default/keyboard
 xorg global input settings:
-/etc/X11/xorg.conf
+: /etc/X11/xorg.conf
 Present in Debian but not Ubuntu?
-/etc/X11/Xmodmap
+: /etc/X11/Xmodmap
 Lowlevel Modifier key mask stuff:
-/usr/include/X11/X.h
+: /usr/include/X11/X.h
 Available KeySym names:
-/usr/include/X11/keysymdef.h
+: /usr/include/X11/keysymdef.h
 
 ** Important Keyboard Tools:
 See the base linux mappings with:
-xmodmap
+: xmodmap
 See the output of various keys with:
-xev
+: xev
 See the output of a single key by pressing Control-V in a terminal:
 Also - 
 Graphical xmodmap configuration tool:
-xkeycaps
+: xkeycaps
 Is called to modify the way terminal prcesses key inputs:
-loadkeys
+: loadkeys
 
 ** Some web Info
 ftp://ftp.lyx.org/pub/sgml-tools/website/HOWTO/Keyboard-and-Console-HOWTO/t1659.html
+
+
+* To get info about the current bindings/output
+** From xmodmap
+: xmodmap -pke > somefile
+and then
+: xmodmap -pm >> somefile
+* xkb
+https://wiki.archlinux.org/index.php/XKB
+: xkbcomp $DISPLAY somefile
+and perhaps use with
+: setxkbmap 
+though this is for much more general configuration
+** Basic Definitions
+*** keycode
+This is a key something like 
+: 21
+ for '='
+*** state
+This is a modifier something like 
+: 0x1
+for 'Shift'
+*** keysym
+This is the combo of the other two symbols giving
+: 0x2b
+for '+'
+and it is returned by 'XLookUpString'
+** Examples
+e.g. '='
+#+BEGIN_VERSE
+KeyPress event, serial 29, synthetic NO, window 0xc00001,
+    root 0xe2, subw 0x0, time 1494706335, (454,512), root:(474,554),
+    state 0x0, keycode 32 (keysym 0x3d, equal), same_screen YES,
+    XLookupString gives 1 bytes: (3d) "="
+    XmbLookupString gives 1 bytes: (3d) "="
+    XFilterEvent returns: False
+
+KeyRelease event, serial 29, synthetic NO, window 0xc00001,
+    root 0xe2, subw 0x0, time 1494706406, (454,512), root:(474,554),
+    state 0x0, keycode 32 (keysym 0x3d, equal), same_screen YES,
+    XLookupString gives 1 bytes: (3d) "="
+    XFilterEvent returns: False
+#+END_VERSE
+and '+'
+#+BEGIN_VERSE
+KeyPress event, serial 29, synthetic NO, window 0xc00001,
+    root 0xe2, subw 0x0, time 1494708782, (454,512), root:(474,554),
+    state 0x1, keycode 32 (keysym 0x2b, plus), same_screen YES,
+    XLookupString gives 1 bytes: (2b) "+"
+    XmbLookupString gives 1 bytes: (2b) "+"
+    XFilterEvent returns: False
+
+KeyRelease event, serial 29, synthetic NO, window 0xc00001,
+    root 0xe2, subw 0x0, time 1494708911, (454,512), root:(474,554),
+    state 0x1, keycode 32 (keysym 0x2b, plus), same_screen YES,
+    XLookupString gives 1 bytes: (2b) "+"
+    XFilterEvent returns: False
+#+END_VERSE
+** XKB Keycode Translation - How Does it all work. The Gory Details
+xkb takes keycode, state and group to return keysym
+: (keycode, group, state) → keysym
+Groups are "layouts" like 
+: US-English
+*** A bit more complex internally
+xvkb has some more internal steps, summarised here:
+#+BEGIN_VERSE
+   (keycode [, group]) → type
+   (state, type) → level
+   (keycode, group, level) → S[keycode][group][level]
+#+END_VERSE
+Where
+: S
+is a translation table (xkb_symbols) and a
+: type
+is used to tell which modifiers affect which keys ("essentially it's a way to reduce the third dimension of S")
+**** e.g.
+A typical alphanumeric key is only affected by Shift - it's type is set to TWO_LEVEL, and
+: (state, TWO_LEVEL) → level = ((state >> 0) & 0x01) = state & 0x01
+which is either 0 or 1. 
+Thus it's 
+: S[keycode][0..4][0..1] 
+or 
+: S[Normal key pressed]['US English'][Shift Pressed/Not Pressed]
+instead of 
+: S[keycode][0..4][0..256]
+
+*** An xkb file layout by Sections
+**** xkb_keycodes
+Keycode definition. 
+The rest of the file doesn't use numeric keycodes, only symbolic keylabels defined in this section.
+The labels themselves are arbitrary. They are only used in xkb_symbols section later.
+**** xkb_types
+Probably not worth mucking around with.
+
+ - ONE_LEVEL keys are not affected by modifiers; e.g. it's Enter, Space, Escape, F keys, Shift/Alt/Ctrl keys and so on. 
+ - TWO_LEVEL and ALPHABETIC keys produce different keysyms depending on Shift state. All alphanumeric keys are of these types. ALPHABETIC additionally respects CapsLock.
+***** Syntax
+: modifiers= Shift+NumLock+LevelThree;
+means keys of this type are affected by Shift, NumLock and LevelThree bits only
+: map[Shift+LevelThree]= Level4;
+define which combination corresponds to which level value.
+**** xkb_compatibility
+ - Action definitions (interpret) and keyboard leds (indicator) among other things.
+ - Note that key+AnyOfOrNone(all) is equivalent to just key, but key is much easier to read.
+**** xkb_symbols
+The main section that defines what each key does. 
+i.e. go from keylabel(keycode) to keysym
+***** Syntax
+: key <LABL> { [ G1L1, G1L2, G1L3, ... ], [ G2L1, G2L2, G2L3, ... ], ... }
+where
+ - <LABL> is keylabel from xkb_keycodes section,
+ - GiLj is keysym for group i level j
+
+Key types are also specified here, either as
+#+BEGIN_VERSE
+   key.type = "T1";
+   key <...> { ... };
+   key <...> { ... };
+   key <...> { ... };
+   key.type = "T2";
+   key <...> { ... };
+   key <...> { ... };
+#+END_VERSE
+or individually
+: key <...> { type = "T", [ .... ], [ .... ] };
+
+1. The number of keysyms in each group must match the number of levels defined for this type
+2. For the list of possible keysyms check:
+: /usr/include/X11/keysymdef.h 
+**** xkb_geometry
+Completely irrelevant
+
+*** Changing modifier keys
+**** Real & Virtual Modifiers
+Real modifier bits are called Shift, Lock, Control and Mod1-Mod5. 
+There are no Alt among them. 
+Virtual modifiers were introduced to allow saying something like
+: #define Alt Mod1
+It is possible to make a usable layout without defining virtual modifiers at all. 
+Among standard modifiers, only Alt/Meta actually need such treatment, because Shift and Control are real modifiers anyway and NumLock is not normally used as a modifier.
+
+Real modifiers, M, are assigned to keys via:
+: modifier_map M { <keysym> };
+A virtual modifier, V, can be assigned to a key via:
+: interpret <keysym> { virtualMod = V; };
+
+If a virtual modifier V shares at least one keysym with a real modifier M, it is bound to M.
+
+Note that virtual modifier names are not pre-defined and must be declared in xkb_compatibility and xkb_types sections before using them:
+#+BEGIN_VERSE
+ xkb_compatibility "complete" {
+       virtual_modifiers LevelThree,NumLock,Alt;
+   }
+#+END_VERSE
+
+**** Changing a single modifier key
+You need a keysym and a matching "interpreter" entry in the relevant sections
+#+BEGIN_VERSE
+   xkb_compatibility {
+       interpret ISO_Level3_Shift { action = SetMods(modifiers=Mod5); };
+   }   
+   xkb_symbols {
+       key <LWIN> { [ISO_Level3_Shift ] };
+   }
+#+END_VERSE
+**** Changing multiple modifier keys
+Modifier map is a table that maps each of eight modifier bits to at most two keys:
+: modifier_map Mod1 { Alt_L, Alt_R };
+*** Some xkb commands/syntax
+Apparently you need the =interpret= and =modifier_map= commands to deal with state/modifier keys.
+: indicator
+this deals with LED lights and CAPSLOCK type state toggles
+: interpret
+: modifier_map
+xkb_types
+: type
+: modifiers
+: map
+: level_name
+
+*** How to find out which xkb group you are currently using
+*** Some Basic KeyMap Change examples...
+*** How this connects to xmodmap and the keycodes given by xev
+From xev we can tell
+Command Key
+: KeyCode 63 Meta_L
+: KeyCode 71 Meta_R
+Alt Key
+: KeyCode 66 Mode_switch
+: KeyCode 69 Mode_switch
+In xkbcomp xkb_keycodes we have the mappings
+#+BEGIN_VERSE
+   <KPMU> = 63;
+    <CAPS> = 66;
+    <FK03> = 69;
+    <FK05> = 71;
+#+END_VERSE
+and in xkb_symbols "unknown we have
+#+BEGIN_VERSE
+    key <KPMU> {         [          Meta_L ] };
+    key <CAPS> {         [     Mode_switch ] };
+    key <FK03> {         [     Mode_switch ] };
+    key <FK05> {         [          Meta_R ] };
+#+END_VERSE
+and at the end we have this
+#+BEGIN_VERSE
+    modifier_map Mod2 { <KPMU> };
+    modifier_map Shift { <LALT> };
+    modifier_map Lock { <SPCE> };
+    modifier_map Mod1 { <CAPS> };
+    modifier_map Control { <FK01> };
+    modifier_map Shift { <FK02> };
+    modifier_map Mod1 { <FK03> };
+    modifier_map Control { <FK04> };
+    modifier_map Mod2 { <FK05> };
+#+END_VERSE
+So Opt goes to Mod1
+and Command goes to Mod2?
+
+**** Escape key mapped to CapsLock (for VIM)
+#+BEGIN_VERSE
+key.type = "ONE_LEVEL";
+key <CAPS> { [ Escape ] };
+#+END_VERSE
+**** 
+*** Setting the xkbmap from a file
+By default xkbcomp generates a source file
+: xkbcomp $DISPLAY keymap.xkb
+Calling on a source file should generate a compiled keymap file by default
+: xkbcomp keymap.xkb
+should generate
+: keymap.xkm
+To update a display you need to call it as the destination with a compiled keymap
+: xkbcomp keymap.xkm $DISPLAY
+Otherwise you can use setxkbmap in combination with xkbcomp:
+: setxkbmap us -print | xkbcomp - $DISPLAY
+** How many times do you have to set it - per terminal?
+Seems to need to be set once per x-server.
+So if you resume a session in Open NX the xkb configuration will have reverted to default.
+** Launching Emacs and xkb
+If Emacs is already launched and you change the xkb configuration then it wont work properly.
+But if you relaunch then it should find the correct modifier bindings.
+
+Perhaps because Emacs does not bind Meta/Super/Ctrl to specific modifiers (Mod1/Mod2 etc) but 
+looks at what is bound to the literal modifiers (Mod1/Mod2/Mod3) at the time of launch 
+e.g. (Alt to Mod3, Super to Mod 4) and decides which Mod keys to bind. 
+
+For the same reason when X-Server returns to normal xkb configuration while Emacs is still 
+running it again doesnt seem to work properly - probably because it is bound to "Real Modifiers" 
+that are now bound to different keys.
+
+** Whats the best set up? Map Command to Super or Meta?
+   Not sure. KDE seemed to work with command mapped to Meta
+   Also worked good with Command mapped to Super and Alt mapped to Meta when using over NX.
+*** KDE seems to start with
+    - Command mapped to <LWIN> & <RWIN>
+    - Alt mapped to <LALT> & <RALT>
+    - Setting up the aliases
+#+BEGIN_VERSE
+    alias <ALGR> = <RALT>;
+    alias <LMTA> = <LWIN>;
+    alias <RMTA> = <RWIN>;
+#+END_VERSE
+    - setting
+#+BEGIN_VERSE
+    key <LALT> {         [           Alt_L,          Meta_L ] };
+    key <RALT> {
+        type= "TWO_LEVEL",
+        symbols[Group1]= [           Alt_R,          Meta_R ]
+    key <LWIN> {         [         Super_L ] };
+    key <RWIN> {         [         Super_R ] };
+#+END_VERSE
+    and then mapping these virtual keys to the real modifier
+#+BEGIN_VERSE
+    modifier_map Mod1 { <LALT> };
+    modifier_map Mod1 { <RALT> };
+    modifier_map Mod1 { <META> }
+    modifier_map Mod4 { <LWIN> };
+    modifier_map Mod4 { <RWIN> };
+    modifier_map Mod4 { <SUPR> };
+#+END_VERSE
+
+Also
+:     <CAPS> = 66;
+:     key <CAPS> {         [       Control_L,       Control_L ] };
+:     modifier_map Control { <CAPS> };
 
 
 * How Does This All fit Together?
@@ -59,7 +346,7 @@ Ubuntu - virtual consoles
 
 
 * PROBLEMS:
-In KDE, in Emacs the super key only works with some keys
+  In KDE, in Emacs the super key only works with some keys
 ** For some keys such as s-f it will say s-f is undefined despite it showing up in emacs keybindings
 ** For other keys such as s-up the input just wont register to emacs at all
 
@@ -68,46 +355,45 @@ https://bugs.kde.org/show_bug.cgi?id=157468
 
 
 
-If you want to use it like in windows, to trigger the menu, go to System -> Preferences -> Keyboard Shortcuts. Scroll down to and click on 'Show the panel's main menu'. Click on the right hand cell, which should change to 'New shortcut...' and press the Windows key.
+If you want to use it like in windows, to trigger the menu, go to 
+: System -> Preferences -> Keyboard Shortcuts. 
+Scroll down to and click on 'Show the panel's main menu'. Click on the right hand cell, which should change to 'New shortcut...' and press the Windows key.
 
 EDIT: turns out this doesn't work but you can make it work by pressing Alt+F2 then entering
 
-gconftool-2 --set /apps/metacity/global_keybindings/panel_main_menu --type string "Super_L"
+: gconftool-2 --set /apps/metacity/global_keybindings/panel_main_menu --type string "Super_L"
 You can bind it to other things as well. You can use it as part of a key combination in for another shortcut or for an action in compiz. For example, I have my Windows key bound to the Initiate Window Resize action (because this is easier than trying to grab the sides of the window) which can be found in Compiz Config Settings Manager  under Window Management -> Resize Window.
 
 
-Going to work around this wih a combo of xmodmap and EMACS:
-The problem:
-1 My Emacs commands are geared around an OS X configuration where Super key is used a lot
-2 KDE sits between the xmodmap settings and breaks the use of the Super key as a modifier for SOME key combinations (Super key + arrow keys, s-f) but not others (s-c, s-o etc)
-
-The solution:
+*** Going to work around this wih a combo of xmodmap and EMACS:
+**** The problem:
+1. My Emacs commands are geared around an OS X configuration where Super key is used a lot
+2. KDE sits between the xmodmap settings and breaks the use of the Super key as a modifier for SOME key combinations (Super key + arrow keys, s-f) but not others (s-c, s-o etc)
+**** The solution:
 xmodmap Super key to something else and then translate that to Super key locally in emacs, thus preserving all my existing emacs bindings...
 
-
-The idea - more detail - 
-xmodmap -e 'keycode 133 = F13'
+**** The idea - more detail -
+: xmodmap -e 'keycode 133 = F13'
 Put F13 in the appropriate mod group
 And then pick it up in Emacs by translating to super key (pseudocode follows)
-(translate-command-thing "F13" "s")
+: (translate-command-thing "F13" "s")
 This SHOULD make emacs recognise all Super_L key combinations rather than just those that KDE doesnt eat and destroy for whatever fucked up reason.
 
-Emacs key remapping functions:
-input-decode-map
+**** Emacs key remapping functions:
+: input-decode-map
 "This variable holds a keymap that describes the character sequences sent by function keys on an ordinary character terminal. This keymap has the same structure as other keymaps, but is used differently: it specifies translations to make while reading key sequences, rather than bindings for key sequences."
- local-function-key-map
+ : local-function-key-map
 "This variable holds a keymap similar to input-decode-map except that it describes key sequences which should be translated to alternative interpretations that are usually preferred. It applies after input-decode-map and before key-translation-map."
-key-translation-map
+: key-translation-map
 "This variable is another keymap used just like input-decode-map to translate input events into other events. It differs from input-decode-map in that it goes to work after local-function-key-map is finished rather than before; it receives the results of translation by local-function-key-map."
 
-Results:
+**** Results:
 If I change Command from Super_L to f13 in xmodmap and then call
-(define-key key-translation-map  (kbd "<f13>") (kbd "<s-right>"))
+: (define-key key-translation-map  (kbd "<f13>") (kbd "<s-right>"))
 Then pressing the Command key will call "s-right" and move to the end of the line
 e.g. then i can call the exact command but i cant seem to set f13 as a prefix command....
 
-
-Emacs cry for help:
+**** Emacs cry for help:
 I'm using kde on Ubuntu 12.04 and it seems to be "eating" the Windows/Super key before emacs can see it.
 
 This sucks since i have a lot of commands bound to it.
@@ -170,25 +456,19 @@ make keycode 29 = Caps_Lock and keycode 58 = Control
 
 
 * These directives associate a keycode with a keysym
-dumpkeys
-loadkeys
-showkeys
-
-
+: dumpkeys
+: loadkeys
+: showkeys
 * Using third-party programs
-keytouch
-actkbd
-xbindkeys
-
-
-* I got the Super Key working in KDE
+: keytouch
+: actkbd
+: xbindkeys
+* I finally got the Super Key working in KDE
 ** kde - Maybe edit the following files while kde is not running
 and maybe disable the "Start the Input Action Daemons on Login" option under
 System Settings -> Custom Shortcuts -> 
-vim ~/.kde/share/config/khotkeysrc
-vim ~/.kde/share/config/kglobalshortcutsrc 
-
-
+: vim ~/.kde/share/config/khotkeysrc
+: vim ~/.kde/share/config/kglobalshortcutsrc 
 ** WAIT - In KDE 
 : Settings -> Input Device -> Keyboard -> Layout
 If you tick 'Configure Layout' and press on the Shortcut area  and 
@@ -198,7 +478,6 @@ and then says
 Shortcut 'Meta + Right' in Application KWin for action Move Right" !!!!!!!!
 
 To the Batmobile!!!!!!!!!!!! 
-
 ** The solution
 OK - 
 : Settings -> Shortcuts & Gestures -> Global Keyboard Shortcuts
@@ -207,7 +486,6 @@ which have their own Keyboard Shortcuts - many of which are 'Meta' i.e. 'Super' 
 Fingers crossed.....
 
 AAAAAWWWWWWWWWWWWW   YEEEEEEEEEEEEEEEEEEEEEEEAAAAAAAAAAHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-
 
 
 * This is kinda interesting - X-Keys + contollerMate?

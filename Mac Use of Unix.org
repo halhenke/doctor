@@ -1,9 +1,10 @@
 #+TITLE: Some OS X specific tips about unix and the shell/command line
 
- - See [[file:Org-Docs/iTerm.org][iTerm]] for tips on working with the iTerm2 terminal emulator
+ - See [[file:iTerm.org][iTerm]] for tips on working with the iTerm2 terminal emulator
+ - Also see [[file:Z-Shell.org][Z-Shell]] setup, tips and tricks
 
 * Changing user settings - alternative to usermod
-In OS X use dscl
+  In OS X use dscl
 ** Adding a user to a group
 : dscl . append /Groups/the_group_you_want GroupMembership the_user
 ** Deleting a user from a group
@@ -105,3 +106,336 @@ Now i think you can add entries to your =/opt/local/etc/dnsmasq.conf= file like 
 : address=/.local/127.0.0.1
 or is it
 : server=/hunomeOnApache/127.0.0.1
+* Changing the shell in OS X
+http://superuser.com/questions/379725/how-do-i-change-a-users-default-shell-in-osx
+: chsh -s /opt/local/bin/zsh
+or
+: sudo dscl . change /users/$USER UserShell /bin/bash /opt/local/bin/zsh
+or
+: sudo dscl localhost -change /Local/Default/Users/USERNAME shell OLD_SHELL NEW_SHELL
+or to read current shell
+: echo $SHELL
+or
+: sudo dscl localhost -read /Local/Default/Users/USERNAME shell
+** This doesnt seem to work for emacs shells
+such as 
+: M-x shell
+or
+: M-x eshell
+
+* Using dscl
+http://www.deadmarshes.com/Blog/20111105010130.html
+** Listing info
+In your home directory
+: dscl . -list .
+or 
+: dscl localhost -list .
+This works best
+: sudo dscl localhost -list /Local/Default/Users/Hal
+* Open NX keys
+ - Basically you want to check out the section on [[file:my%20emacs%20and%20keybinding%20dilemma.org::*xkb][xkb]] from my emacs keybinding notes - this has everything to do with this problem?
+** The Problem 
+When loggging in from OS X often the Opt/Alt keys and especially the Command key do not work.
+** This fixed the alt key issue
+http://stackoverflow.com/questions/7093353/keymap-issues-with-nx-from-mac-os-x-lion
+editing
+: ~/.nx/config/HOST.nxs
+and changing:
+#+BEGIN_VERSE
+<option key="Current keyboard" value="false"/>
+<option key="Custom keyboard layout" value="empty"/>
+<option key="Grab keyboard" value="false"/>
+#+END_VERSE
+
+If you look in 
+: ~/.nx/temp/xxxx/sshlog you can se how the keyboard is configured on login.
+When I login from KDE where the Alt/Opt/Command/Super keys on my Apple Keyboard work properly I get
+#+BEGIN_VERSE
+Restoresession --session="Dev" ......
+--keyboard="pc101\057us"
+#+END_VERSE
+
+After applying the above changes to 
+: ~/.nx/config/HOST.nxs
+i have 
+#+BEGIN_VERSE
+Restoresession --session="dev" .......
+ --keyboard="empty\057empty"
+#+END_VERSE
+
+If i can change them - i think i am on a winner......
+
+*However* everything got screwed on KDE
+here are the settings:
+#+BEGIN_VERSE
+<option key="Current keyboard" value="true"/>
+<option key="Custom keyboard layout" value="us"/>
+<option key="Grab keyboard" value="false"/>
+#+END_VERSE
+
+** What worked on KDE again
+#+BEGIN_VERSE
+<option key="Current keyboard" value="false"/>
+<option key="Custom keyboard layout" value="us"/>
+<option key="Grab keyboard" value="false"/>
+#+END_VERSE
+
+** Looking at the output of the Command Keys and Alt keys in X Server 
+*** on OS X
+ - Launch xterm
+ - xev
+Command Key
+: KeyCode 63 Meta_L
+: KeyCode 71 Meta_R
+Alt Key
+: KeyCode 66 Mode_switch
+: KeyCode 69 Mode_switch
+Output of 
+: xmodmap -pm
+#+BEGIN_VERSE
+shift       Shift_L (0x40),  Shift_R (0x44)
+lock        Caps_Lock (0x41)
+control     Control_L (0x43),  Control_R (0x46)
+mod1        Mode_switch (0x42),  Mode_switch (0x45)
+mod2        Meta_L (0x3f),  Meta_R (0x47)
+mod3      
+mod4      
+mod5      
+#+END_VERSE
+*** On Open NX
+ - Launch xterm
+ - xev
+Command Key
+: KeyCode 63 Meta_L
+: KeyCode 71 Meta_R
+Alt Key
+: KeyCode 66 Mode_switch
+: KeyCode 69 Mode_switch
+
+Additionally though it gives other output such as 
+for Left Alt/Opt
+#+BEGIN_VERSE
+KeyRelease event, serial 33, synthetic NO, window 0x3800001,
+    root 0x1d6, subw 0x0, time 1490691041, (983,398), root:(984,476),
+    state 0x2000, keycode 66 (keysym 0xff7e, Mode_switch), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+PropertyNotify event, serial 33, synthetic NO, window 0x3800001,
+    atom 0x1d4 (XKLAVIER_STATE), time 1490691041, state PropertyNewValue
+
+PropertyNotify event, serial 33, synthetic NO, window 0x3800001,
+    atom 0x1d4 (XKLAVIER_STATE), time 1490691042, state PropertyNewValue
+#+END_VERSE
+and for Left Command Key
+#+BEGIN_VERSE
+KeyPress event, serial 33, synthetic NO, window 0x3800001,
+    root 0x1d6, subw 0x0, time 1490793462, (343,185), root:(344,263),
+    state 0x0, keycode 63 (keysym 0xffe7, Meta_L), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyRelease event, serial 33, synthetic NO, window 0x3800001,
+    root 0x1d6, subw 0x0, time 1490793549, (343,185), root:(344,263),
+    state 0x10, keycode 63 (keysym 0xffe7, Meta_L), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+#+END_VERSE
+whereas locally on OS X/X11 
+xterm just gives
+Left Alt/Opt
+#+BEGIN_VERSE
+KeyPress event, serial 29, synthetic NO, window 0xc00001,
+    root 0xe2, subw 0x0, time 1490897921, (286,80), root:(306,122),
+    state 0x0, keycode 66 (keysym 0xff7e, Mode_switch), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyRelease event, serial 29, synthetic NO, window 0xc00001,
+    root 0xe2, subw 0x0, time 1490898009, (286,80), root:(306,122),
+    state 0x2000, keycode 66 (keysym 0xff7e, Mode_switch), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+#+END_VERSE
+and for Left Command Key
+#+BEGIN_VERSE
+KeyPress event, serial 29, synthetic NO, window 0xc00001,
+    root 0xe2, subw 0x0, time 1490961304, (423,261), root:(443,303),
+    state 0x0, keycode 63 (keysym 0xffe7, Meta_L), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyRelease event, serial 29, synthetic NO, window 0xc00001,
+    root 0xe2, subw 0x0, time 1490961440, (423,261), root:(443,303),
+    state 0x10, keycode 63 (keysym 0xffe7, Meta_L), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+#+END_VERSE
+
+Output of 
+: xmodmap -pm
+#+BEGIN_VERSE
+shift       Shift_L (0x40),  Shift_R (0x44)
+lock        Caps_Lock (0x41)
+control     Control_L (0x43),  Control_R (0x46)
+mod1        Mode_switch (0x42),  Mode_switch (0x45)
+mod2        Meta_L (0x3f),  Meta_R (0x47)
+#+END_VERSE
+
+** Output of setxkbmap
+*** on OS X
+#+BEGIN_VERSE
+setxkbmap -print
+xkb_keymap {
+        xkb_keycodes  { include "empty+aliases(qwerty)" };
+        xkb_types     { include "complete"      };
+        xkb_compat    { include "complete"      };
+        xkb_symbols   { include "empty(basic)"  };
+        xkb_geometry  { include "pc(pc104)"     };
+};
+#+END_VERSE
+*** on Open NX
+#+BEGIN_VERSE
+setxkbmap -print
+xkb_keymap {
+	xkb_keycodes  { include "xfree86+aliases(qwerty)"	};
+	xkb_types     { include "complete"	};
+	xkb_compat    { include "complete"	};
+	xkb_symbols   { include "pc+empty"	};
+	xkb_geometry  { include "pc(pc104)"	};
+};
+#+END_VERSE
+
+** From man setxkbmap
+#+BEGIN_VERSE
+ USING WITH xkbcomp
+If  you have an Xserver and a client shell running on different computers and XKB configuration files on those machines are different you can get problems specifying
+a keyboard map by model, layout, options names.  This is because setxkbcomp converts these names to names of XKB configuration files according to files that  are  on
+the client side computer, then it sends the file names to the server where the xkbcomp has to compose a complete keyboard map using files which the server has.  Thus
+if the sets of files differ significantly the names that the setxkbmap generates can be unacceptable on the server side.  You can solve this problem by  running  the
+xkbcomp  on  the  client  side  too.  With the -print option setxkbmap just prints the file names in an appropriate format to its stdout and this output can be piped
+directly to the xkbcomp input. For example, the command
+: setxkbmap us -print | xkbcomp - $DISPLAY
+makes both steps run on the same (client) machine and loads a keyboard map into the server.
+#+END_VERSE
+
+
+** How I began to solve the issue on the Mac
+I fiddled with the settings of my xkbcomp on the remote machine
+: xkbcomp $DISPLAY xkb-file.xkb
+Then make the following changes
+#+BEGIN_VERSE
+xkb_symbols "unknown" {
+
+    key <KPMU> {         [          Super_L ] };
+    key <CAPS> {         [     Meta_L ] };
+    key <FK03> {         [     Meta_R ] };
+    key <FK05> {         [          Super_R ] };
+...
+    modifier_map Control { Caps_Lock };
+    modifier_map Mod1 { Meta_L };
+    modifier_map Mod1 { Meta_R };
+    modifier_map Mod2 { Super_L };
+    modifier_map Mod2 { Super_R };
+}
+#+END_VERSE
+and replaced
+#+BEGIN_VERSE
+    type "CTRL+ALT" {
+        modifiers= Control+Alt;
+        map[Control+Alt]= Level2;
+        level_name[Level1]= "Base";
+        level_name[Level2]= "Ctrl+Alt";
+    };
+#+END_VERSE
+with
+#+BEGIN_VERSE
+    type "CTRL+ALT" {
+        modifiers= Shift+Control+Alt+LevelThree;
+        map[Shift]= Level2;
+        map[LevelThree]= Level3;
+        map[Shift+LevelThree]= Level4;
+        map[Control+Alt]= Level5;
+        level_name[Level1]= "Base";
+        level_name[Level2]= "Shift";
+        level_name[Level3]= "Alt Base";
+        level_name[Level4]= "Shift Alt";
+        level_name[Level5]= "Ctrl+Alt";
+    };
+#+END_VERSE
+This meant I could do "Shift+Alt+Left/Right" to select text (but i could no longer do "Shift+Alt+Up/Down")
+
+Then to apply changes, on the remote server:
+: xkbcomp xkb-file.xkb
+: xkbcomp xkb-file.xkm $DISPLAY
+
+
+
+** The same modmap behaves badly when i am logging in from Ubunutu
+*** In Emacs
+Alt key produces Meta but Super key produces nothing with this keymapping... 
+Thats because the keys from my Apple Keyboard produce different output in xev
+(This is after the modified xkb map has been applied)
+KeyCode KeySym
+Alt/Opt: L & R
+: 64     Alt_L
+: 113   Alt_R
+Command L & R
+: 115   Super_L
+: 116   Super_R
+Caps
+: 66    Caps_Lock
+
+So Caps_Lock is directly mapped to 
+Key              KeySym
+Caps Lock     <CAPS>
+Alt L               <LALT>
+ALt R             <RALT>
+Command L   <LWIN>
+Command R  <RWIN>
+
+* Logging into Open NX from Home/Mac OSX when the session has been set to the xkb map derived from Work/KDE/Ubuntu
+You need to paste 
+: xkbcomp ~/xkb-maps/home-login-mod.xkm $DISPLAY
+to the terminal and press enter
+
+To paste you need to press
+: Control + Shift + v
+The equivalent keys are
+: '0' + '\' +  '.'
+and
+: 8
+for return
+: ]
+for
+: a
+and
+: l
+will produce
+: k
+and
+: e
+produces
+: Delete
+: r 
+produces
+: TAB
+: n
+produces
+: x
+I gotta make a more straightforward, universal keymap.....
+
+: xkbcomp ~/xkb-maps/home-login-mod.xkm $DISPLAY
+is 
+: nl
+** As a script
+ok i put the command in the file
+: ~/do-home-login-setup
+so to run i need to type
+: ./do TAB RET
+in other words
+<AB09><AB10><AC03> <AD09>
+:  Super_R  ESC u =  q  r 8

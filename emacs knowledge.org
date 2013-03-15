@@ -1104,6 +1104,9 @@ To be accurate clearer - if you have tagged all files in a directory then this c
 will show you all the functions etc defined in a file that you select - not just all files 
 in a particular TAGS file.
 : M-x list-tags <RET> FILE <RET>
+** You can visit/find modules, classes and helpers in Ruby/Rails by using tags
+i.e. place cursor on the module/class name and press
+: M-.
 * el-get
 ** How it works...sort of
 This info is pretty old...
@@ -1405,6 +1408,12 @@ I got the following bug
 : File mode specification error: (error "Lisp nesting exceeds `max-lisp-eval-depth'")
 See [[*Something%20in%20init%20file%20giving%20the%20error%20"File%20mode%20specification%20error:%20(error%20"Lisp%20nesting%20exceeds%20`max-lisp-eval-depth'")"][this bug report]] 
 *** Probably easier to add .el files to the 'auto-mode-alist for lisp-interaction-mode
+** TODO linum-mode that automatically launches only in: 
+fixed-width font environments or certain modes.
+ - Wouldnt want it in
+   - org-mode
+ - Would want it in
+   - most/all source code modes
 * Bugs
 ** A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
 ** delete-selection-mode stopped working when i saved a new buffer and text mode was enabled. 

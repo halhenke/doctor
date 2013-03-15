@@ -1,7 +1,6 @@
 #+TITLE: Javascript Tips Tricks & Troubleshooting
 
 * Javascript can be incredibly fiddly and error sensitive
-
 * Why things sometimes just don't work
 ** An earlier syntactical error means that there is a "silent failure"
 Have to get everything right.
@@ -60,3 +59,15 @@ Not really sure how to do this without refreshing the browser window....
 : skewer()
 from the browser console
 * Console
+** Look under Network/XHR to see pages/routes fetched by AJAX
+You can also set breakpoints whenever a XHR request is made under 
+Scripts/XHR Breakpoints and clicking the box
+: Any XHR
+* jQuery
+** How to tell which events are bound to a particular element
+I was told it was 
+: $._data('#filters ul.filters:not(#purchase-filter,.history_filter) input.checkbox', "events")
+but it was actually
+: ('#filters ul.filters:not(#purchase-filter,.history_filter) input.checkbox').data("events")
+or more specifically
+: ('#filters ul.filters:not(#purchase-filter,.history_filter) input.checkbox').data("events")["click"]

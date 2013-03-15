@@ -1,0 +1,30 @@
+#+TITLE: Z-Shell
+ - Also see [[file:Shell%20Scripting%20Magic.org][Shell Scripting Magic]]
+
+* Oh-My-Shell
+Can sequester into its own directory
+: git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+and add
+: source ~/.oh-my-zsh/templates/zshrc.zsh-template
+to your 
+: .zshrc 
+or 
+: .zshrc_mac
+** Customising auto-completion
+To enable custom auto-completion etc from "Oh My Shell"
+Set the plugins array  
+: plugins=(git macports mysql-macports apache2-macports rails3)
+in
+: "/Users/Hal/.oh-my-zsh/templates/zshrc.zsh-template"
+
+
+* Choosing a prompt
+: prompt clint
+
+
+* "Bash Completion"
+: typeset -A key
+: [[ -n "${key[Up]}"   ]]  && bindkey  "${key[Up]}"    history-beginning-search-backward
+: [[ -n "${key[Down]}" ]]  && bindkey  "${key[Down]}"  history-beginning-search-forward
+
+

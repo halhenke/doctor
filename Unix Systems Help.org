@@ -3,6 +3,7 @@
 *Other Org-Mode files with relevant info*
  - See [[file:Mac%20Use%20of%20Unix.org][UNIX tips specific to OS X]] for mac related differences
  - See [[file:Shell%20Scripting%20Magic.org][Shell Scripting Docs]] for some cool shell scripting commands and things that often trip me up
+ -  Also see [[file:Z-Shell.org][Z-Shell]] setup, tips and tricks
  - See [[file:psql%20commands.org][Postgres & psql]] for some more advice on that area (mostly psql atm)
  - See [[file:my%20emacs%20and%20keybinding%20dilemma.org][The Emacs/Linux/Super Key epic keybinding Odyssey.org]] for more info on changing keybindings in Linux
  - See [[file:Git%20Usage%20Notes.org][Git Usage Notes]] for info on GIT usage
@@ -83,63 +84,61 @@ From ~ directory
  - dpkg.cfg
  - dpkg-reconfigure
 
-
 ** Update Package List
-$ apt-get update
-
+: apt-get update
+** Where are package archives stored (.deb files)
+: /var/cache/apt/archives
 ** Search for package
 e.g. port search package
-$ apt-cache search package
+: apt-cache search package
 OR to match against/search only the package names
-$ apt-cache search -n package
-
+: apt-cache search -n package
 ** Info on package
 e.g. port info package
-$ apt-cache show package
+: apt-cache show package
 or more detail
-$ apt-cache showpkg package
-
+: apt-cache showpkg package
 ** Package Dependencies
-apt-cache depends sbcl
-
+: apt-cache depends sbcl
 ** Show installed packages
 e.g. port installed | grep python
-$ dpkg --get-selections | grep python
+: dpkg --get-selections | grep python
 OR
-$ dpkg -l
-
+: dpkg -l
 ** Show available packages
-$ apt-cache pkgnames
-
+: apt-cache pkgnames
 ** Show which version of a package is installed
 e.g. port installed | grep python
-$ dpkg -l | grep package
-
+: dpkg -l | grep package
 ** Show which packages a package needs that arent yet installed
+i.e. combo of 
+: apt-cache depends sbcl
+and check to see if each is installed
+I think this is equiv to 
+: port unmet sbcl
 
-
-Show which package dependecies our SYSTEM currently has unfulfilled
-$ apt-cache unmet package
-
-Show where files from a package are installed
-$ dpkg-query -L bash-completion
-
-Reconfigure package
-$ dpkg-reconfigure packagename
-
+The crazy thing is we can easily do the opposite
+:  apt-cache --recurse --installed depends sbcl
+With some effort we can get
+: apt-cache --recurse depends  emacs | grep Depends | sed 's_.*Depends: __' | xargs dpkg --status| grep Status
+** Show which package dependecies our SYSTEM currently has unfulfilled
+Nothe this prints for *all packages*
+: apt-cache unmet 
+** Show where files from a package are installed
+: dpkg-query -L bash-completion
+** Reconfigure package
+: dpkg-reconfigure packagename
 ** Show Contents of a package
 *** A package in the cache
-use apt-file 
+use apt-file
+: apt-file pkg_name
  - (probably needs to be installed and updated)
 *** A  local .deb package 
-dpkg-deb -c package.deb
-
+: dpkg-deb -c package.deb
 ** Show changelog for a package (installed)
-apt-listchanges 
-or 
-*This seems like a bit of a bitch*
-cat /usr/share/doc/somepackage/changelog.Debian.gz
-
+: apt-listchanges pkg_name
+or (*This seems like a bit of a bitch*)
+: cat /usr/share/doc/somepackage/changelog.Debian.gz
 ** Adding a package ppa with add-apt-repository 
 The following line will add a file in directory =/etc/apt/sources.list.d/=:
 : sudo add-apt-repository ppa:doctormo/wacom-plus
@@ -149,6 +148,186 @@ hal@HAL9000:~/work/test-sites/my-moodle-23$ cat /etc/apt/sources.list.d/doctormo
 deb http://ppa.launchpad.net/doctormo/wacom-plus/ubuntu precise main
 deb-src http://ppa.launchpad.net/doctormo/wacom-plus/ubuntu precise main
 #+END_SRC
+** Getting a list of packages line by line only
+: apt-cache --recurse depends  emacs | grep Depends | sed 's_.*Depends: __'
+OK Assuming we have a deb package locally we can get the top level depends via
+: dpkg --info ../emacs24-lucid_24.2+1-2_amd64.deb | grep Depends | sed -e 's_, _\n_g' | sed -e 's_(.*)__' | sed -e 's_ Depends: __'
+** Using apt-tools when you dont have root access/installing in a local directory
+Quite difficult
+*** Use dpkg to manually install package where you want
+: dpkg -i --force-not-root --root=$HOME package.deb
+**** Probems
+I created a directory 
+: ~/local
+and a variable
+: HAL_ROOT=$(pwd)
+then the comand:
+: dpkg --force-not-root --root=$HAL_ROOT -i deb-packages/emacs24-lucid_24.2+1-2_amd64.deb
+ First I needed to copy recursively the directory with all dpkg info
+: /var/lib/dpkg/
+to
+: ~/local/var/lib/dpkg/
+
+But the problem is 
+#+BEGIN_VERSE
+ error setting ownership of `./usr': Operation not permitted
+dpkg-deb: subprocess paste killed by signal (Broken pipe)
+dpkg (subprocess): failed to chroot to `/home/hal.henke/local': Operation not permitted
+#+END_VERSE
+Apparently we need chroot for this method to work and chroot needs sudo.
+*** Download source files of package and configure them manually to install locally
+#+BEGIN_SRC shell
+apt-get source package
+cd package
+./configure --prefix=$HOME
+make
+make install
+#+END_SRC
+*** Use dpkg this to extract package where you want?
+: dpkg -X 
+Think this is the same as
+: dpkg-deb -x /path/to/some.deb $HOME
+*** Setup a virtual root directory with chroot/schroot
+Kind of requires root privileges at least once
+*** Use an alternative package manager such as Nix-OS
+**** Nix-OS
+2,500 packages
+http://nixos.org/
+**** JHBuild
+https://live.gnome.org/Jhbuild
+**** Zero Install
+http://0install.net/
+**** Package Source
+ - 12000 packages
+ - Installs from source but manages dependecies apparently
+http://www.pkgsrc.org/
+*** A combination of ways
+We need to
+ - get the unmet dependencies of a package
+ - get the deb files
+ - install locally
+
+
+**** Attempts to automatically check unmet dependencies
+
+**** Force apt-cache to temporarily use an additional cache without sudo?
+Problem is that we cant use apt-cache to locate dependencies that arent installed already if we use a .deb package that we dont get from our archives
+**** Getting packages and installing locally
+Get the URLS of the packages
+: apt-get -y install --print-uris emacs | cut -d\' -f2 | grep http:// > apturls
+Get everything in that file
+: wget -i path-to-apturls-file
+Install locally (into "sub-root")
+: dpkg -x emacs24-lucid_24.2+1-2_amd64.deb sub-root/
+
+Set the dynamic library path
+: export LD_LIBRARY_PATH="/home/hal.henke/local/sub-root/usr/lib"
+
+* Using pkgsrc
+Download and compile with the unprivileged flag so we can install in our own directories
+
+A good description of bilding from source/unprivileged
+http://leaf.dragonflybsd.org/~justin/handbook/pkgsrc-sourcetree-using.html
+** How to install a package
+Change to the package directory
+: cd ~/local/pkgsrc/editors/emacs
+Build pakagae
+: bmake
+Install
+: bmake install
+** Remove package
+: bmake deinstall
+** Update package
+: bmake update
+or 
+: bmake replace
+or to update all that need updating from source
+: pkg_chk -u -s
+** Getting pkg-vulnerabilities
+: /home/hal.henke/pkg/sbin/pkg_admin -K /home/hal.henke/pkg/var/db/pkg fetch-pkg-vulnerabilities
+** Adding to your PATH
+Add the pkgsrc commands, man pages for their use and the commands installed by pkgsrc.
+
+#+BEGIN_SRC shell-script
+# Add pkgsrc commands - after regular commands
+PATH=$PATH:$HOME/pkg/sbin:$HOME/pkg/bin
+MANPATH=:$HOME/pkg/man
+#+END_SRC
+** Showing build options avilable
+From the directory of the package you are building:
+: bmake show-options
+** Changing options
+pkgsrc is going to look in a global configuration file called mk.conf
+example change - To enable mysql on builds of postfix 
+: echo "PKG_OPTIONS.postfix+=mysql" >> ~/pkg/etc/mk.conf
+*** Where is mk.conf
+The location is
+: ${PREFIX}/etc/mk.conf
+or 
+: /usr/etc/mk.conf
+if installed globally
+
+If you installed as unprivileged then 
+: PREFIX=~/pkg
+by default, so we are looking at 
+: ~/pkg/etc/mk.conf
+*** Changing options
+First see default options.
+From package src drirectory:
+: bmake show-options
+Add the following line to 
+: ~/pkg/etc/mk.conf
+Make sure you add this between the "if" flags - otherwise seems to be ignored...
+: PKG_OPTIONS.emacs=    motif -gtk
+We can see which options are supported by looking in the
+: options.mk
+file in the pkg directory and this will also tell us the name of the package to use in
+: PKG_OPTIONS.package_name
+*** Emacs specific version
+If using the "emacs" metapackage you have to set the env variable EMACS_TYPE
+: export EMACS_TYPE="emacs24"
+Must do this before installing and deinstalling - otherwise pkgsrc will 
+choose emacs23 by default.
+** PROBLEMS with installing emacs
+*** Canberra-GTK-module
+It would crash with 
+#+BEGIN_VERSE
+Gtk-Message: Failed to load module "canberra-gtk-module"
+
+(emacs-23-4:31007): Pango-WARNING **: failed to choose a font, expect ugly output. engine-type='PangoRenderFc', script='latin'
+Connection lost to X server `:1022.0'
+When compiled with GTK, Emacs cannot recover from X disconnects.
+This is a GTK bug: https://bugzilla.gnome.org/show_bug.cgi?id=85715
+For details, see etc/PROBLEMS.
+Fatal error (6)
+#+END_VERSE
+The problem seems to be that the variable 
+: GTK_MODULES 
+has the value
+: canberra-gtk-module
+so install that:
+#+BEGIN_VERSE
+cd local/pkgsrc/audio/libcanberra
+bmake
+bmake install
+#+END_VERSE
+*** No fonts
+http://mail-index.netbsd.org/pkgsrc-users/2011/07/20/msg014714.html
+
+I installed both
+: local/pkgsrc/fonts/font-misc-misc
+and
+: local/pkgsrc/fonts/font-misc-misc
+: local/pkgsrc/fonts/urw-fonts/
+*** Emacs can't find x-server and crashes
+Can start in a terminal with 
+: emacs -nw
+or start a daemon
+: emacs --daemon
+* Using nix-pkg
+: ./configure  --prefix=$HOME/hal-nix/local/ --with-store-dir=$HOME/hal-nix/store/ --localstatedir=$HOME/hal-nix/var/
+
+: The Perl modules DBI and/or DBD::SQLite are missing 
 
 * Setting up/Installing emacs24 when only emacs23 is in the apt-cache package repository
 First get all the dependencies of emacs 23 and then i think i just installed 24 to /usr/local
@@ -160,145 +339,6 @@ sudo apt-get update
 sudo apt-get install emacs-snapshot
 emacs-snapshot
 #+END_SRC bash
-
-* Vim
-** Cool & Useful Commands
-reload the .vimrc (=so= is equivallent to =source=)
-: :so $MYVIMRC
-** Setting Up Vim
-*** Two choices
-This
-https://github.com/spf13/spf13-vim
-Or
-this:
-https://github.com/amix/vimrc.git
-
-I installed amix on HAL9000
-might try spf13 on Hurricane box
-
-**** Evaluation
-Ugh spf13 has numbers package that needs Vim 7.3 - problem given we have 7.2
-
-_Later_: Yeah spf13 is *shit*, at least with the vim 7.3 setup. In contrast amix works awesome
-even over ssh i'm going to uninstall spf13 on hal-rails-box and go with amix....
-
-Actually since this vim setup stires everything in ~/.spf13-vim-3 and creates the symlinks:
-#+BEGIN_SRC
-lrwxrwxrwx  1 hal  hal     29 2012-11-26 12:55 .vimrc -> /home/hal/.spf13-vim-3/.vimrc
-lrwxrwxrwx  1 hal  hal     37 2012-11-26 12:55 .vimrc.bundles -> /home/hal/.spf13-vim-3/.vimrc.bundles
-lrwxrwxrwx  1 hal  hal     42 2012-11-26 12:55 .vimrc.bundles.fork -> /home/hal/.spf13-vim-3/.vimrc.bundles.fork
-lrwxrwxrwx  1 hal  hal     34 2012-11-26 12:55 .vimrc.fork -> /home/hal/.spf13-vim-3/.vimrc.fork
-#+END_SRC
-I will just remove the sym-links for now and run my other installation script with a simple:
-#+BEGIN_SRC bash
-git clone git://github.com/amix/vimrc.git ~/.vim_runtime
-sh ~/.vim_runtime/install_awesome_vimrc.sh
-#+END_SRC bash
-
-* Server/Apache Management
-** Getting rid of the "Could not reliably determine the server's fully qualified domain name" error 
-Add the following to =/etc/apache2/apache2.conf= 
-#+BEGIN_SRC conf
-# HAL - trying to get rid of 
-# "apache2: Could not reliably determine the server's fully qualified domain name" error...
-ServerName HALserver
-#+END_SRC
-** Restart the server
-$ sudo /etc/init.d/apache2 restart
-OR
-$ service apache2 reload
-OR
-$ apache2ctl restart
-
-other useful stuff maybe:
-check and modify which apache modules are available and enabled
-$ a2enmod
-copies a site from available to enabled directory of apache:
-$ a2ensite drupal-cat-au-website.conf  
-
-User name that runs apache etc is set in:
-/etc/apache2/envvars
-
-However are we restarting
-/etc/init.d/apache2
-OR
- /usr/sbin/apache2
-
-** Available/Enabled Sites
-
-I edited the apache2 file:
-/etc/apache2/sites-available/default
-adding:
-    Alias /hal/ "/home/hal/work/"
-    <Directory "/home/hal/work/">
-        Options Indexes MultiViews FollowSymLinks
-        AllowOverride None
-        Order deny,allow
-        Deny from all
-        Allow from 127.0.0.0/255.0.0.0 ::1/128
-    </Directory>
-so that i can access my /home/hal/work folder at the URL:
-http://localhost/hal/
-
-Later we added
-a file:
-drupal-cat-au-website.conf 
-to the directory:
-/etc/apache2/sites-available
-This specified some site specific error/access logging in a new directory/file
-/var/log/sitelogs/drupal-site-cat-au-website/
-did:
-$ chgrp www-data /var/log/sitelogs/drupal-site-cat-au-website/
-$ chmod g+w /var/log/sitelogs/drupal-site-cat-au-website/
-$ a2ensite drupal-cat-au-website.conf 
-
-** Hosts file
-Also have to add the line:
-127.0.0.1 d.catalyst-au.net
-to /etc/hosts where d.catalyst-au.net is the SeverName from drupal-cat-au-website.conf 
-
-q
-
-** Apache on Debian uses a Non-Standard Configuration
-See here:
-http://www.control-escape.com/web/configuring-apache2-debian.html
-
-* Postgres Setup
-
-First grant yourself superuser privileges:
-: sudo -su postgres createuser yourname
-
-list databases
-: psql -l
-
-Then login with 
-: psql -d databasename
-
-
-Databases live in
-: /var/lib/postgresql/9.1/main/
-Configuration lives in
-: /etc/postgresql/9.1/main/
-Log files live in:
-: /var/log/postgres
-
-: sudo -u postgres 
-
-Create Database and then
-: psql databasename < data_base_dump
-
-Restart postgres with
-: sudo /etc/init.d/postgresql restart
-
-Also - 
-in pg_hba.conf under: 
-: # IPv4 local connections:
-we changed:
-: host    all             all             127.0.0.1/32            md5
-to:
-: host    all             all             127.0.0.1/32            trust
-
-which meant we dont have to provide passwords for local connections (in drush at least)
 
 
 * Editing files on remote machines from EMACS via TRAMP
@@ -315,9 +355,9 @@ Make sure you dont muck this up too much as you wont get in!
 * Editing files as root or another user on the local machine using TRAMP
 
 Slightly different syntax here
-C-x C-f /sudo:root@localhost:/path/to/whatever
+: C-x C-f /sudo:root@localhost:/path/to/whatever
 or just:
-C-x C-f /sudo:hal@localhost:/path/to/whatever
+: C-x C-f /sudo:hal@localhost:/path/to/whatever
 
 * scp doesn't work if your .bashrc_local or other files produce output
 You will have to remove any messages such as 
