@@ -68,6 +68,6 @@ Scripts/XHR Breakpoints and clicking the box
 I was told it was 
 : $._data('#filters ul.filters:not(#purchase-filter,.history_filter) input.checkbox', "events")
 but it was actually
-: ('#filters ul.filters:not(#purchase-filter,.history_filter) input.checkbox').data("events")
+: $('#filters ul.filters:not(#purchase-filter,.history_filter) input.checkbox').data("events")
 or more specifically
-: ('#filters ul.filters:not(#purchase-filter,.history_filter) input.checkbox').data("events")["click"]
+: $('#filters ul.filters:not(#purchase-filter,.history_filter) input.checkbox').data("events")["click"]
