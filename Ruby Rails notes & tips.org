@@ -304,6 +304,8 @@ This will be pretty big....
 : ObjectSpace.each_object { |x| p x }
 ** List all currently included modules
 : Module.included_modules
+** List included modules in a specific module? Not sure
+: (class << helper; self; end).send :included_modules
 * Gem Commands
 ** Check which gems a gem depends on (i.e. it needs)
 gem dependency  rails
@@ -384,6 +386,8 @@ This is the last migration file prefix we have done
 *** Show how Rails will convert form Key/Value Pairs into a params hash
 On the command line do this:
 : Rack::Utils.parse_query "user[]=baby&user[]=non&name=fred&phone=0123456789"
+*** Running my own scripts from a custom directory - easy way
+: load('hal/scripts/' + Dir.entries('hal/scripts')[8])
 ** Sprockets
 *** Located in
 : app/assets/stylesheets/application.css/ 
@@ -491,7 +495,7 @@ Rollback two migrations
 : rake db:rollback STEP=2
 Rollback to a specific version
 : rake db:migrate:down VERSION=20100905201547
-*** Perform Migration on a specific database
+*** Recreating migrations for Test Database
 If you do some migrations in dev and then you run rspec you are testing your "test" environment database
 where the migrations have not been performed.
 : bundle exec rake db:migrate RAILS_ENV=test
@@ -592,6 +596,15 @@ Unlike say elisp where we require a tag that is provided in a loadpath by a =pro
 
 
 * Rspec
+** It syntax
+either
+#+BEGIN_SRC ruby
+it "string" do
+ something.should ....
+end
+#+END_SRC
+or 
+: it { should ..... }
 ** Be careful of scope
 Some stuff shoudl go in a 
 : before
@@ -622,7 +635,35 @@ I needed to do
 the method
 : view.stub(:current_contract => jsa_contract)
 
+* FactoryGirl
+** Can test from the console
+Must be in test environment
+: bundle exec rails c test
+and then try something like
+: FactoryGirl.create :des_contract_referral_detail
+Or to specify some traits ('dms' and 'suspended')
+: FactoryGirl.create(:des_contract_referral_detail, :dms, :suspended)
+** TopMost factory definition must match an existing model/table definition
+e.g 
+#+BEGIN_SRC ruby
+FactoryGirl.define do
+  
+  factory :des_contract_referral_detail do
+    association :client_on_des_contract
+    ........
+#+END_SRC
+must be a model called
+: DesContractReferralDetail
+and cant write 
+: des_contract_referral_details
 
+** Be careful with associations
+* Navigating directory tree from the console
+Basically - the Dir module
+pwd
+: Dir.pwd
+ls
+: Dir.entries "app"
 * How does Rake work
 Call rake in a directory it will automatically call the Rakefile
 
@@ -771,6 +812,9 @@ Both these are viable ways to do this and might be equivalent:
 @user_profile_knowtype.user_profile = @user_profile
 #+END_SRC ruby
 
+** Queries from Console
+*** Find field where string is not nil or non empty
+: FormQuestion.where("hidden is not NULL").select{|fq| fq.hidden != ""}
 
 * Weird Errors
 ** Gem install brings in lots of different stuff inexplicably - UNSOLVED
@@ -937,3 +981,6 @@ file. Instead it will look only in the asset pipeline path i.e.
 : lib/assets/javascripts
 : vendor/assets/javascripts
 (unless configured to do so)
+** Rails Active Record Clone vs Dup
+http://torontoprogrammer.ca/2012/06/spot-the-bug-rails-dup-vs-clone/
+"So to summarize: if you want to make a quick copy of an ActiveRecord that’s in addition to the one that’s already in the table, use dup, not clone, as of Ruby on Rails 3.1.  And add tests and read release notes…"

@@ -1436,6 +1436,26 @@ Alternatively it can take a filename optional argument to load.
 ** DONE Line Numbering package.
 ** TODO Follow links in directories in current window
 ** TODO Save window and frame configuration 
+*** Possible Solution using Workgroups
+ - On init
+   - load all workgroups in wg-load-path in new frames
+     - perhaps ask for each one?
+   - On exit
+     - iterate through existing frames
+       - If a workgroup exists then
+	 - update it
+	   - (y-or-n?)
+	 - save to wg-file-path
+       - If a workgroup does not exist
+	 - create a new one
+	   - (y-or-n?)
+	 - save to wg-file-path
+**** Custom vs Default
+ - Custom
+   - Ask for each one
+ - Default or quick shutdown
+   - save everything
+
 ** DONE A function bound to "s-4" (Command 4) that creates a "square" set of 4 windows in the current frame.
 ** TODO Fix the require stuff for rinari - stuff should be in util subdirectory?
 ** DONE <Command Tab> for tab completion or something like it
@@ -1476,6 +1496,11 @@ fixed-width font environments or certain modes.
    - org-mode
  - Would want it in
    - most/all source code modes
+* TODO Ideas
+** TODO Startup Magit
+On init create a new frame programatically,
+change to a certain directory (prompt?) and run magit-status
+ - Integrate with workgroups?
 * Bugs
 ** General
 *** TODO A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
@@ -1498,3 +1523,5 @@ Can see why that wouldn't work
 *** On KDE - set-frame-font not working properly on initialization
 : (set-frame-font "DejaVu Serif-10" nil t)
 is giving me something insanely huge
+*** On Ubuntu10.04 - fonts disappear
+Its an xorg/ncurses type error

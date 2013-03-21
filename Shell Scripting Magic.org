@@ -73,9 +73,11 @@ ps -ef | grep apache
           ps -eo pid,tt,user,fname,tmout,f,wchan
 ** List output Codes
 ps L
-** A good format - PID  TT   USER     GROUP    COMMAND  COMMAND
-ps -eo pid,tt,user,group,fname,args | grep pass
-
+** A good format - PID  TT   USER     GROUP    COMMAND  COMMAND UserName
+: ps -eo pid,tt,user,group,fname,args,uname | grep pass
+** The same with COLUMN TITLES
+: ps -eo pid,tt,user,group,fname,args,uname | grep "emacs\|PID"
+Obviously use something else if you dont expect PID to be in the title
 * Is the following syntax possible to set and ENV variable and call a command?
 : RAILS_ENV=development ruby management_scripts/tmp.rb
 I think you want this?
