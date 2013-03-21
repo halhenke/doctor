@@ -136,7 +136,63 @@ Connect from the command line
 http://stackoverflow.com/questions/2231902/originate-edit-of-remote-file-using-emacs-tramp-from-ssh-session
 Cant get it working yet
 Its tricky as default config assumes you have a shared directory from which you can read/write to a serverfile
+** Doing it over Open NX
+*** What i know so far
+I had to get rid of the following to connect
+#+BEGIN_SRC elisp
+(setq server-use-tcp 't)
+;; This tells emacsclient who to connect to
+(setq server-host "localhost") 
+#+END_SRC
+and 
+: emacs --daemon didnt seem to work either
+only if i ran
+: server-start 
+from emacs
+** Stopping emacs in server-mode
+From the command line
+: emacsclient -e "(save-buffers-kill-emacs)"
+or
+: emacsclient -e "(kill-emacs)"
+* Saving frames/windows/buffers configuration
+** workgroups.el
+Its a minor mode
+ - In init file:
+: (workgroups-mode 1)
+and
+: (wg-revert-workgroup) 
+: (wg-update-workgroup) 
+** perspective-el
+https://github.com/nex3/perspective-el
+** window-configuration-to-register
+Stores the configuration of a single frame in a register
 
+To store:
+: C-x r w <register>
+To restore:
+: C-x r j <register>
+where
+: <register>
+is a single character
+** elscreen
+** revive
+** winner-mode
+In init file
+: (winner-mode 1)
+and then
+: winner-undo
+and
+: winner-redo
+to switch between window configurations
+** layout-restore
+: (el-get-install layout-restore)
+** others
+See
+http://www.emacswiki.org/emacs/FramesAndRegisters
+
+: M-: (info "(emacs) Window Convenience") 
+and 
+: M-: (info "(emacs) RegConfig")
 * Key Binding
 ** Recover the normal function of a key if you destroy its binding
 For instance I rebound the "b" key with 
@@ -1088,7 +1144,13 @@ First you will need to get a more recent version of etags
 By default there is no etags alias to this new command so to generate emacs compatible tags call like this
 : ctags -eR app/
 the '-R' flag is recursive
-** Invoke etags
+** Additional ways to control the use of etags/ctags
+*** Specify output to a particular file
+Use the -f flag
+: ctags -Ref SIGMA_TAGS vendor/sigma.js
+*** Exclude files/files matching a pattern from the tags table
+Use the --exclude flag
+: ctags -Ref SIGMA_TAGS --exclude="vendor/sigma.js/plugins/*" vendor/sigma.js
 ** Find all TAGS tables
 : M-x locate <RET> TAGS <RET>
 If you have never generated the "locate" database before you will be prompted to run

@@ -23,6 +23,13 @@ Also see [[file:emacs%20knowledge.org::*TO%20DO][Emacs Knowledge: TO DO]]
 *** TODO Particularly I want these to open in ruby-mode 
  - .rake files
  - Gemfile
+** TODO Make some modes open with certain fonts and with linum-mode etc
+*** Source Code Files
+ - Fixed width
+ - linum-mode
+*** Org-Mode and Other Stuff
+ - No linum-mode
+ - Fancy font?
 * TODO vim
 ** Define some reasonably sane settings/customisations
  - especially some that are emacs compatible

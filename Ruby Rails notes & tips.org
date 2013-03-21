@@ -373,7 +373,10 @@ This is the last migration file prefix we have done
 On the command line do this:
 : Rack::Utils.parse_query "user[]=baby&user[]=non&name=fred&phone=0123456789"
 ** Sprockets
- - =app/assets/stylesheets/application.css/= and =app/assets/javascripts/application.js/=
+*** Located in
+: app/assets/stylesheets/application.css/ 
+and 
+: app/assets/javascripts/application.js/
 *** Comments
  - anything which is preceded with an = sign is included
  - otherwise its commented out
@@ -392,6 +395,22 @@ is "commented out". while
 :  *= require_tree .
 is not.
 
+*** require and require_tree and paths to assets
+When you use require_tree in a Manifest file such as 
+: application.js
+it will search for a path relative to the location of that manifest file.
+**** Getting around awkward path requirements
+That can be awkward if you have a filetree/path in another directory like 
+: vendor/assets/javascripts/sigma
+which would require the line
+: //= require_tree ../../../vendor/assets/javascripts/sigma 
+
+To get around this you can put a manifest file in
+: vendor/assets/javascripts/sigma/manifest.js
+which has the line
+: //= require_directory .
+and then in application.js you can get the whole thing with
+: //= require sigma/manifest
 ** Migrations
 *** See which migrations have been done and which haven't yet
 : bundle exec rake db:migrate:status
@@ -892,3 +911,17 @@ My =./.rdebugrc= file was mispelled as =./.redbug.rc=
 * Rails Learning Resources
 Code Academy
 Rails 4 Zombies
+
+* Gotchas
+** =javascript_include_tag= and public/javascripts folder
+Contrary to documentation, from 3.1 onwards c
+: = javascript_include_tag "nested_form" 
+will not look in 
+: public/javascripts 
+for the 
+: nested_form.js
+file. Instead it will look only in the asset pipeline path i.e.
+: app/assets/javascripts
+: lib/assets/javascripts
+: vendor/assets/javascripts
+(unless configured to do so)
