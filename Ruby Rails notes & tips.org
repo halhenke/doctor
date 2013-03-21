@@ -260,6 +260,18 @@ end
 
 ** List all currently included modules
 : Module.included_modules
+** Can call a function from a module without including it/extending it with module_function
+if you have 
+#+BEGIN_SRC ruby
+module UsefulThings
+  def a()
+    puts "aaay"
+  end
+  module_function :a
+#+END_SRC
+then from the command line you could call
+: UsefulThings.a
+However module_function must be placed after the function definition in the module
 * Introspection - from the command line
 ** Check an objects methods minus inhereited stuff
 obj.methods - Object.methods

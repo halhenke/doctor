@@ -1477,19 +1477,24 @@ fixed-width font environments or certain modes.
  - Would want it in
    - most/all source code modes
 * Bugs
-** A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
-** delete-selection-mode stopped working when i saved a new buffer and text mode was enabled. 
+** General
+*** TODO A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
+*** TODO delete-selection-mode stopped working when i saved a new buffer and text mode was enabled. 
 Started working again after i deactivated and re-activated the mode
-** When I used <Command b> or tried to switch to a buffer it would not change the buffer in the current window
+*** TODO When I used <Command b> or tried to switch to a buffer it would not change the buffer in the current window
 as normal but would move me to a currently open window in another frame which was already showing the buffer. 
 Not necessarily a bad thing but would like this behaviour to be consistent. 
 
-** Ido-Mode does Not play well with ssh/tramp - causes whole of emacs to hang
- - Seems to happen only with local connections to BigMac
- - Cant open when ido-mode is on
- - If I have an old connection that TRAMP presumably tries to re-authenticate while ido-mode is enabled then emacs effectively crashes - it hangs indefinitely
+*** TODO Ido-Mode does Not play well with ssh/tramp - causes whole of emacs to hang
+  - Seems to happen only with local connections to BigMac
+  - Cant open when ido-mode is on
+  - If I have an old connection that TRAMP presumably tries to re-authenticate while ido-mode is enabled then emacs effectively crashes - it hangs indefinitely
 
-** Something in init file giving the error "File mode specification error: (error "Lisp nesting exceeds `max-lisp-eval-depth'")"
+*** TODO Something in init file giving the error "File mode specification error: (error "Lisp nesting exceeds `max-lisp-eval-depth'")"
 Tracked down to this line of code in an initialization file:
 : (add-hook 'emacs-lisp-mode-hook 'lisp-interaction-mode)
 Can see why that wouldn't work
+** Unix
+*** On KDE - set-frame-font not working properly on initialization
+: (set-frame-font "DejaVu Serif-10" nil t)
+is giving me something insanely huge
