@@ -635,6 +635,42 @@ I needed to do
 the method
 : view.stub(:current_contract => jsa_contract)
 
+** should & Matchers e.g. should_equal etc
+should takes a matcher and a method
+: - (Object) should(matcher = nil, message = nil)
+Default matchers are things like
+#+BEGIN_VERSE
+should be
+should be_true
+should be_false
+should be_nil
+should be_arbitrary_predicate(*args)
+should_not be_nil
+should_not be_arbitrary_predicate(*args)
+#+END_VERSE
+*** Automagic predicate/boolean matchers
+Rspec will also automagically create matchers for any predicates - e.g. boolean methods ending in ?
+A Ruby predicate is a method that ends with a "?" and returns true or false. 
+#+BEGIN_VERSE
+empty?
+nil? 
+instance_of?
+#+END_VERSE
+All you need to do is write =should be_= followed by the predicate without the question mark, and RSpec will figure it out from there
+*** Custom matchers
+These can also be defined
+** subject
+Can be decalred explicitly
+: subject { Person.new(:birthdate => 19.years.ago) }
+if so it will be automatically be called on it e.g.
+: it { should_be false}
+else an implicit subject will call should on the thing you are describing
+#+BEGIN_SRC ruby
+describe Widget do
+  it { should validate_presence_of(:name) }
+end
+#+END_SRC
+is called on Widget
 * FactoryGirl
 ** Can test from the console
 Must be in test environment
