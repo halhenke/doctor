@@ -1000,6 +1000,8 @@ i.e. from development.rb or Hunome::Application.configure
 Why doesnt start_remote/start_server seem to get called?
 My =./.rdebugrc= file was mispelled as =./.redbug.rc=
 
+* TODO Cool Things
+** TODO List/iterate over all models in the app from the console
 * Rails Learning Resources
 Code Academy
 Rails 4 Zombies
