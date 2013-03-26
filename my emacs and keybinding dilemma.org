@@ -318,6 +318,12 @@ Also
 :     key <CAPS> {         [       Control_L,       Control_L ] };
 :     modifier_map Control { <CAPS> };
 
+** Further Problems
+ - require look at
+   - xkb_compatibility "complete"?
+   - xkb_types "complete"?
+*** Caps Lock mapped to Control_L
+
 
 * How Does This All fit Together?
 http://forums.gentoo.org/viewtopic.php?t=51783

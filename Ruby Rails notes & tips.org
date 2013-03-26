@@ -1002,6 +1002,19 @@ My =./.rdebugrc= file was mispelled as =./.redbug.rc=
 
 * TODO Cool Things
 ** TODO List/iterate over all models in the app from the console
+Can sort of do this - bascially This would show all objects of class Contract in existence
+: ObjectSpace.each_object(Contract).map{|ar| ar.class.name}
+And i could show all Classes with
+: ObjectSpace.each_object(Class).map{|ar| ar.class.name}
+However - even though
+: Contract.superclass.name
+ => "ActiveRecord::Base"
+: ObjectSpace.each_object(ActiveRecord::Base).map{|ar| ar.class.name}
+gives me a bunch of stuff this maybe isnt quite what i wanted
+ - i wanted to see which Classes the current environment has loaded
+   - e.g. Helpers, Controllers, Models/ActiveRecords etc
+But not necessarily which instances I have in non garbage collected memory 
+ 
 * Rails Learning Resources
 Code Academy
 Rails 4 Zombies
