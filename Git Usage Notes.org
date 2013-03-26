@@ -13,6 +13,8 @@ Git will prevent you from pushing older changes over newer changes (?)
 1. The =HEAD= pointer/ref determines which branch you are on by pointing to a particular branchname pointer/ref
 2. The branchname pointer/ref points tot the latest commit on each branch
 
+* As compared to Mercurial
+http://stackoverflow.com/questions/1598759/git-and-mercurial-compare-and-contrast/1599930#1599930
 * What do these Commands do?
 # Separate into:
 # * Porcelain
@@ -214,7 +216,9 @@ USING Git 1.7.0:
 
 
 * Git
-
+** Getting the most recent commit from all remote branches
+# Credit http://stackoverflow.com/a/2514279
+: for branch in `git branch -r | grep -v HEAD`;do echo -e `git show --format="%ci %cr" $branch | head -n 1` \\t$branch; done | sort -r
 ** Seting up a global gitignore file
 : git config --global core.excludesfile ~/.gitignore_global
 ** Syntax in referring to previous commits
@@ -224,8 +228,6 @@ or
 : HEAD^^^
 commit just before current one
 : HEAD^
-** As compared to Mercurial
-http://stackoverflow.com/questions/1598759/git-and-mercurial-compare-and-contrast/1599930#1599930
 ** Terminology and features
 
 |--------------+---------------------------------------------------------------------------------------------------------------|
@@ -299,7 +301,12 @@ You need the command
 ~/project $ git remote add origin ~/Google\ Drive/git/project.git
 ~/project $ git push -u origin master
 #+END_VERSE
-** gitignore
+** gitignore and =.git/info/excludes=
+*** The difference between ignores and excludes
+Ignore is a file that can be shared between repositories
+
+Excludes lives in .git and cannot be shared - therefore it is suitable for 
+local files and folders that wont be shared with others
 *** Comments
 Any line beginning with #
 : # a comment

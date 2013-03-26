@@ -15,6 +15,45 @@ and it would never fire unti I placed it after the form.
 Not sure why.
 *** IN Rails the order you include scripts in the asset pipeline must be correct.
 
+** Not creating an object properly
+In Leaflet.js it said you could create a newobject with
+#+BEGIN_SRC javascript
+    myIcon = L.Icon({
+	iconUrl: 'Hulk_Leap.png',
+	iconSize: [102, 64]
+    });
+#+END_SRC
+but this didnt work (it would not return a valid object reference) without a call to "new"
+e.g. 
+#+BEGIN_SRC javascript
+    myIcon = new L.Icon({
+	iconUrl: 'Hulk_Leap.png',
+	iconSize: [102, 64]
+    });
+#+END_SRC
+Curiously though
+: L.marker()
+did return a valid object 
+*** Why Didnt this work
+If I called 
+: L.marker
+from the command line I get
+: function (t,e){return new n.Marker(t,e)}
+whereas if I call L.Icon or L.DivIcon (which also doesn't work) I get
+: function (){this.initialize&&this.initialize.apply(this,arguments),this._initHooks&&this.callInitHooks()}
+
+The reason - I should have called *L.icon* instead of *L.Icon*
+*** How were the two working/not working objects defined
+**** L.marker
+#+BEGIN_SRC javascript
+L.marker = function (latlng, options) {
+	return new L.Marker(latlng, options);
+#+END_SRC
+**** L.icon
+#+BEGIN_SRC javascript
+L.icon = function (options) {
+	return new L.Icon(options);
+#+END_SRC
 * Skewer-Mode in Emacs
 ** Load it from el-get or elpa
 Since the MELPA repository was down I added this to el-get-sources to install it:
