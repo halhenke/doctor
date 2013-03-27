@@ -110,3 +110,12 @@ but it was actually
 : $('#filters ul.filters:not(#purchase-filter,.history_filter) input.checkbox').data("events")
 or more specifically
 : $('#filters ul.filters:not(#purchase-filter,.history_filter) input.checkbox').data("events")["click"]
+*** More completely
+#+BEGIN_SRC javascript
+var click_events = $('a.update_supplier_status').data('events').click;
+$.each(click_events, function(key, handlerObj) {
+  console.log(handlerObj.handler);
+});
+#+END_SRC
+But this just seems to return the javascript event handler - I want thte actual specific code from our application.....
+http://stackoverflow.com/questions/570960/how-to-debug-javascript-jquery-event-bindings-with-firebug-or-similar-tool
