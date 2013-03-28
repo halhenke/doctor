@@ -324,6 +324,11 @@ Also
    - xkb_types "complete"?
 *** Caps Lock mapped to Control_L
 
+** When i logged in from home and then work again it seemed to change the behaviour of the Caps Lock key
+** Now i dont need to set it when logging into Open NX at work?
+Or did I set some shell script somewhere to automatically run
+: do-new-work-xkb-setup
+and i cant remember?
 
 * How Does This All fit Together?
 http://forums.gentoo.org/viewtopic.php?t=51783

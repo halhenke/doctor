@@ -388,6 +388,10 @@ On the command line do this:
 : Rack::Utils.parse_query "user[]=baby&user[]=non&name=fred&phone=0123456789"
 *** Running my own scripts from a custom directory - easy way
 : load('hal/scripts/' + Dir.entries('hal/scripts')[8])
+Better way - get proper scripts
+: Dir.entries('hal/scripts').select{|fn| not fn.include? "~"}
+then 
+: load('hal/scripts/' + Dir.entries('hal/scripts').select{|fn| not fn.include? "~"}[4])
 ** Sprockets
 *** Located in
 : app/assets/stylesheets/application.css/ 
@@ -495,6 +499,7 @@ Rollback two migrations
 : rake db:rollback STEP=2
 Rollback to a specific version
 : rake db:migrate:down VERSION=20100905201547
+The "VERSION" is important...
 *** Recreating migrations for Test Database
 If you do some migrations in dev and then you run rspec you are testing your "test" environment database
 where the migrations have not been performed.
