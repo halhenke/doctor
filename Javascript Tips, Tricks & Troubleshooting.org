@@ -1,5 +1,14 @@
 #+TITLE: Javascript Tips Tricks & Troubleshooting
 
+* HowTo
+** Enumerate all the properties of an object/prototype
+3 ways as of ECMAScript5
+*** for...in loops
+This method traverses all enumerable properties of an object and its prototype chain
+*** Object.keys(o)
+This method returns an array with all the own (not in the prototype chain) enumerable properties names ("keys") of an object o.
+*** Object.getOwnPropertyNames(o)
+This method returns an array containing all own properties names (enumerable or not) of an object o.
 * Javascript can be incredibly fiddly and error sensitive
 * Why things sometimes just don't work
 ** An earlier syntactical error means that there is a "silent failure"
@@ -103,6 +112,10 @@ You can also set breakpoints whenever a XHR request is made under
 Scripts/XHR Breakpoints and clicking the box
 : Any XHR
 * jQuery
+** Tell which version you are running from the command line
+: $().jquery; 
+or 
+: $.fn.jquery wh
 ** How to tell which events are bound to a particular element
 I was told it was 
 : $._data('#filters ul.filters:not(#purchase-filter,.history_filter) input.checkbox', "events")
@@ -119,3 +132,11 @@ $.each(click_events, function(key, handlerObj) {
 #+END_SRC
 But this just seems to return the javascript event handler - I want thte actual specific code from our application.....
 http://stackoverflow.com/questions/570960/how-to-debug-javascript-jquery-event-bindings-with-firebug-or-similar-tool
+*** Apparently this isnt the way after jQuery 1.7
+#+BEGIN_SRC javascript
+var elem = $('#someid')[0];
+var data = jQuery.hasData( elem ) && jQuery._data( elem );
+console.log(data.events);
+#+END_SRC
+** Return the id, class of an object
+: $(".class_name").attr("id")

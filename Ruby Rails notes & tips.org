@@ -516,6 +516,15 @@ Class Countries < ActiveRecord::Base
 ** You can visit/find modules, classes and helpers by using tags
 i.e. place cursor on the module/class name and press
 : M-.
+** Render Javascript from View/Controller
+: render :js => "$('div#{my_id}').remove()"
+** Rendering Partials with collections and local variable names
+#+BEGIN_VERSE
+When a partial is called with a pluralized collection, then the individual instances of the partial have access to the member of the collection being rendered via a variable named after the partial. In this case, the partial is _product, and within the _product partial, you can refer to product to get the instance that is being rendered.
+#+END_VERSE
+In Rails 3 you can also render a partial just by rendering a collection with the same name
+: = render @products
+will render the _product partial with the @products collection
 * Ruby Meta/Magic Stuff
 ** You can call methods based on strings with the send method
 : object.send("add_#{@type_of_fruit}", d)

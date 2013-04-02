@@ -880,6 +880,8 @@ Which links to
     command can be helpful.  It describes the character at point, and names the font that it's rendered in.
 ** List properties of the current font
 : describe-font
+This is also a full low level Lisp description - not really suitable for feeding back to 
+: set-default-font
 ** Font changing Commands
 This is a pretty good reference
 http://ergoemacs.org/emacs/emacs_switching_fonts.html
