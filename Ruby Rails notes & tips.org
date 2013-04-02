@@ -1020,6 +1020,10 @@ gives me a bunch of stuff this maybe isnt quite what i wanted
    - e.g. Helpers, Controllers, Models/ActiveRecords etc
 But not necessarily which instances I have in non garbage collected memory 
  
+** Grep attribute_names of an ActiveRecord
+More or less pipe 
+: User.attribute_names
+into grep
 * Rails Learning Resources
 Code Academy
 Rails 4 Zombies

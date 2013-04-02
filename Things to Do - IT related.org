@@ -1,6 +1,6 @@
 #+TITLE: Things to Do
 
- - See also [[file:Development%20&%20Apps.org][Ideas for Things to Develop]]
+ - See also [[file:Development%20&%20Apps.org][Ideas for Things to Develop (Apps, gems, tools etc)]]
 
 * TODO emacs
 Also see [[file:emacs%20knowledge.org::*TO%20DO][Emacs Knowledge: TO DO]]
@@ -17,12 +17,38 @@ Also see [[file:emacs%20knowledge.org::*TO%20DO][Emacs Knowledge: TO DO]]
    - its a code introspection mode - not code modification
  - probably tie it into org-mode bindings
    - i.e. TAB will show or hide something etc
+*** TODO Js2-Mode has the right idea i think
+Get rid of the '@' symbol
+Show entry
+: C-c C-e
+Hide Entry
+: C-c C-c
+Show all
+: C-c C-a
+Hide all
+: C-c C-t
+Toggle functions
+: C-c C-f
+Toggle comments!
+: 
 ** TODO Get a Better Multi-Mode
  - minmamo mode sucks
 ** TODO Add some filetypes to be automatically opened in a certain mode
 *** TODO Particularly I want these to open in ruby-mode 
  - .rake files
  - Gemfile
+*** I seem to have great difficulty with .js files and js2-mode :-(
+But i'm not sure - still they always seem to open in normal javascript mode despite me adding to 
+: auto-mode-alist
+Is this because the original file association is still stored first?
+
+Apparently not - i dont get anything for the command
+: (rassoc 'javascript-mode auto-mode-alist)
+and 
+: (assoc "\\.js$" auto-mode-alist)
+returns
+: ("\\.js$" . js2-mode)
+(Same with assq and rassq)
 ** TODO Make some modes open with certain fonts and with linum-mode etc
 *** Source Code Files
  - Fixed width
@@ -30,6 +56,8 @@ Also see [[file:emacs%20knowledge.org::*TO%20DO][Emacs Knowledge: TO DO]]
 *** Org-Mode and Other Stuff
  - No linum-mode
  - Fancy font?
+** TODO Change word boundaries in haml and master word boundaries in general
+Want it to recognise CamelCase? (underscores) as separate words...
 * TODO vim
 ** Define some reasonably sane settings/customisations
  - especially some that are emacs compatible

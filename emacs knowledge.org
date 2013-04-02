@@ -644,7 +644,6 @@ by evaluating:
 or go to the source and do 
 : C-u C-M-x 
 (<Control u> <Control Alt x>) to set up a function for edebugging
-
 * Regular Expressions
 See here for more info
 http://ergoemacs.org/emacs/emacs_regex.html
@@ -1080,16 +1079,14 @@ M-x vc-annotate
 *** C-x v l 
 *** C-x v d 
 * Magit
-** Check which version of a package is installed
-: el-get-update
-If you have a git package that is installed by git this will give you the commit
-** Upate/Upgrade a pakage
-: el-get-update
-** Upate/Upgrade el-get
-: el-get-self-update
-
+** Ignoring Stuff Locally
+: C-u I
+will prompt for a path which enables you to add everything under say
+: vendor/elastic-search-0.21
+to the local
+: .git/excludes/info 
+file
 ** Troubleshooting
-
 *** A very annoying error - magit-show gives the error "branchname is not a commit or tree."
 It still mostly seems to work - but only in the one frame. 
 If you try magit-show from other frames then you get this error.
@@ -1330,6 +1327,13 @@ and then (first step is optional really) get a description of a package includin
 
 ** List installed packages (or packages with other statuses)
 : (el-get-list-package-names-with-status "installed")
+** Check which version of a package is installed
+: el-get-update
+If you have a git package that is installed by git this will give you the commit
+** Upate/Upgrade a package
+: el-get-update
+** Upate/Upgrade el-get
+: el-get-self-update
 * elpa
 ** List of installed packages
 Evaluate the following variable
