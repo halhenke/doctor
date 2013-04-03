@@ -1336,6 +1336,25 @@ If you have a git package that is installed by git this will give you the commit
 : el-get-update
 ** Upate/Upgrade el-get
 : el-get-self-update
+** I had "el-get" itself in my list of packages to sync - wouldnt load properly
+I edited 
+: ~/.emacs.d/el-get/.status.el
+and removed the line
+#+BEGIN_SRC elisp
+  (el-get status "installed" recipe
+	 (:name el-get :website "https://github.com/dimitri/el-get#readme" :description "Manage the external elisp bits and pieces you depend upon." :type github :branch "4.stable" :pkgname "dimitri/el-get" :features el-get :info "." :load "el-get.el"))
+#+END_SRC
+That was after auto-complete and before emacs-http-server...
+
+Lets see if that helps...
+*NOPE*
+Still get
+#+BEGIN_VERSE
+Warning (initialization): An error occurred while loading `/home/halhenke/.emacs':
+End of file during parsing: /home/halhenke/.emacs.d/init-files/hals-el-get-setup.el
+#+END_VERSE
+
+I remember something like this happening before though
 * elpa
 ** List of installed packages
 Evaluate the following variable
@@ -1541,6 +1560,11 @@ Not necessarily a bad thing but would like this behaviour to be consistent.
 Tracked down to this line of code in an initialization file:
 : (add-hook 'emacs-lisp-mode-hook 'lisp-interaction-mode)
 Can see why that wouldn't work
+*** TODO When trying to do describe-mode I get this eror
+Describe-mode is 
+: C-h m
+anyways happens on Linus/Open NX a few times - also in Magit/Log buffer
+: describe-mode: Cannot open doc string file "/usr/share/emacs/24.1.50/etc/DOC-24.1.50.1"
 ** Unix
 *** On KDE - set-frame-font not working properly on initialization
 : (set-frame-font "DejaVu Serif-10" nil t)
