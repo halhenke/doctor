@@ -37,7 +37,7 @@ Toggle comments!
 *** TODO Particularly I want these to open in ruby-mode 
  - .rake files
  - Gemfile
-*** I seem to have great difficulty with .js files and js2-mode :-(
+*** DONE I seem to have great difficulty with .js files and js2-mode :-(
 But i'm not sure - still they always seem to open in normal javascript mode despite me adding to 
 : auto-mode-alist
 Is this because the original file association is still stored first?
@@ -49,6 +49,13 @@ and
 returns
 : ("\\.js$" . js2-mode)
 (Same with assq and rassq)
+
+BUT 
+: (rassoc 'javascript-generic-mode auto-mode-alist)
+gives
+: ("\\.js\\'" . javascript-generic-mode)
+which i can get rid of with
+: (setq auto-mode-alist (delq (rassoc 'javascript-generic-mode auto-mode-alist) auto-mode-alist))
 ** TODO Make some modes open with certain fonts and with linum-mode etc
 *** Source Code Files
  - Fixed width

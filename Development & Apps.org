@@ -1,0 +1,31 @@
+#+TITLE: Apps, gems, & Tools to Develop
+
+ - See also [[file:Things%20to%20Do%20-%20IT%20related.org][Things to Do - I.T./Health/Web/Personal]]
+
+* *Skeleton App* - A way of quickly navigating and familiarising oneself with a new Rails app
+ - Viewing a URL will show
+   - the paths of the partials displayed
+   - The variable names/models invoked
+   - Controller stuff
+   - Can we show Javascript stuff?
+     - Events?
+* Rails Model/SQL Table visualisation
+ - Something better than RailRoady
+ - Can be restricted to show a subset of models to be more comprehensible
+ - Can work from model associations or directly reading tables from a database?
+
+* Emacs/Ruby script - Git pull & update TAGS file and revisit tags file, bundle check/install and rake db:migrate check/migrate...
+* Gem to show output of db:migrate:status in browser - like sextant with routes
+: bundle exec rake db:migrate:status
+* Something like Hyperpolyglot but will show different properties of language
+** Scope
+e.g. Show the scope rules for Javascript 
+: {} does not introduce new scope
+vs something else like Ruby
+* Some kind of GreaseMonkey Script/CSS i can use to restyle certain pages
+e.g. to always run something like:
+#+BEGIN_SRC css
+#container {
+ margin-left: 200px;
+}
+#+END_SRC

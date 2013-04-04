@@ -126,6 +126,12 @@ See [[file:Shell%20Scripting%20Magic.org::*Capture%20the%20output%20and%20then%2
 But basically they will be available from the array ENV
 : ENV['HOME']
 Must be a string and not a symbol key
+** Gems from irb
+Use the Gem Module
+e.g.
+: Gem.path
+Check if a gem is available in path
+: Gem.available? "factory-girl"
 * Diagnostics & How to See Whats Going On
 inspect?
 : @object.inspect
@@ -308,17 +314,15 @@ This will be pretty big....
 : (class << helper; self; end).send :included_modules
 * Gem Commands
 ** Check which gems a gem depends on (i.e. it needs)
-gem dependency  rails
-
+: gem dependency rails
 ** ALSO check which gems depend on this gem (i.e. which need it)
-gem dependency  -R rails
-
+: gem dependency -R rails
 ** Install a gem
 sudo gem install -r zzzzzz
 
 ** Install a gem with version
 ** Adding a source to the gem package source list
-gem  sources -a http://gems.github.com
+: gem  sources -a http://gems.github.com
 ** Uninstalling a gem and all dependencies
 *** Shell Script - doesnt seem to recursively delete dependencies
 Modified from:
@@ -333,19 +337,20 @@ done
 https://github.com/mattdipasquale/gem_uninstall_r
 
 ** Searching for all version of rails gems on remote server
-gem search -ra "rails" | egrep "^rails "
-
+: gem search -ra "rails" | egrep "^rails "
 ** Install a particular gem version - DOES THIS HAVE PROBLEMS?
-sudo gem install -r rails -v=2.3.14
+: sudo gem install -r rails -v=2.3.14
 ** Update the gem executable/rubygems
 # New way
-sudo gem update --system
+: sudo gem update --system
 # OLD WAY, for historical purposes 
-sudo gem install rubygems-update --no-rdoc --no-ri
-sudo update_rubygems
-
+: sudo gem install rubygems-update --no-rdoc --no-ri
+: sudo update_rubygems
 ** Info on whre gems are installed etc
-gem env
+From the command line
+: gem env
+or from irb
+: Gem.path
 
 
 * map command - block vs function syntax
