@@ -184,8 +184,9 @@ in your Gemfile
 ***** No configuration necesary if using a Rails server such as thin
 When you want to invoke the debugger in the code just add to the line
 : require 'debugger'; debugger
-***** Other Configuration to be done once per app - applies to Apache/Passenger
-****** Whack this in config/environments/development.rb
+***** Otherwise
+****** Other Configuration to be done once per app - applies to Apache/Passenger
+******* Whack this in config/environments/development.rb
 #+BEGIN_SRC ruby
   if File.exists?(File.join(Rails.root,'tmp', 'debug.txt'))
     Debugger.wait_connection = true
@@ -203,7 +204,7 @@ can specify port and host if you like
     File.delete(File.join(Rails.root,'tmp', 'debug.txt'))
   end
 #+END_SRC
-****** Create a rake restart task
+******* Create a rake restart task
 Heres what i have in a =lib/tasks/rails_debug.rake= file
 #+BEGIN_SRC ruby
     desc "Restarts passenger if in debug mode"
@@ -212,7 +213,7 @@ Heres what i have in a =lib/tasks/rails_debug.rake= file
       system("touch tmp/debug.txt") if ENV["DEBUG"] == 'true'
     end
 #+END_SRC
-****** Create an rdebug.rc file
+******* Create an rdebug.rc file
  - either in home directory or current directory
  - This may have been crucial - not sure
 At any rate heres what i have in my ./rdebug.rc file
@@ -221,12 +222,12 @@ set autolist
 set autoeval
 set autoreload
 #+END_VERSE
-***** Configuration to be done whenever you want to start the debugger
-****** Call restart of passenger via rake task with DEBUG env variable set to true
+****** Configuration to be done whenever you want to start the debugger
+******* Call restart of passenger via rake task with DEBUG env variable set to true
 : bundle exec rake restart DEBUG=true
-****** THEN - VERY IMPORTANT - you must load a NEW page to get server to work
+******* THEN - VERY IMPORTANT - you must load a NEW page to get server to work
 any page it doesnt matter
-****** Open a remote debug session with
+******* Open a remote debug session with
 : bundle exec rdebug -c
 or if port and host specified earlier
 : bundle exec rdebug -c -p 7000 -h 127.0.0.1
@@ -666,12 +667,13 @@ or
 *** Stubbing current_contract
 Would work in main view but not in partial if i used
 : let (:current_contract) {jsa_contract}
-
 I needed to do 
 : before :each 
 the method
 : view.stub(:current_contract => jsa_contract)
-
+*** Stub a partial view
+To simplify the testing of  a complex page where you dont care what some partials return:
+: stub_template "clients/_details.haml" => "%h1 Details"
 ** should & Matchers e.g. should_equal etc
 should takes a matcher and a method
 : - (Object) should(matcher = nil, message = nil)
@@ -716,6 +718,8 @@ and then try something like
 : FactoryGirl.create :des_contract_referral_detail
 Or to specify some traits ('dms' and 'suspended')
 : FactoryGirl.create(:des_contract_referral_detail, :dms, :suspended)
+Create a user with some roles (definition uses :ignore and :after create)
+: u1 = FactoryGirl.create(:user, :with_roles => "create_non_epf_purchase_claims_role_name")
 ** TopMost factory definition must match an existing model/table definition
 e.g 
 #+BEGIN_SRC ruby
@@ -731,6 +735,11 @@ and cant write
 : des_contract_referral_details
 
 ** Be careful with associations
+** Stub current_user
+In before block
+: view.stub(:current_user => user)
+and then define user in your methods
+: 
 * Navigating directory tree from the console
 Basically - the Dir module
 pwd
@@ -1052,11 +1061,13 @@ gives me a bunch of stuff this maybe isnt quite what i wanted
    - e.g. Helpers, Controllers, Models/ActiveRecords etc
 But not necessarily which instances I have in non garbage collected memory 
  
-** Grep attribute_names of an ActiveRecord
+** TODO Grep attribute_names of an ActiveRecord
 More or less pipe 
 : User.attribute_names
 into grep
-** Bundle exec cache - quicker version of whatever bundle install does?
+....I bloody did this already....cant remember how...
+** TODO Bundle exec cache - quicker version of whatever bundle install does?
+** TODO Awesome gem for rails console test?
 * Rails Learning Resources
 Code Academy
 Rails 4 Zombies
