@@ -97,7 +97,10 @@ Should be in a
 directory
 *** TODO e.g. automate some stuff after doing a git pull in rails
 Making a postpull script
-* Web Development
+* TODO Knowledge Management
+** TODO Merge all my bookmarks together from Different browser
+** TODO Store local copies of many lightweight but useful pages
+* TODO Web Development
 ** TODO  Learn and Install nginx
 * TODO OS X
 ** TODO Configure dnsmasq properly
