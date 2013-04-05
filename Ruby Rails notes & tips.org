@@ -130,8 +130,26 @@ Must be a string and not a symbol key
 Use the Gem Module
 e.g.
 : Gem.path
-Check if a gem is available in path
+*** Check if a gem is available in path
 : Gem.available? "factory-girl"
+or apparently new method:
+: Gem::Specification.find_by_name "factory_girl"
+*** Adding a gem from a non-standard location in irb
+Add the path
+: Gem.path << "/Users/Hal/code/hunome/hunomeGems/ruby/1.9.1/gems/"
+Refresh gems knowledge
+: Gem.refresh
+then check new gems
+: Gem.available? "factory_girl"
+or apparently new method:
+: Gem::Specification.find_by_name "factory_girl"
+*** See which Gems are loaded/required
+: Gem.loaded_specs
+*** See which gem paths are available based on Gem.paths
+: Gem.latest_load_paths
+But you still may have to do a Gem.refresh to get some of them
+*** All available Gems
+: Gem::Specification.all_names
 * Diagnostics & How to See Whats Going On
 inspect?
 : @object.inspect
@@ -217,7 +235,7 @@ or if port and host specified earlier
 *** Checking for the existance of a =params= key/value
 : if params[:country_list].present?
 
-* Modules and loading/accessing their inards
+* Modules and loading/accessing their innards
 ** See loaded modules
 : Module.included_modules
 
@@ -1049,7 +1067,8 @@ But not necessarily which instances I have in non garbage collected memory
 More or less pipe 
 : User.attribute_names
 into grep
-I bloody did this....cant remember how...
+....I bloody did this already....cant remember how...
+** TODO Bundle exec cache - quicker version of whatever bundle install does?
 ** TODO Awesome gem for rails console test?
 * Rails Learning Resources
 Code Academy
