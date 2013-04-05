@@ -616,6 +616,8 @@ Unlike say elisp where we require a tag that is provided in a loadpath by a =pro
 
 
 * Rspec
+** Always run migrations first in test environment
+: bundle exec rake db:test:clone_structure
 ** It syntax
 either
 #+BEGIN_SRC ruby
