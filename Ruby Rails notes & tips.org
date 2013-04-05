@@ -238,7 +238,6 @@ or if port and host specified earlier
 * Modules and loading/accessing their innards
 ** See loaded modules
 : Module.included_modules
-
 For more:
 http://www.ruby-doc.org/core-1.9.3/Module.htm
 ** See all modules and constants available from "Root"
@@ -273,7 +272,7 @@ end
 
 Whereas to access it you just need something like:
 
-#+END_SRC ruby
+#+BEGIN_SRC ruby
 module LRD::FormBuilder
   # ActionPack's metaprogramming would have done this for us, if FormHelper#labeled_input 
   # had been defined  at load.   Instead we define it ourselves here.
@@ -549,6 +548,19 @@ When a partial is called with a pluralized collection, then the individual insta
 In Rails 3 you can also render a partial just by rendering a collection with the same name
 : = render @products
 will render the _product partial with the @products collection
+** ActiveRecord Queries - Issues
+Probably MySQL related:
+This didnt work:
+: ReceivedEmail.where('"from" LIKE "%oleg.ivanov@jnsolutions.com.au%"')
+but this did:
+: ReceivedEmail.where('received_emails.from LIKE ?', "%oleg%")
+Calling "to_sql" on the first one gives
+: "SELECT `received_emails`.* FROM `received_emails`  WHERE (\"from\" LIKE \"%oleg%\")"
+and on the second gives
+: "SELECT `received_emails`.* FROM `received_emails`  WHERE (received_emails.from LIKE '%oleg%')"
+
+This also works
+: ReceivedEmail.where('received_emails.from LIKE "%oleg%"')
 * Ruby Meta/Magic Stuff
 ** You can call methods based on strings with the send method
 : object.send("add_#{@type_of_fruit}", d)
