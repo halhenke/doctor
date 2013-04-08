@@ -330,6 +330,7 @@ This will be pretty big....
 : Module.included_modules
 ** List included modules in a specific module? Not sure
 : (class << helper; self; end).send :included_modules
+
 * Gem Commands
 ** Check which gems a gem depends on (i.e. it needs)
 : gem dependency rails
@@ -370,6 +371,14 @@ From the command line
 or from irb
 : Gem.path
 
+** What does this mean? (from the rspec executable)
+All this occurs after:
+: require 'rubygems'
+but we have 'gem' method and a call to bin_path
+#+BEGIN_SRC ruby
+gem 'rspec-core', version
+load Gem.bin_path('rspec-core', 'rspec', version)
+#+END_SRC
 
 * map command - block vs function syntax
 Apparently these are equivalent
