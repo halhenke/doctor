@@ -62,10 +62,20 @@ would throw an exception.
 *** cool_guys ? cool_guys.name() : nil
 *** Using 'try'
 Try is like send and can be called by itself, with args and/or blocks
-**** cool_guys.try(:name)
-**** cool_guys.try(:find, "hal")
-**** cool_guys.try(:collect) {|g| g.name}
+: cool_guys.try(:name)
+: cool_guys.try(:find, "hal")
+: cool_guys.try(:collect) {|g| g.name}
 
+
+Here is some weirder syntax using try - we pass the 
+: [] 
+hash lookup symbol as a method with the argument
+: uploaded_data
+as something to be looked up with that method e.g.
+: params[:attachment].try(:[],:uploaded_data)
+Which will fetch the value associated with the key "uploaded_data" if it is present
+e.g. equivalent to
+: params[:attachment][:uploaded_data]
 
 * Ruby Class/Metaclass/Object/Module Hierarchy
 ** Root Class
