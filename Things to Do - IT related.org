@@ -65,6 +65,8 @@ which i can get rid of with
  - Fancy font?
 ** TODO Change word boundaries in haml and master word boundaries in general
 Want it to recognise CamelCase? (underscores) as separate words...
+** TODO Modify revbufs to also call update on all buffers that are directories
+Shouldnt be too hard...?
 * TODO vim
 ** Define some reasonably sane settings/customisations
  - especially some that are emacs compatible
