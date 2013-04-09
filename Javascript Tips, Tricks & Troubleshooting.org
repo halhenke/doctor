@@ -92,6 +92,28 @@ Since the MELPA repository was down I added this to el-get-sources to install it
  - To see if it works then try console.log() something and start a Developer console in that browser window
  - Otherwise you can eval stuff with 
 : C-x C-e
+*** To add it to a Rails 3 app (or any other site)
+From the console simply execute:
+: $.getScript("http://localhost:8080/skewer")
+*** If it stops working and cant find the server
+First try running 
+: skewer()
+from the console
+If that fails posssibly by saying
+: GET http://0.0.0.0:3009/skewer/get 404 (Not Found)
+then manually set the skewer host like so
+: skewer.host = "http://127.0.0.1:8080"
+and then run
+: skewer()
+again
+
+Also make sure that
+: httpd-start
+has been called in emacs.
+ Doing 
+: M-x run-skewer
+is a good way to get things going again in a new tab if nothing else
+*** Im now getting all these "ReferenceError: $ is not defined" errors...
 *** To test if its not working
 If when you do
 : M-x list-skewer-clients
@@ -140,3 +162,17 @@ console.log(data.events);
 #+END_SRC
 ** Return the id, class of an object
 : $(".class_name").attr("id")
+** $.fn
+In jQuery, the fn property is just an alias to the prototype property.
+The jQuery identifier (or $) is just a constructor function, and all instances created with it, inherit from the constructor's prototype.
+A simple constructor function:
+#+BEGIN_SRC javascript
+function Test() {
+  this.a = 'a';
+}
+Test.prototype.b = 'b';
+
+var test = new Test(); 
+test.a; // "a", own property
+test.b; // "b", inherited property
+#+END_SRC
