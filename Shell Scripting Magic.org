@@ -195,6 +195,8 @@ Use this instead:
 : sudo bash -c " export RAILS_ENV=production; cd /app/mynbcs/current/; /usr/local/bin/rake --silent delayed_job:touch_file "
 
 
+* Find out about yourself, home directory, shell etc (UNIX)
+: cat /etc/passwd | grep hal
 * Read basic bash documentation in Emacs
 Use Emacs Info mode
 * See bash environment/system variables

@@ -1513,7 +1513,7 @@ checks the feature list to see if a file has been loaded and if not
 it will try to load the file feature.el
 Alternatively it can take a filename optional argument to load.
 
-* TO DO
+* TODO - Stuff
 ** DONE A comment-region that comments out all lines that are being "touched" by the current region
 ** DONE A select-region and type that simultaneously deletes the previously selected region and inserts the new text instead of deselecting and inserting text
   - SOLVED -  (set delete-selection-mode t)
@@ -1580,6 +1580,8 @@ fixed-width font environments or certain modes.
    - org-mode
  - Would want it in
    - most/all source code modes
+** TODO Get better version of Lisp Debugger?
+ - May be something available in el-get/elpa?
 * TODO Ideas
 ** TODO Startup Magit
 On init create a new frame programatically,
@@ -1603,11 +1605,15 @@ Not necessarily a bad thing but would like this behaviour to be consistent.
 Tracked down to this line of code in an initialization file:
 : (add-hook 'emacs-lisp-mode-hook 'lisp-interaction-mode)
 Can see why that wouldn't work
-*** TODO When trying to do describe-mode I get this eror
+*** TODO When trying to do describe-mode I get this eror - (Documentaion file not installed)
 Describe-mode is 
 : C-h m
 anyways happens on Linus/Open NX a few times - also in Magit/Log buffer
 : describe-mode: Cannot open doc string file "/usr/share/emacs/24.1.50/etc/DOC-24.1.50.1"
+Caused by a version mismatch - loking for earlier documentation rather than later
+
+Fixed with
+: sudo ln -s /usr/share/emacs/24.1.50/etc/DOC-24.1.50.2 /usr/share/emacs/24.1.50/etc/DOC-24.1.50.1
 ** Unix
 *** On KDE - set-frame-font not working properly on initialization
 : (set-frame-font "DejaVu Serif-10" nil t)
