@@ -99,7 +99,17 @@ Should be in a
 directory
 *** TODO e.g. automate some stuff after doing a git pull in rails
 Making a postpull script
-* TODO Knowledge Management
+* TODO Knowledge Management & General Maintenance
+** TODO Setup some predefined bookmarks in Chrome that open up windows with needed pages
+i.e. 
+A Rails Page that opens
+ - RubyDocs for
+   - FactoryGirl
+   - RSpec
+   - RspecRails
+ - Rails Guids
+ - Ruby API/RubyDoc
+An Emacs Page etc
 ** TODO Merge all my bookmarks together from Different browser
 ** TODO Store local copies of many lightweight but useful pages
 * TODO Web Development

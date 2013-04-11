@@ -1167,6 +1167,15 @@ or
 : diff-buffer-with-file
 or 
 : ediff-current-file
+* isearch
+** isearch variables
+: isearch-string
+   This is the search-string that isearhc will try to match
+: isearch-message
+   This seems to be the last searched for term
+: isearch-text-char-description
+: isearch-yank-flag
+: isearch-search-and-update
 * shell-mode
 ** "Dumb terminals" and staggered output
 If you wish to avoid the problems with dumb/non-standard terminal and output such as from the man command when running a shell in emacs then pipe the output of such commands to the 'tee' command e.g.
