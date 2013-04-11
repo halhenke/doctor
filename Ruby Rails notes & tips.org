@@ -613,6 +613,16 @@ Strings enclosed with backquotes or =%x{}= are be considered by Ruby as operatin
 : puts ("Current directory content is: #{%x/dir/}")
 
 
+* Ruby HowTo
+** Check if is a subclass of
+*** If you are dealing with two classes:
+*NO THIS IS WRONG*
+=kind_of= is an instance method
+# : EpfClaim.kind_of? PurchaseClaim.class
+# gotta remeber the "class" call for the second argument
+*** If you are dealing with an object/instance:
+: this_Claim.kind_of? PurchaseClaim.
+no "class" call for both caller or argument
 * Heroku
 ** Transferring a PostGres Database to and from heroku
 http://www.ryandaigle.com/a/pgtransfer-is-the-new-taps

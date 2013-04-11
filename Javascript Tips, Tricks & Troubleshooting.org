@@ -176,3 +176,5 @@ var test = new Test();
 test.a; // "a", own property
 test.b; // "b", inherited property
 #+END_SRC
+** Deprecated Stuff
+*** >live() is now .on()
