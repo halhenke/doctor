@@ -330,6 +330,56 @@ Or did I set some shell script somewhere to automatically run
 : do-new-work-xkb-setup
 and i cant remember?
 
+** Also - i accidentally logged into my "home session" from work and it seemed to change all the keybindings
+ - My Alt keys became "Mode Switch" again
+ - My Command Keys became Meta Keys
+
+Basically went something like from this
+#+BEGIN_VERSE
+    key <KPMU> {         [          Super_L ] };
+    key <LALT> {         [         Shift_L ] };
+    key <SPCE> {         [       Caps_Lock ] };
+    key <CAPS> {         [     Meta_L ] };
+    key <FK01> {         [       Control_L ] };
+    key <FK02> {         [         Shift_R ] };
+    key <FK03> {         [     Meta_R ] };
+    key <FK04> {         [       Control_R ] };
+    key <FK05> {         [          Super_R ] };
+
+    modifier_map Shift { <LALT> };
+    modifier_map Lock { <SPCE> };
+    modifier_map Control { Caps_Lock };
+    modifier_map Control { <FK01> };
+    modifier_map Shift { <FK02> };
+    modifier_map Control { <FK04> };
+    modifier_map Mod2 { Meta_L };
+    modifier_map Mod2 { Meta_R };
+    modifier_map Mod4 { Super_L };
+    modifier_map Mod4 { Super_R };
+#+END_VERSE
+to: 
+#+BEGIN_VERSE
+    key <KPMU> {         [          Meta_L ] };
+    key <LALT> {         [         Shift_L ] };
+    key <SPCE> {         [       Caps_Lock ] };
+    key <CAPS> {         [     Mode_switch ] };
+    key <FK01> {         [       Control_L ] };
+    key <FK02> {         [         Shift_R ] };
+    key <FK03> {         [     Mode_switch ] };
+    key <FK04> {         [       Control_R ] };
+    key <FK05> {         [          Meta_R ] };
+
+    modifier_map Mod2 { <KPMU> };
+    modifier_map Shift { <LALT> };
+    modifier_map Lock { <SPCE> };
+    modifier_map Mod1 { <CAPS> };
+    modifier_map Control { <FK01> };
+    modifier_map Shift { <FK02> };
+    modifier_map Mod1 { <FK03> };
+    modifier_map Control { <FK04> };
+    modifier_map Mod2 { <FK05> };
+#+END_VERSE
+*** I managed to fix it by running the "do-new-home-login-setup" script 
 * How Does This All fit Together?
 http://forums.gentoo.org/viewtopic.php?t=51783
 loadkeys is for the console (and cannot be used in X), xmodmap is for use in X, and xkb, which is loaded with command "xsetkbmap", is a newer method for for making changes in the keymap under X. 
