@@ -95,6 +95,12 @@ Since the MELPA repository was down I added this to el-get-sources to install it
 *** To add it to a Rails 3 app (or any other site)
 From the console simply execute:
 : $.getScript("http://localhost:8080/skewer")
+**** To drop it into a haml file
+Add this to the view
+#+BEGIN_SRC haml
+%script{ :src => 'http://localhost:8080/skewer'}
+  skewer.host = "http://127.0.0.1:8080";
+#+END_SRC
 *** If it stops working and cant find the server
 First try running 
 : skewer()
