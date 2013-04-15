@@ -661,12 +661,35 @@ by evaluating:
 (set 'comment-start "<!--")
 (set 'comment-end "-->")
 #+END_SRC elisp
+** Sometimes uncommenting doesnt work
+In haml-mode my =comment-or-uncomment-region-or-line=
+function doesnt uncomment properly
+: comment-or-uncomment-region-or-line 
+calls
+: comment-or-uncomment-region
+which calls both
+: comment-region
+: uncomment-region
 
+But calling			
+: M-;
+i.e.
+: comment-dwim
+with the region properly selected will remove a comment
+** variables
+: c-indent-comment-alist
+: c-indent-comments-syntactically-p
 * edebug
 : M-x edebug-eval-top-level-form
 or go to the source and do 
 : C-u C-M-x 
 (<Control u> <Control Alt x>) to set up a function for edebugging
+
+Or can define
+: edebug-all-defs
+so that all definitions will be instrumented by eval-region, eval-current-buffer, and eval-buffer
+: edebug-all-forms
+controls whether eval-region will automatically instrument all code - even non defintions
 * Regular Expressions
 See here for more info
 http://ergoemacs.org/emacs/emacs_regex.html
@@ -1499,6 +1522,16 @@ Precedes the regexp pattern
 : {} +
 this is part of the find command
 
+* Word Boundaries & Syntax Tables
+** Describe Syntax table
+describe-syntax is bound to
+: C-h s
+So maybe
+: (modify-syntax-entry ?_ "w" haml-mode-syntax-table)
+** Some relevant Stuff
+: (modify-syntax-entry ?_ "." c++-mode-syntax-table)
+The variable
+: words-include-escapes
 * Lisp source files for emacs and packages
 All the lisp files for the current installation of emacs are in:
 : /Applications/Emacs.app/Contents/Resources/lisp/
@@ -1583,6 +1616,9 @@ I got the following bug
 : File mode specification error: (error "Lisp nesting exceeds `max-lisp-eval-depth'")
 See [[*Something%20in%20init%20file%20giving%20the%20error%20"File%20mode%20specification%20error:%20(error%20"Lisp%20nesting%20exceeds%20`max-lisp-eval-depth'")"][this bug report]] 
 *** Probably easier to add .el files to the 'auto-mode-alist for lisp-interaction-mode
+** TODO Change word boundaries in some modes
+Seems to be something like
+: (modify-syntax-entry ?_ "." c++-mode-syntax-table)
 ** TODO linum-mode that automatically launches only in: 
 fixed-width font environments or certain modes.
  - Wouldnt want it in
