@@ -662,6 +662,8 @@ by evaluating:
 (set 'comment-end "-->")
 #+END_SRC elisp
 ** Sometimes uncommenting doesnt work
+Weird thing is it seems to work fine on Mac but not work on linux.....
+
 In haml-mode my =comment-or-uncomment-region-or-line=
 function doesnt uncomment properly
 : comment-or-uncomment-region-or-line 
