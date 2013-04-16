@@ -168,6 +168,16 @@ console.log(data.events);
 #+END_SRC
 ** Return the id, class of an object
 : $(".class_name").attr("id")
+** livequery?
+** Stepping into jQuery bound events/functions
+Stack trace - where do we step into a new function?
+#+BEGIN_SRC javascript
+jQuery.event.dispatch (bridge.js:3333)
+jQuery.event.add.elemData.handle.eventHandle (bridge.js:2942)
+#+END_SRC
+on this one:
+: ret = ( (jQuery.event.special[ handleObj.origType ] || {}).handle || handleObj.handler ).apply( matched.elem, args );
+
 ** $.fn
 In jQuery, the fn property is just an alias to the prototype property.
 The jQuery identifier (or $) is just a constructor function, and all instances created with it, inherit from the constructor's prototype.

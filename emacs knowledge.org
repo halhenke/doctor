@@ -1743,3 +1743,7 @@ Fixed with
 is giving me something insanely huge
 *** On Ubuntu10.04 - fonts disappear
 Its an xorg/ncurses type error
+*** Js2-Mode still not firing - auto-mode-alist not being modified at startup
+This line not being run? 
+: (setq auto-mode-alist (delq (rassoc 'javascript-generic-mode auto-mode-alist) auto-mode-alist))
+Whole file not being run?
