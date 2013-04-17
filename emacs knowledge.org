@@ -741,6 +741,13 @@ in this bit of code
 		   ;; might be both a comment-end marker and \s-.
 		   "+\\)[ \t]*")))
 #+END_SRC
+** Basically what comment-start-skip and comment-end-skip do
+: comment-start-skip
+Regexp to match the start of a comment plus everything up to its body.
+If there are any \(...\) pairs, the comment delimiter text is held to begin
+at the place matched by the close of the first pair.
+: comment-end-skip
+Regexp to match the end of a comment plus everything back to its body.
 * edebug
 This command will evaluate the top level form point is currently in and step through with edebug:
 : M-x edebug-eval-top-level-form
