@@ -90,11 +90,15 @@ or
 ** reload buffer from disk
 : s-u 
 ** Modes
+*** All Modes
 =C-h m= or 
 : M-x describe-mode 
 shows all the active minor modes (and major mode) and a brief description of each.
-
+*** Minor modes
 Also: =M-:= describe-mode or describe-minor-mode 
+*** Major Mode
+eval
+: major-mode
 ** Package management
 el-get in combination with built in package management for github goodness
 ** To check whether you are in a non-terminal system look at the value of:
@@ -342,6 +346,7 @@ Normally, whenever a function is executed, Emacs sets the value of this-command 
 M-x string-insert-rectangle
 * Ways to jump between predefined points in a file (function definitions etc)
 ** Outline Mode
+** etags
 * Editing files on remote machines from EMACS via TRAMP
 
 Emacs will work the same on remote machines as when you are editing a file as root on the local machine.
@@ -704,7 +709,54 @@ or locally:
 : "\\(\\(^\\|[^\\\n]\\)\\(\\\\\\\\\\)*\\)\\(\\s<+\\|-#+\\)[ 	]*"
 : comment-end-skip
 : "[ 	]*\\(\\s>\\|\n\\)"
+** Basically what comment-start-skip and comment-end-skip do
+: comment-start-skip
+Regexp to match the start of a comment plus everything up to its body.
+If there are any \(...\) pairs, the comment delimiter text is held to begin
+at the place matched by the close of the first pair.
+: comment-end-skip
+Regexp to match the end of a comment plus everything back to its body.
+** What the comment-uncomment functions do/how they work
+*** comment-or-uncomment-region
+depends on the result of 
+: comment-only-p
+to see if it should comment or uncomment the region
+*** comment-only-p
+: comment-only-p (beg end)
+"Return non-nil if the text between BEG and END is all comments."
+Which sounds a bit crazy...
+It calls
+: comment-forward
+*** comment-forward
+*This method is kinda complex*
+Described as:
+  "Skip forward over N comments.
+Just like `forward-comment' but only for positive N
+and can use regexps instead of syntax."
+
+It calls 
+: (forward-comment 1)
+: (looking-at comment-start-skip)
+: (goto-char (match-end 0))
+and 
+: (re-search-forward comment-end-skip nil 'move)
+so it depends on both
+: comment-start-skip
+: comment-end-skip
+
+if at the end
+: (n = 0)
+it will uncomment
+
+It is called from comment-only-p with: 
+: n = pointmax
+i.e. the max of the buffer
+
+and there is a when loop that makes /no sense/
+: (setq n (1 - n))
+? wtf?
 ** Heres why it doesnt work for haml
+*** My Stack trace of comment-uncomment-lines
 : comment-or-uncomment-lines
 calls
 : comment-or-uncomment-region
@@ -716,17 +768,18 @@ which calls
 : (looking-at comment-start-skip)
 where comment-start-skip is 
 : "\\(\\(^\\|[^\\\n]\\)\\(\\\\\\\\\\)*\\)\\(\\s<+\\|-#+\\)[ 	]*"
+
 Now if the comment is in the right place relative to the point this will return true. But if its not then this wont go on to call
 : (goto-char (match-end 0))
 : (re-search-forward comment-end-skip nil 'move)))
 and the mark will not be in the right place and it will not uncomment....
 
-So this regular expression must be changed to be less specific
+*** So this regular expression must be changed to be less specific
 Basically it doesnt match any whitespace before the comment 
 which is very common in HAML files but prob not so much in other langs
 where comments must be at the start of the file.
 
-I think if comment-strip-start is not set it gets set to something like:
+*** I think if comment-strip-start is not set it gets set to something like:
 : "\\(\\(^\\|[^\\]\\)\\(\\\\\\\\\\)*\\)\\(\\s<+\\|-#"
 in this bit of code
 #+BEGIN_SRC elisp
@@ -741,13 +794,55 @@ in this bit of code
 		   ;; might be both a comment-end marker and \s-.
 		   "+\\)[ \t]*")))
 #+END_SRC
-** Basically what comment-start-skip and comment-end-skip do
-: comment-start-skip
-Regexp to match the start of a comment plus everything up to its body.
-If there are any \(...\) pairs, the comment delimiter text is held to begin
-at the place matched by the close of the first pair.
-: comment-end-skip
-Regexp to match the end of a comment plus everything back to its body.
+
+Everything works up until 
+: (re-search-forward comment-search-skip nil 'move) 
+*** In changing this i sometime get 
+uncomment-region-default: Can't find the comment end
+
+This is the bit that fails
+#+BEGIN_SRC elisp
+	    ;; Find the end of the comment.
+	    (ept (progn
+		   (goto-char spt)
+		   (unless (or (comment-forward)
+			       ;; Allow non-terminated comments.
+			       (eobp))
+		     (error "Can't find the comment end"))
+		   (point)))
+#+END_SRC
+csre
+"-#+ ?"
+spt
+3
+ipt
+3
+*** Other comment-start-skips and comment-end-skips
+**** First - haml-mode
+comment-start
+"-#"
+comment-start-skip
+"\\(\\(^\\|[^\\\n]\\)\\(\\\\\\\\\\)*\\)\\(\\s<+\\|-#+\\)[ 	]*"
+comment-end-skip
+"[ 	]*\\(\\s>\\|
+\\)"
+**** Lisp-interaction-mode
+comment-start
+";"
+comment-start-skip
+"\\(\\(^\\|[^\\\\
+]\\)\\(\\\\\\\\\\)*\\);+ *"
+comment-end-skip
+"[ 	]*\\(\\s>\\|
+\\)"
+**** Js2-Mode
+comment-start
+"//"
+comment-start-skip
+"\\(//+\\|/\\*+\\)\\s *"
+comment-end-skip
+"[ 	]*\\(\\s>\\|
+\\)"
 * edebug
 This command will evaluate the top level form point is currently in and step through with edebug:
 : M-x edebug-eval-top-level-form
@@ -1036,6 +1131,9 @@ Basically Info will look for a file called dir in each of these directories.
 This dir file will contain an info formatted menu thing.
 ** Searching for info on a particular topic
 : M-x info-apropos
+** Opening a second Info Mode
+Like Shell Mode use prefix command to name second buffer
+: C-u something M-x info
 * Skewer Mode
 See [[file:Javascript%20Tips,%20Tricks%20&%20Troubleshooting.org::*Skewer-Mode%20in%20Emacs][Skewer-Mode in Emacs]] in the Javascript org Doc for info/setup
 * Org mode
