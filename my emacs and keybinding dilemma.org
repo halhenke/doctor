@@ -379,7 +379,26 @@ to:
     modifier_map Control { <FK04> };
     modifier_map Mod2 { <FK05> };
 #+END_VERSE
-*** I managed to fix it by running the "do-new-home-login-setup" script 
+*** I managed to fix it by running the "do-new-home-login-setup" script
+** Getting a xkb map that seems to work as expected - possible solution?
+My previously susccesful map did not generate bindings which worked - particularly for emacs Alt key
+
+Therefore I created an experimental map in which i removed all Keycodes and Aliases that generated warnings when the map was called with
+: xkbcomp exp-map.xkb
+: xkbcomp exp-map.xkm $DISPLAY
+
+This then worked - but perhaps the reason was not due to removing missing Keycodes but due to the fact that my .xkm files were being generated in the wrong directories e.g.
+** My xkb setup scripts didnt seemt to be generating the output .xkm files 
+i had to call 
+: xkbcomp exp-map.xkb
+directly to get the xkm file for the 
+: xkbcomp exp-map.xkm $DISPLAY
+command
+
+The reason - The xkm file was being generated in the directory the script was being called from. Meaning i've been using old files for a long time....
+:-\
+
+
 * How Does This All fit Together?
 http://forums.gentoo.org/viewtopic.php?t=51783
 loadkeys is for the console (and cannot be used in X), xmodmap is for use in X, and xkb, which is loaded with command "xsetkbmap", is a newer method for for making changes in the keymap under X. 
