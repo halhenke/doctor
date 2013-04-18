@@ -1133,5 +1133,29 @@ http://torontoprogrammer.ca/2012/06/spot-the-bug-rails-dup-vs-clone/
 "So to summarize: if you want to make a quick copy of an ActiveRecord that’s in addition to the one that’s already in the table, use dup, not clone, as of Ruby on Rails 3.1.  And add tests and read release notes…"
 ** local variables in unexecuted branches
 As Oleg described
+#+BEGIN_SRC ruby
+  class Example
+    attr_accessible something
+    def weirdness
+      if false #This should never happen
+        something = 10 #This is a local variable - not the Example.new.something var
+      end
+      puts something.inspect
+    end
+  end
+  
+  e = Example.new
+  e.something = 4
+  e.weirdness # This puts nil and not 4 - instance var is shadowed 
+#+END_SRC
 ** New hash syntax
+*** With functions defaults
+Use to write
+: foo(arg1, opts)
+where opts is a hash, now we write this with default values:
+: foo(arg1, opt1: :this, opt2: :that )
 *** Numbers as keys works with 'rockets' but not JSON style
+This is valid
+: {1 => "twenty two"}
+This isnt
+: {1: => "twenty two"}
