@@ -17,10 +17,8 @@ Set the plugins array
 in
 : "/Users/Hal/.oh-my-zsh/templates/zshrc.zsh-template"
 
-
 * Choosing a prompt
 : prompt clint
-
 
 * "Bash Completion"
 : typeset -A key
@@ -28,3 +26,13 @@ in
 : [[ -n "${key[Down]}" ]]  && bindkey  "${key[Down]}"  history-beginning-search-forward
 
 
+* Grep and regular expressions dont seem to work the same
+When I ran the 'find-grep' command from emacs it would sometimes exit abnormally.
+Bascally whenever i had a character like 
+: - _
+etc
+
+Whats the deal here? How do we do regexs in Z?
+
+* Calling ssh-add from .zshenv - not a good idea
+Thought this would be run once at login but now its asking me for my passphrase even when i try to do stuff like shell commands from emacs
