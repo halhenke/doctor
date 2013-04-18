@@ -1131,3 +1131,7 @@ file. Instead it will look only in the asset pipeline path i.e.
 ** Rails Active Record Clone vs Dup
 http://torontoprogrammer.ca/2012/06/spot-the-bug-rails-dup-vs-clone/
 "So to summarize: if you want to make a quick copy of an ActiveRecord that’s in addition to the one that’s already in the table, use dup, not clone, as of Ruby on Rails 3.1.  And add tests and read release notes…"
+** local variables in unexecuted branches
+As Oleg described
+** New hash syntax
+*** Numbers as keys works with 'rockets' but not JSON style

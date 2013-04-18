@@ -177,6 +177,19 @@ jQuery.event.add.elemData.handle.eventHandle (bridge.js:2942)
 #+END_SRC
 on this one:
 : ret = ( (jQuery.event.special[ handleObj.origType ] || {}).handle || handleObj.handler ).apply( matched.elem, args );
+*So a breakpoint here might be a good idea as a place to step into descending code...*
+*** Looking a bit clearer at what this does
+**** jQuery.event.add.elemData.handle.eventHandle
+: jQuery.event.add = function( elem, types, handler, data, selector )
+This function sets this shit
+: elemData = jQuery._data( elem )
+: eventHandle = elemData.handle;
+or if ! elemData.handle;
+: eventHadle = jQuery.event.dispatch.apply( eventHandle.elem, arguments ) 
+**** jQuery.event.dispatch
+: ret = ( (jQuery.event.special[ handleObj.origType ] || {}).handle || handleObj.handler ).apply( matched.elem, args );
+
+
 
 ** $.fn
 In jQuery, the fn property is just an alias to the prototype property.

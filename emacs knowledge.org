@@ -1303,6 +1303,11 @@ will prompt for a path which enables you to add everything under say
 to the local
 : .git/excludes/info 
 file
+** Using grep in logs
+This uses the shell grep/regular expressions - not emacs ones i.e.
+: (hulk|crazy)
+not
+: \\(hulk\\|crazy\\)
 ** Troubleshooting
 *** A very annoying error - magit-show gives the error "branchname is not a commit or tree."
 It still mostly seems to work - but only in the one frame. 
