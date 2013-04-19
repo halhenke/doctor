@@ -1832,6 +1832,9 @@ fixed-width font environments or certain modes.
 On init create a new frame programatically,
 change to a certain directory (prompt?) and run magit-status
  - Integrate with workgroups?
+** TODO Magit Hooks/Customization
+*** TODO Run revbuffs after a Pull
+*** TODO Push to multiple remotes
 * Bugs
 ** General
 *** TODO A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window

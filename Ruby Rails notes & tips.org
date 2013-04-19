@@ -1082,6 +1082,12 @@ If not on =master= branch
 : git push heroku yourbranch:master --force
 
 
+* Cool & Weird Ruby tricks
+** Hash Key Value Inversion
+In this example SESSION_TYPE_NAMES is a hash that converts symbols to more meaningful names
+Apparently you can call invert to give the hash a value and get a key :-o
+:  SESSION_TYPE_NAMES.invert[session_type_name] || session_type_name
+
 * TODO PROBLEMS
 ** How to log *anything* from configuration file
 i.e. from development.rb or Hunome::Application.configure
