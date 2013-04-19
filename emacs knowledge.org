@@ -755,6 +755,22 @@ i.e. the max of the buffer
 and there is a when loop that makes /no sense/
 : (setq n (1 - n))
 ? wtf?
+*** looking-at
+-- Function: looking-at regexp
+     This function determines whether the text in the current buffer
+     directly following point matches the regular expression REGEXP.
+     "Directly following" means precisely that: the search is
+     "anchored" and it can succeed only starting with the first
+     character following point.  The result is `t' if so, `nil'
+     otherwise.
+So we can test this in a buffer by evaluating:
+: (looking-at comment-start-skip)
+**** Basically this shows
+That this comment returns true only when
+haml comment is the very first character on a line and the point/cursor is on that first character e.g.
+: -# - if defined? gexf
+or the character is elsewhere along the line and the piont is one character before the comment e.g.
+:   -# -# != "var sparks_data = #{@spark_list.to_json}"
 ** Heres why it doesnt work for haml
 *** My Stack trace of comment-uncomment-lines
 : comment-or-uncomment-lines
