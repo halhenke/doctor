@@ -1,7 +1,5 @@
 #+TITLE: Macports Usage Info & Info On The Setup of Selected Ports
 
-
-
 * The setup process for selected ports
 ** MySQL
 *** Set-up
@@ -59,3 +57,8 @@ Please report any problems with the /opt/local/lib/mysql55/bin/mysqlbug script!
 *** Starting MySQL Server
 : sudo mysqld_safe
 ** Postgres
+** MongoDB
+See [[*MongoDB][Starting MongoDB]]
+* Starting Some Macports Installed Processes
+** MongoDB
+: sudo mongod --dbpath /opt/local/var/db/mongodb

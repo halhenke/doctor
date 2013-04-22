@@ -1015,6 +1015,51 @@ to:
    4. =fields_for()= is same as 3 except does not create outer HTML form tags
       - therefore can be used to add form fields for other models in the same form 
 
+* HAML - (from hunome doc)
+** Emacs Mode
+*** Default Indentation Behaviour is annoying.
+ - Indentation behaviour is currently set according to the value of the variable =indent-line-function=
+ - And in haml this function is =haml-indent-line=
+ - Should make something that will indent and un-indent based on Tab and Shift-Tab/Backtab
+** Some working example
+*** Setting a style tag on a page
+#+BEGIN_SRC haml
+%style
+  dt {color:red; font-weight:bold;}
+#+END_SRC
+*** Fields in a form
+ - These are /roughly/ equivalent in terms of output:
+: %input{ :type => "text", :value => "First Name"}
+and:
+: = text_field :user, :firstname, :value => "Hey pal"
+although the second will have name and id set to =user[firstname]= and the first wont.
+
+Or if you have a =form_for= block
+: = f.text_field :firstname
+
+#+BEGIN_SRC haml
+    %h2 My Profile
+    .item
+      %label.wide My First Name
+      %input{ :type => "text", :value => "Hal"} 
+      -# %= label_tag :q, "Search for:"
+      -# "My First Name"
+      -# %= text_field "Hal"
+    .item
+      %label My Last Name
+      %input{ :type => "text", :value => "Henke"} 
+#+END_SRC
+#+BEGIN_SRC haml
+#+END_SRC
+#+BEGIN_SRC haml
+#+END_SRC
+
+** Troubleshooting
+*** syntax error, unexpected keyword_ensure, expecting keyword_end
+Check your indentation 
+ - haml doesnt know where to put an end keyword because you have a block where something is not idented below the control flow bit properly
+
+
 
 * How forms in Rails work
  - You call forms_for on a model *instance* i.e. on an *object - not a class*
