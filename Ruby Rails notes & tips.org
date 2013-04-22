@@ -542,6 +542,8 @@ Rollback two migrations
 Rollback to a specific version
 : rake db:migrate:down VERSION=20100905201547
 The "VERSION" is important...
+*** Recreate a scpecific environments database if deleted/destroyed
+: RAILS_ENV=test bundle exec rake db:create    
 *** Recreating migrations for Test Database
 If you do some migrations in dev and then you run rspec you are testing your "test" environment database
 where the migrations have not been performed.
