@@ -2,27 +2,6 @@
 * HowTos (not necessarily that cool...)
 ** Cancel a command while in the middle of it
 : \C-g
-** Associate a particular filetype with a particular mode
-: (add-to-list 'auto-mode-alist '("\\.rake\\'" . ruby-mode))
-Add to list is supposed to add it to the front of the list so that it "shadows" the other value/s
-You can remove a cons pair (:k1 'v1) from a list, a1, with
-: (setq a1 (delq (assoc :k1 a1) a1))
-actually this seems to work just as much
-: (delq (assoc :k1 a1) a1)
-But if you use rassoc then you do need to setq
-: (setq auto-mode-alist (delq (rassoc 'javascript-generic-mode auto-mode-alist) auto-mode-alist))
-** See which files are currently associated with which modes
-Check the value of 
-: auto-mode-alist
-** Manipulating alist or checking the first mode associated with a file type with auto-amode-alist
-You can check the first match to a mode with rassoc
-: (rassoc 'javascript-generic-mode auto-mode-alist
-or the first match to the regular expression
-: (assoc "\\.js$" auto-mode-alist)
-(can also use assq and rassq)
-
-But the best is probably to use assoc-default, string-match and any given string representing a filename you are interested in:
-: (assoc-default "apple.js" auto-mode-alist 'string-match)
 ** See which modes are currently enabled
 : C-h m
 ** See what the current major mode is
@@ -181,6 +160,28 @@ From the command line
 : emacsclient -e "(save-buffers-kill-emacs)"
 or
 : emacsclient -e "(kill-emacs)"
+* File Type Associations & Manipulating Them
+** Associate a particular filetype with a particular mode
+: (add-to-list 'auto-mode-alist '("\\.rake\\'" . ruby-mode))
+Add to list is supposed to add it to the front of the list so that it "shadows" the other value/s
+You can remove a cons pair (:k1 'v1) from a list, a1, with
+: (setq a1 (delq (assoc :k1 a1) a1))
+actually this seems to work just as much
+: (delq (assoc :k1 a1) a1)
+But if you use rassoc then you do need to setq
+: (setq auto-mode-alist (delq (rassoc 'javascript-generic-mode auto-mode-alist) auto-mode-alist))
+** See which files are currently associated with which modes
+Check the value of 
+: auto-mode-alist
+** Manipulating alist or checking the first mode associated with a file type with auto-amode-alist
+You can check the first match to a mode with rassoc
+: (rassoc 'javascript-generic-mode auto-mode-alist)
+or the first match to the regular expression
+: (assoc "\\.js$" auto-mode-alist)
+(can also use assq and rassq)
+
+But the best is probably to use assoc-default, string-match and any given string representing a filename you are interested in:
+: (assoc-default "apple.js" auto-mode-alist 'string-match)
 * Saving frames/windows/buffers configuration
 ** workgroups.el
 Its a minor mode
@@ -1722,6 +1723,27 @@ So maybe
 : (modify-syntax-entry ?_ "." c++-mode-syntax-table)
 The variable
 : words-include-escapes
+** Comparison of _ in different modes
+*** In Ruby Mode 
+where it is effectively a word boundary the
+Ruby syntax table tells us
+: _		_ 	which means: symbol
+*** In Haml mode
+where it is not effectively a word boundary the
+Haml syntax table tells us
+: _		w 	which means: word
+** How haml-mode declares its syntax-table
+#+BEGIN_SRC elisp
+(defvar haml-mode-syntax-table
+  (let ((table (make-syntax-table)))
+    (modify-syntax-entry ?: "." table)
+    (modify-syntax-entry ?_ "w" table)
+    (modify-syntax-entry ?' "\"" table)
+    table)
+  "Syntax table in use in `haml-mode' buffers.")
+#+END_SRC
+** The command to use
+: (modify-syntax-entry ?_ "_" haml-mode-syntax-table)
 * Lisp source files for emacs and packages
 All the lisp files for the current installation of emacs are in:
 : /Applications/Emacs.app/Contents/Resources/lisp/

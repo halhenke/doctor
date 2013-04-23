@@ -27,6 +27,85 @@ Show all tasks
 : rake -T
 or 
 : rake -D
+* How does Rake work
+Call rake in a directory it will automatically call the Rakefile
+
+** Example of hurricane app
+In this case it then requires these files:
+#+BEGIN_SRC ruby
+require 'config/boot'
+require 'rake'
+require 'rake/testtask'
+require 'rdoc/task'
+require 'tasks/rails'
+#+END_SRC ruby
+This is where we get the deprecation warnings
+ - config/boot checks whether rails is running i think
+
+then this task throws an error if RAILS_ENV isnt defined....
+#+BEGIN_SRC ruby
+task :touch_file => :environment do                                                          
+  if ENV.has_key?('RAILS_ENV')                                                               
+    RAILS_ENV = ENV['RAILS_ENV']                                                             
+  else                                                                                       
+    puts 'FATAL rake delayed_job:touchfile: RAILS_ENV not set.'                              
+    exit 1                                                                                   
+  end                                                                                        
+  # 'Hurricane::TouchFileJob' is defined in config/initializers.                             
+  puts "mynbcs (rails):RAILS_ENV=#{RAILS_ENV}: Queuing delayed job to touch file."           
+  Delayed::Job.enqueue(Hurricane::TouchFileJob.new)                                          
+end 
+#+END_SRC ruby
+otherwise it
+ - prints "mynbcs (rails):RAILS_ENV=#{RAILS_ENV}: Queuing delayed job to touch file."   
+ - and using the Delayed plugin
+ - it puts a Hurricane::TouchFileJob class into a queue...
+
+* IRB
+** Configuration
+http://www.rubycentral.org/pickaxe/irb.html
+http://tagaholic.me/2009/05/29/exploring-how-to-configure-irb.html
+** Get configuration values from within IRB itself
+enter
+: conf
+or
+: irb_context
+on the irb command line
+** Set Prompt values
+The normal Prompt (interactive) is nested in a number of hashes
+: IRB.conf[:PROMPT][:DEFAULT][:PROMPT_I] = "bacon: "
+The default prompt is =:DEFAULT=
+
+** Getting access to BASH env variables
+See [[file:Shell%20Scripting%20Magic.org::*Capture%20the%20output%20and%20then%20manipuate%20it%20in%20Ruby%20via%20IRB][Manipuating bash variables in Ruby via IRB]] for more details
+
+But basically they will be available from the array ENV
+: ENV['HOME']
+Must be a string and not a symbol key
+** Gems from irb
+Use the Gem Module
+e.g.
+: Gem.path
+*** Check if a gem is available in path
+: Gem.available? "factory-girl"
+or apparently new method:
+: Gem::Specification.find_by_name "factory_girl"
+*** Adding a gem from a non-standard location in irb
+Add the path
+: Gem.path << "/Users/Hal/code/hunome/hunomeGems/ruby/1.9.1/gems/"
+Refresh gems knowledge
+: Gem.refresh
+then check new gems
+: Gem.available? "factory_girl"
+or apparently new method:
+: Gem::Specification.find_by_name "factory_girl"
+*** See which Gems are loaded/required
+: Gem.loaded_specs
+*** See which gem paths are available based on Gem.paths
+: Gem.latest_load_paths
+But you still may have to do a Gem.refresh to get some of them
+*** All available Gems
+: Gem::Specification.all_names
 
 
 * Require arbitrary file in irb
@@ -114,52 +193,6 @@ Comments out both HTML and Ruby logic
 Find admin role in Roles table
 : addy = Roles.where()
 : User.find(1).roles << addy
-
-* IRB
-** Configuration
-http://www.rubycentral.org/pickaxe/irb.html
-http://tagaholic.me/2009/05/29/exploring-how-to-configure-irb.html
-** Get configuration values from within IRB itself
-enter
-: conf
-or
-: irb_context
-on the irb command line
-** Set Prompt values
-The normal Prompt (interactive) is nested in a number of hashes
-: IRB.conf[:PROMPT][:DEFAULT][:PROMPT_I] = "bacon: "
-The default prompt is =:DEFAULT=
-
-** Getting access to BASH env variables
-See [[file:Shell%20Scripting%20Magic.org::*Capture%20the%20output%20and%20then%20manipuate%20it%20in%20Ruby%20via%20IRB][Manipuating bash variables in Ruby via IRB]] for more details
-
-But basically they will be available from the array ENV
-: ENV['HOME']
-Must be a string and not a symbol key
-** Gems from irb
-Use the Gem Module
-e.g.
-: Gem.path
-*** Check if a gem is available in path
-: Gem.available? "factory-girl"
-or apparently new method:
-: Gem::Specification.find_by_name "factory_girl"
-*** Adding a gem from a non-standard location in irb
-Add the path
-: Gem.path << "/Users/Hal/code/hunome/hunomeGems/ruby/1.9.1/gems/"
-Refresh gems knowledge
-: Gem.refresh
-then check new gems
-: Gem.available? "factory_girl"
-or apparently new method:
-: Gem::Specification.find_by_name "factory_girl"
-*** See which Gems are loaded/required
-: Gem.loaded_specs
-*** See which gem paths are available based on Gem.paths
-: Gem.latest_load_paths
-But you still may have to do a Gem.refresh to get some of them
-*** All available Gems
-: Gem::Specification.all_names
 * Diagnostics & How to See Whats Going On
 inspect?
 : @object.inspect
@@ -613,6 +646,12 @@ See here also [[*Rails%20converting%20strings%20to%20symbols%20etc][Rails conver
 Strings enclosed with backquotes or =%x{}= are be considered by Ruby as operating system commands. Just try:
 : puts (`calc`)
 : puts ("Current directory content is: #{%x/dir/}")
+* Navigating directory tree from the console
+Basically - the Dir module
+pwd
+: Dir.pwd
+ls
+: Dir.entries "app"
 
 
 * Ruby HowTo
@@ -652,6 +691,64 @@ e.g.
 Apparently for Ruby you use
 : Module.const_get
 but this doesnt handle nesting
+* How forms in Rails work
+ - You call forms_for on a model *instance* i.e. on an *object - not a class*
+ - If its blank Rails will then generate empty fields you can add stuff too
+ - If not Rails will add existing info to the fields and you can edit it
+ - After this Rails will store all this in =params[:yourobjectname]=
+   - This is effectively a series of string key value pairs (HTML cannot do anything else) but Rails will format in such a way that it will read it as a hash/array/dictionary.
+** sub_objects
+ - These can also be edited in a form
+ - Rails will pass them to the post method with the suffix attributes e.g. =params[:user][:user_profile_attributes]=
+ - check out the name of this input field
+#+BEGIN_SRC web
+       <input class="faux-tag-checkbox inline" type="checkbox" name="user[user_profile_attributes][user_profile_languages_attributes][]" value="<%= lang.id %>" <%= @user_profile.id.present? ? (@user_profile.has_language?(lang.id) ? "checked=\"true\"" : "") : "" %> />
+#+END_SRC
+ - the name determines what the key will be in the post form - if you have a [] at the end of the name then the values will be placed in an array
+ - If you have =accepts_nested_attributes_for user_profile= in your =user= model *and* =user_profile= =belongs_to= =user= then it should work
+   - you may have to write a =user_profile_attributes=(attributes)= method in =user= yourself
+** More on different methods of building Forms
+ - We are creating an HTML form that will update/create/edit a specific instance of a Rais model
+ - So we have to specify fields for different model attributes we wish to edit.
+  
+   We have 3 basic ways to build form helpers:
+   1. =form_tag= - completely manual form construction
+      - takes two args: path and options
+      - can form a complete form with the help of these others
+	- =label_tag=
+	- =text_field_tag=
+	- =submit_tag=
+   2. something like =<% text_field(model, model_property) %>= which takes two args
+      - first is a model instance that is being edited
+      - second is an attribute of the model (doesnt have to be attribute though - just property type pair of methods)
+   3. =form_for(:model_instance)=
+      - yields a form builder
+      - methods called on form builder to build the specific form
+      - effectively a shorthand for method
+   4. =fields_for()= is same as 3 except does not create outer HTML form tags
+      - therefore can be used to add form fields for other models in the same form 
+
+
+
+** How =form_for= and =fields_for= relate to specific FormHelper fields/emthods
+The basic idea with =forms_for= is that it yields a FormHelper that works like this:
+: <%= form_for :person do |f| %>
+:   <%= f.text_field :first_name %>
+gets expanded to:
+: <%= text_field :person, :first_name %>
+where =ActionView::Helpers::FormHelper= defines =text_field= as:
+: text_field(object_name, method, options = {})
+In turn, a FormHelper has the =fields_for= method that yields a FormBuilder.\\
+A FormBuilder.checkbox seems to call a FormHelper.checkbox on the object that form_for is called on
+#BEGIN_SRC ruby
+def check_box(method, options = {}, checked_value = "1", unchecked_value = "0")
+  @template.check_box(@object_name, method, objectify_options(options), checked_value, unchecked_value)
+end
+#END_SRC
+i.e. with the code
+: <%= form_for :person do |f| %>
+=@object_name= is :person and =@template= is f
+
 
 * How to reset a users password from the command line in a Rails app using devise
 Get the user
@@ -785,45 +882,6 @@ In before block
 : view.stub(:current_user => user)
 and then define user in your methods
 : 
-* Navigating directory tree from the console
-Basically - the Dir module
-pwd
-: Dir.pwd
-ls
-: Dir.entries "app"
-* How does Rake work
-Call rake in a directory it will automatically call the Rakefile
-
-** Example of hurricane app
-In this case it then requires these files:
-#+BEGIN_SRC ruby
-require 'config/boot'
-require 'rake'
-require 'rake/testtask'
-require 'rdoc/task'
-require 'tasks/rails'
-#+END_SRC ruby
-This is where we get the deprecation warnings
- - config/boot checks whether rails is running i think
-
-then this task throws an error if RAILS_ENV isnt defined....
-#+BEGIN_SRC ruby
-task :touch_file => :environment do                                                          
-  if ENV.has_key?('RAILS_ENV')                                                               
-    RAILS_ENV = ENV['RAILS_ENV']                                                             
-  else                                                                                       
-    puts 'FATAL rake delayed_job:touchfile: RAILS_ENV not set.'                              
-    exit 1                                                                                   
-  end                                                                                        
-  # 'Hurricane::TouchFileJob' is defined in config/initializers.                             
-  puts "mynbcs (rails):RAILS_ENV=#{RAILS_ENV}: Queuing delayed job to touch file."           
-  Delayed::Job.enqueue(Hurricane::TouchFileJob.new)                                          
-end 
-#+END_SRC ruby
-otherwise it
- - prints "mynbcs (rails):RAILS_ENV=#{RAILS_ENV}: Queuing delayed job to touch file."   
- - and using the Delayed plugin
- - it puts a Hurricane::TouchFileJob class into a queue...
 
 
 
@@ -954,8 +1012,6 @@ rake 0.9.2.2 was suddenly installed on philemon
 along with Rails 3.2.1
 
 
-
-
 * Troubleshooting Rails - Specific errors & solutions
 ** If you get this:
 : User(#70180561615400) expected, got ActiveSupport::HashWithIndifferentAccess(#70180531877120)
@@ -1017,7 +1073,7 @@ to:
    4. =fields_for()= is same as 3 except does not create outer HTML form tags
       - therefore can be used to add form fields for other models in the same form 
 
-* HAML - (from hunome doc)
+* Haml - (from hunome doc)
 ** Emacs Mode
 *** Default Indentation Behaviour is annoying.
  - Indentation behaviour is currently set according to the value of the variable =indent-line-function=
@@ -1060,66 +1116,6 @@ Or if you have a =form_for= block
 *** syntax error, unexpected keyword_ensure, expecting keyword_end
 Check your indentation 
  - haml doesnt know where to put an end keyword because you have a block where something is not idented below the control flow bit properly
-
-
-
-* How forms in Rails work
- - You call forms_for on a model *instance* i.e. on an *object - not a class*
- - If its blank Rails will then generate empty fields you can add stuff too
- - If not Rails will add existing info to the fields and you can edit it
- - After this Rails will store all this in =params[:yourobjectname]=
-   - This is effectively a series of string key value pairs (HTML cannot do anything else) but Rails will format in such a way that it will read it as a hash/array/dictionary.
-** sub_objects
- - These can also be edited in a form
- - Rails will pass them to the post method with the suffix attributes e.g. =params[:user][:user_profile_attributes]=
- - check out the name of this input field
-#+BEGIN_SRC web
-       <input class="faux-tag-checkbox inline" type="checkbox" name="user[user_profile_attributes][user_profile_languages_attributes][]" value="<%= lang.id %>" <%= @user_profile.id.present? ? (@user_profile.has_language?(lang.id) ? "checked=\"true\"" : "") : "" %> />
-#+END_SRC
- - the name determines what the key will be in the post form - if you have a [] at the end of the name then the values will be placed in an array
- - If you have =accepts_nested_attributes_for user_profile= in your =user= model *and* =user_profile= =belongs_to= =user= then it should work
-   - you may have to write a =user_profile_attributes=(attributes)= method in =user= yourself
-** More on different methods of building Forms
- - We are creating an HTML form that will update/create/edit a specific instance of a Rais model
- - So we have to specify fields for different model attributes we wish to edit.
-  
-   We have 3 basic ways to build form helpers:
-   1. =form_tag= - completely manual form construction
-      - takes two args: path and options
-      - can form a complete form with the help of these others
-	- =label_tag=
-	- =text_field_tag=
-	- =submit_tag=
-   2. something like =<% text_field(model, model_property) %>= which takes two args
-      - first is a model instance that is being edited
-      - second is an attribute of the model (doesnt have to be attribute though - just property type pair of methods)
-   3. =form_for(:model_instance)=
-      - yields a form builder
-      - methods called on form builder to build the specific form
-      - effectively a shorthand for method
-   4. =fields_for()= is same as 3 except does not create outer HTML form tags
-      - therefore can be used to add form fields for other models in the same form 
-
-
-
-** How =form_for= and =fields_for= relate to specific FormHelper fields/emthods
-The basic idea with =forms_for= is that it yields a FormHelper that works like this:
-: <%= form_for :person do |f| %>
-:   <%= f.text_field :first_name %>
-gets expanded to:
-: <%= text_field :person, :first_name %>
-where =ActionView::Helpers::FormHelper= defines =text_field= as:
-: text_field(object_name, method, options = {})
-In turn, a FormHelper has the =fields_for= method that yields a FormBuilder.\\
-A FormBuilder.checkbox seems to call a FormHelper.checkbox on the object that form_for is called on
-#BEGIN_SRC ruby
-def check_box(method, options = {}, checked_value = "1", unchecked_value = "0")
-  @template.check_box(@object_name, method, objectify_options(options), checked_value, unchecked_value)
-end
-#END_SRC
-i.e. with the code
-: <%= form_for :person do |f| %>
-=@object_name= is :person and =@template= is f
 * Compiling stuff for Production Mode
 : bundle exec rake assets:precompile
 : git add public/assets
