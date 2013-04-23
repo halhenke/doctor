@@ -1,208 +1,210 @@
 #+TITLE: Keyboard Settings & Keymappings in Linux & Emacs
 
-* Basic Figuring out how things work in Linux
+To get to the meat of things:  [[*SO%20I%20FINALLY%20FIGURED%20IT%20OUT][I finally figured out how to set things up properly via xkb]]
 
- - Xmodmaps maps keycodes (the actual output of the physical keyboard) to KeySyms (Logical/Virtual names)
+* basic figuring out how things work in linux
+
+ - xmodmaps maps keycodes (the actual output of the physical keyboard) to keysyms (logical/virtual names)
  - xkb is more complex and configurable...
 
-** Important Files:
+** important files:
 default keyboard...thing:
 : /etc/default/keyboard
 xorg global input settings:
-: /etc/X11/xorg.conf
-Present in Debian but not Ubuntu?
-: /etc/X11/Xmodmap
-Lowlevel Modifier key mask stuff:
-: /usr/include/X11/X.h
-Available KeySym names:
-: /usr/include/X11/keysymdef.h
+: /etc/x11/xorg.conf
+present in debian but not ubuntu?
+: /etc/x11/xmodmap
+lowlevel modifier key mask stuff:
+: /usr/include/x11/x.h
+available keysym names:
+: /usr/include/x11/keysymdef.h
 
-** Important Keyboard Tools:
-See the base linux mappings with:
+** important keyboard tools:
+see the base linux mappings with:
 : xmodmap
-See the output of various keys with:
+see the output of various keys with:
 : xev
-See the output of a single key by pressing Control-V in a terminal:
-Also - 
-Graphical xmodmap configuration tool:
+see the output of a single key by pressing control-v in a terminal:
+also - 
+graphical xmodmap configuration tool:
 : xkeycaps
-Is called to modify the way terminal prcesses key inputs:
+is called to modify the way terminal prcesses key inputs:
 : loadkeys
 
-** Some web Info
-ftp://ftp.lyx.org/pub/sgml-tools/website/HOWTO/Keyboard-and-Console-HOWTO/t1659.html
+** some web info
+ftp://ftp.lyx.org/pub/sgml-tools/website/howto/keyboard-and-console-howto/t1659.html
 
-
-* To get info about the current bindings/output
-** From xmodmap
+* to get info about the current bindings/output
+** from xmodmap
 : xmodmap -pke > somefile
 and then
 : xmodmap -pm >> somefile
+
 * xkb
-https://wiki.archlinux.org/index.php/XKB
-: xkbcomp $DISPLAY somefile
+https://wiki.archlinux.org/index.php/xkb
+: xkbcomp $display somefile
 and perhaps use with
 : setxkbmap 
 though this is for much more general configuration
-** Basic Definitions
+** basic definitions
 *** keycode
-This is a key something like 
+this is a key something like 
 : 21
  for '='
 *** state
-This is a modifier something like 
+this is a modifier something like 
 : 0x1
-for 'Shift'
+for 'shift'
 *** keysym
-This is the combo of the other two symbols giving
+this is the combo of the other two symbols giving
 : 0x2b
 for '+'
-and it is returned by 'XLookUpString'
-** Examples
+and it is returned by 'xlookupstring'
+** examples
 e.g. '='
-#+BEGIN_VERSE
-KeyPress event, serial 29, synthetic NO, window 0xc00001,
+#+begin_verse
+keypress event, serial 29, synthetic no, window 0xc00001,
     root 0xe2, subw 0x0, time 1494706335, (454,512), root:(474,554),
-    state 0x0, keycode 32 (keysym 0x3d, equal), same_screen YES,
-    XLookupString gives 1 bytes: (3d) "="
-    XmbLookupString gives 1 bytes: (3d) "="
-    XFilterEvent returns: False
+    state 0x0, keycode 32 (keysym 0x3d, equal), same_screen yes,
+    xlookupstring gives 1 bytes: (3d) "="
+    xmblookupstring gives 1 bytes: (3d) "="
+    xfilterevent returns: false
 
-KeyRelease event, serial 29, synthetic NO, window 0xc00001,
+keyrelease event, serial 29, synthetic no, window 0xc00001,
     root 0xe2, subw 0x0, time 1494706406, (454,512), root:(474,554),
-    state 0x0, keycode 32 (keysym 0x3d, equal), same_screen YES,
-    XLookupString gives 1 bytes: (3d) "="
-    XFilterEvent returns: False
-#+END_VERSE
+    state 0x0, keycode 32 (keysym 0x3d, equal), same_screen yes,
+    xlookupstring gives 1 bytes: (3d) "="
+    xfilterevent returns: false
+#+end_verse
 and '+'
-#+BEGIN_VERSE
-KeyPress event, serial 29, synthetic NO, window 0xc00001,
+#+begin_verse
+keypress event, serial 29, synthetic no, window 0xc00001,
     root 0xe2, subw 0x0, time 1494708782, (454,512), root:(474,554),
-    state 0x1, keycode 32 (keysym 0x2b, plus), same_screen YES,
-    XLookupString gives 1 bytes: (2b) "+"
-    XmbLookupString gives 1 bytes: (2b) "+"
-    XFilterEvent returns: False
+    state 0x1, keycode 32 (keysym 0x2b, plus), same_screen yes,
+    xlookupstring gives 1 bytes: (2b) "+"
+    xmblookupstring gives 1 bytes: (2b) "+"
+    xfilterevent returns: false
 
-KeyRelease event, serial 29, synthetic NO, window 0xc00001,
+keyrelease event, serial 29, synthetic no, window 0xc00001,
     root 0xe2, subw 0x0, time 1494708911, (454,512), root:(474,554),
-    state 0x1, keycode 32 (keysym 0x2b, plus), same_screen YES,
-    XLookupString gives 1 bytes: (2b) "+"
-    XFilterEvent returns: False
-#+END_VERSE
-** XKB Keycode Translation - How Does it all work. The Gory Details
+    state 0x1, keycode 32 (keysym 0x2b, plus), same_screen yes,
+    xlookupstring gives 1 bytes: (2b) "+"
+    xfilterevent returns: false
+#+end_verse
+** xkb keycode translation - how does it all work. the gory details
 xkb takes keycode, state and group to return keysym
 : (keycode, group, state) → keysym
-Groups are "layouts" like 
-: US-English
-*** A bit more complex internally
+groups are "layouts" like 
+: us-english
+*** a bit more complex internally
 xvkb has some more internal steps, summarised here:
-#+BEGIN_VERSE
+#+begin_verse
    (keycode [, group]) → type
    (state, type) → level
-   (keycode, group, level) → S[keycode][group][level]
-#+END_VERSE
-Where
-: S
+   (keycode, group, level) → s[keycode][group][level]
+#+end_verse
+where
+: s
 is a translation table (xkb_symbols) and a
 : type
-is used to tell which modifiers affect which keys ("essentially it's a way to reduce the third dimension of S")
+is used to tell which modifiers affect which keys ("essentially it's a way to reduce the third dimension of s")
 **** e.g.
-A typical alphanumeric key is only affected by Shift - it's type is set to TWO_LEVEL, and
-: (state, TWO_LEVEL) → level = ((state >> 0) & 0x01) = state & 0x01
+a typical alphanumeric key is only affected by shift - it's type is set to two_level, and
+: (state, two_level) → level = ((state >> 0) & 0x01) = state & 0x01
 which is either 0 or 1. 
-Thus it's 
-: S[keycode][0..4][0..1] 
+thus it's 
+: s[keycode][0..4][0..1] 
 or 
-: S[Normal key pressed]['US English'][Shift Pressed/Not Pressed]
+: s[normal key pressed]['us english'][shift pressed/not pressed]
 instead of 
-: S[keycode][0..4][0..256]
+: s[keycode][0..4][0..256]
 
-*** An xkb file layout by Sections
+*** an xkb file layout by sections
 **** xkb_keycodes
-Keycode definition. 
-The rest of the file doesn't use numeric keycodes, only symbolic keylabels defined in this section.
-The labels themselves are arbitrary. They are only used in xkb_symbols section later.
+keycode definition. 
+the rest of the file doesn't use numeric keycodes, only symbolic keylabels defined in this section.
+the labels themselves are arbitrary. they are only used in xkb_symbols section later.
 **** xkb_types
-Probably not worth mucking around with.
+probably not worth mucking around with.
 
- - ONE_LEVEL keys are not affected by modifiers; e.g. it's Enter, Space, Escape, F keys, Shift/Alt/Ctrl keys and so on. 
- - TWO_LEVEL and ALPHABETIC keys produce different keysyms depending on Shift state. All alphanumeric keys are of these types. ALPHABETIC additionally respects CapsLock.
-***** Syntax
-: modifiers= Shift+NumLock+LevelThree;
-means keys of this type are affected by Shift, NumLock and LevelThree bits only
-: map[Shift+LevelThree]= Level4;
+ - one_level keys are not affected by modifiers; e.g. it's enter, space, escape, f keys, shift/alt/ctrl keys and so on. 
+ - two_level and alphabetic keys produce different keysyms depending on shift state. all alphanumeric keys are of these types. alphabetic additionally respects capslock.
+***** syntax
+: modifiers= shift+numlock+levelthree;
+means keys of this type are affected by shift, numlock and levelthree bits only
+: map[shift+levelthree]= level4;
 define which combination corresponds to which level value.
 **** xkb_compatibility
- - Action definitions (interpret) and keyboard leds (indicator) among other things.
- - Note that key+AnyOfOrNone(all) is equivalent to just key, but key is much easier to read.
+ - action definitions (interpret) and keyboard leds (indicator) among other things.
+ - note that key+anyofornone(all) is equivalent to just key, but key is much easier to read.
 **** xkb_symbols
-The main section that defines what each key does. 
+the main section that defines what each key does. 
 i.e. go from keylabel(keycode) to keysym
-***** Syntax
-: key <LABL> { [ G1L1, G1L2, G1L3, ... ], [ G2L1, G2L2, G2L3, ... ], ... }
+***** syntax
+: key <labl> { [ g1l1, g1l2, g1l3, ... ], [ g2l1, g2l2, g2l3, ... ], ... }
 where
- - <LABL> is keylabel from xkb_keycodes section,
- - GiLj is keysym for group i level j
+ - <labl> is keylabel from xkb_keycodes section,
+ - gilj is keysym for group i level j
 
-Key types are also specified here, either as
-#+BEGIN_VERSE
-   key.type = "T1";
+key types are also specified here, either as
+#+begin_verse
+   key.type = "t1";
    key <...> { ... };
    key <...> { ... };
    key <...> { ... };
-   key.type = "T2";
+   key.type = "t2";
    key <...> { ... };
    key <...> { ... };
-#+END_VERSE
+#+end_verse
 or individually
-: key <...> { type = "T", [ .... ], [ .... ] };
+: key <...> { type = "t", [ .... ], [ .... ] };
 
-1. The number of keysyms in each group must match the number of levels defined for this type
-2. For the list of possible keysyms check:
-: /usr/include/X11/keysymdef.h 
+1. the number of keysyms in each group must match the number of levels defined for this type
+2. for the list of possible keysyms check:
+: /usr/include/x11/keysymdef.h 
 **** xkb_geometry
-Completely irrelevant
+completely irrelevant
 
-*** Changing modifier keys
-**** Real & Virtual Modifiers
-Real modifier bits are called Shift, Lock, Control and Mod1-Mod5. 
-There are no Alt among them. 
-Virtual modifiers were introduced to allow saying something like
-: #define Alt Mod1
-It is possible to make a usable layout without defining virtual modifiers at all. 
-Among standard modifiers, only Alt/Meta actually need such treatment, because Shift and Control are real modifiers anyway and NumLock is not normally used as a modifier.
+*** changing modifier keys
+**** real & virtual modifiers
+real modifier bits are called shift, lock, control and mod1-mod5. 
+there are no alt among them. 
+virtual modifiers were introduced to allow saying something like
+: #define alt mod1
+it is possible to make a usable layout without defining virtual modifiers at all. 
+among standard modifiers, only alt/meta actually need such treatment, because shift and control are real modifiers anyway and numlock is not normally used as a modifier.
 
-Real modifiers, M, are assigned to keys via:
-: modifier_map M { <keysym> };
-A virtual modifier, V, can be assigned to a key via:
-: interpret <keysym> { virtualMod = V; };
+real modifiers, m, are assigned to keys via:
+: modifier_map m { <keysym> };
+a virtual modifier, v, can be assigned to a key via:
+: interpret <keysym> { virtualmod = v; };
 
-If a virtual modifier V shares at least one keysym with a real modifier M, it is bound to M.
+if a virtual modifier v shares at least one keysym with a real modifier m, it is bound to m.
 
-Note that virtual modifier names are not pre-defined and must be declared in xkb_compatibility and xkb_types sections before using them:
-#+BEGIN_VERSE
+note that virtual modifier names are not pre-defined and must be declared in xkb_compatibility and xkb_types sections before using them:
+#+begin_verse
  xkb_compatibility "complete" {
-       virtual_modifiers LevelThree,NumLock,Alt;
+       virtual_modifiers levelthree,numlock,alt;
    }
-#+END_VERSE
+#+end_verse
 
-**** Changing a single modifier key
-You need a keysym and a matching "interpreter" entry in the relevant sections
-#+BEGIN_VERSE
+**** changing a single modifier key
+you need a keysym and a matching "interpreter" entry in the relevant sections
+#+begin_verse
    xkb_compatibility {
-       interpret ISO_Level3_Shift { action = SetMods(modifiers=Mod5); };
+       interpret iso_level3_shift { action = setmods(modifiers=mod5); };
    }   
    xkb_symbols {
-       key <LWIN> { [ISO_Level3_Shift ] };
+       key <lwin> { [iso_level3_shift ] };
    }
-#+END_VERSE
-**** Changing multiple modifier keys
-Modifier map is a table that maps each of eight modifier bits to at most two keys:
-: modifier_map Mod1 { Alt_L, Alt_R };
-*** Some xkb commands/syntax
-Apparently you need the =interpret= and =modifier_map= commands to deal with state/modifier keys.
+#+end_verse
+**** changing multiple modifier keys
+modifier map is a table that maps each of eight modifier bits to at most two keys:
+: modifier_map mod1 { alt_l, alt_r };
+*** some xkb commands/syntax
+apparently you need the =interpret= and =modifier_map= commands to deal with state/modifier keys.
 : indicator
-this deals with LED lights and CAPSLOCK type state toggles
+this deals with led lights and capslock type state toggles
 : interpret
 : modifier_map
 xkb_types
@@ -211,114 +213,114 @@ xkb_types
 : map
 : level_name
 
-*** How to find out which xkb group you are currently using
-*** Some Basic KeyMap Change examples...
-*** How this connects to xmodmap and the keycodes given by xev
-From xev we can tell
-Command Key
-: KeyCode 63 Meta_L
-: KeyCode 71 Meta_R
-Alt Key
-: KeyCode 66 Mode_switch
-: KeyCode 69 Mode_switch
-In xkbcomp xkb_keycodes we have the mappings
-#+BEGIN_VERSE
-   <KPMU> = 63;
-    <CAPS> = 66;
-    <FK03> = 69;
-    <FK05> = 71;
-#+END_VERSE
+*** how to find out which xkb group you are currently using
+*** some basic keymap change examples...
+*** how this connects to xmodmap and the keycodes given by xev
+from xev we can tell
+command key
+: keycode 63 meta_l
+: keycode 71 meta_r
+alt key
+: keycode 66 mode_switch
+: keycode 69 mode_switch
+in xkbcomp xkb_keycodes we have the mappings
+#+begin_verse
+   <kpmu> = 63;
+    <caps> = 66;
+    <fk03> = 69;
+    <fk05> = 71;
+#+end_verse
 and in xkb_symbols "unknown we have
-#+BEGIN_VERSE
-    key <KPMU> {         [          Meta_L ] };
-    key <CAPS> {         [     Mode_switch ] };
-    key <FK03> {         [     Mode_switch ] };
-    key <FK05> {         [          Meta_R ] };
-#+END_VERSE
+#+begin_verse
+    key <kpmu> {         [          meta_l ] };
+    key <caps> {         [     mode_switch ] };
+    key <fk03> {         [     mode_switch ] };
+    key <fk05> {         [          meta_r ] };
+#+end_verse
 and at the end we have this
-#+BEGIN_VERSE
-    modifier_map Mod2 { <KPMU> };
-    modifier_map Shift { <LALT> };
-    modifier_map Lock { <SPCE> };
-    modifier_map Mod1 { <CAPS> };
-    modifier_map Control { <FK01> };
-    modifier_map Shift { <FK02> };
-    modifier_map Mod1 { <FK03> };
-    modifier_map Control { <FK04> };
-    modifier_map Mod2 { <FK05> };
-#+END_VERSE
-So Opt goes to Mod1
-and Command goes to Mod2?
+#+begin_verse
+    modifier_map mod2 { <kpmu> };
+    modifier_map shift { <lalt> };
+    modifier_map lock { <spce> };
+    modifier_map mod1 { <caps> };
+    modifier_map control { <fk01> };
+    modifier_map shift { <fk02> };
+    modifier_map mod1 { <fk03> };
+    modifier_map control { <fk04> };
+    modifier_map mod2 { <fk05> };
+#+end_verse
+so opt goes to mod1
+and command goes to mod2?
 
-**** Escape key mapped to CapsLock (for VIM)
-#+BEGIN_VERSE
-key.type = "ONE_LEVEL";
-key <CAPS> { [ Escape ] };
-#+END_VERSE
+**** escape key mapped to capslock (for vim)
+#+begin_verse
+key.type = "one_level";
+key <caps> { [ escape ] };
+#+end_verse
 **** 
-*** Setting the xkbmap from a file
-By default xkbcomp generates a source file
-: xkbcomp $DISPLAY keymap.xkb
-Calling on a source file should generate a compiled keymap file by default
+*** setting the xkbmap from a file
+by default xkbcomp generates a source file
+: xkbcomp $display keymap.xkb
+calling on a source file should generate a compiled keymap file by default
 : xkbcomp keymap.xkb
 should generate
 : keymap.xkm
-To update a display you need to call it as the destination with a compiled keymap
-: xkbcomp keymap.xkm $DISPLAY
-Otherwise you can use setxkbmap in combination with xkbcomp:
-: setxkbmap us -print | xkbcomp - $DISPLAY
-** How many times do you have to set it - per terminal?
-Seems to need to be set once per x-server.
-So if you resume a session in Open NX the xkb configuration will have reverted to default.
-** Launching Emacs and xkb
-If Emacs is already launched and you change the xkb configuration then it wont work properly.
-But if you relaunch then it should find the correct modifier bindings.
+to update a display you need to call it as the destination with a compiled keymap
+: xkbcomp keymap.xkm $display
+otherwise you can use setxkbmap in combination with xkbcomp:
+: setxkbmap us -print | xkbcomp - $display
+** how many times do you have to set it - per terminal?
+seems to need to be set once per x-server.
+so if you resume a session in open nx the xkb configuration will have reverted to default.
+** launching emacs and xkb
+if emacs is already launched and you change the xkb configuration then it wont work properly.
+but if you relaunch then it should find the correct modifier bindings.
 
-Perhaps because Emacs does not bind Meta/Super/Ctrl to specific modifiers (Mod1/Mod2 etc) but 
-looks at what is bound to the literal modifiers (Mod1/Mod2/Mod3) at the time of launch 
-e.g. (Alt to Mod3, Super to Mod 4) and decides which Mod keys to bind. 
+perhaps because emacs does not bind meta/super/ctrl to specific modifiers (mod1/mod2 etc) but 
+looks at what is bound to the literal modifiers (mod1/mod2/mod3) at the time of launch 
+e.g. (alt to mod3, super to mod 4) and decides which mod keys to bind. 
 
-For the same reason when X-Server returns to normal xkb configuration while Emacs is still 
-running it again doesnt seem to work properly - probably because it is bound to "Real Modifiers" 
+for the same reason when x-server returns to normal xkb configuration while emacs is still 
+running it again doesnt seem to work properly - probably because it is bound to "real modifiers" 
 that are now bound to different keys.
 
-** Whats the best set up? Map Command to Super or Meta?
-   Not sure. KDE seemed to work with command mapped to Meta
-   Also worked good with Command mapped to Super and Alt mapped to Meta when using over NX.
-*** KDE seems to start with
-    - Command mapped to <LWIN> & <RWIN>
-    - Alt mapped to <LALT> & <RALT>
-    - Setting up the aliases
-#+BEGIN_VERSE
-    alias <ALGR> = <RALT>;
-    alias <LMTA> = <LWIN>;
-    alias <RMTA> = <RWIN>;
-#+END_VERSE
+** whats the best set up? map command to super or meta?
+   not sure. kde seemed to work with command mapped to meta
+   also worked good with command mapped to super and alt mapped to meta when using over nx.
+*** kde seems to start with
+    - command mapped to <lwin> & <rwin>
+    - alt mapped to <lalt> & <ralt>
+    - setting up the aliases
+#+begin_verse
+    alias <algr> = <ralt>;
+    alias <lmta> = <lwin>;
+    alias <rmta> = <rwin>;
+#+end_verse
     - setting
-#+BEGIN_VERSE
-    key <LALT> {         [           Alt_L,          Meta_L ] };
-    key <RALT> {
-        type= "TWO_LEVEL",
-        symbols[Group1]= [           Alt_R,          Meta_R ]
-    key <LWIN> {         [         Super_L ] };
-    key <RWIN> {         [         Super_R ] };
-#+END_VERSE
+#+begin_verse
+    key <lalt> {         [           alt_l,          meta_l ] };
+    key <ralt> {
+        type= "two_level",
+        symbols[group1]= [           alt_r,          meta_r ]
+    key <lwin> {         [         super_l ] };
+    key <rwin> {         [         super_r ] };
+#+end_verse
     and then mapping these virtual keys to the real modifier
-#+BEGIN_VERSE
-    modifier_map Mod1 { <LALT> };
-    modifier_map Mod1 { <RALT> };
-    modifier_map Mod1 { <META> }
-    modifier_map Mod4 { <LWIN> };
-    modifier_map Mod4 { <RWIN> };
-    modifier_map Mod4 { <SUPR> };
-#+END_VERSE
+#+begin_verse
+    modifier_map mod1 { <lalt> };
+    modifier_map mod1 { <ralt> };
+    modifier_map mod1 { <meta> }
+    modifier_map mod4 { <lwin> };
+    modifier_map mod4 { <rwin> };
+    modifier_map mod4 { <supr> };
+#+end_verse
 
-Also
-:     <CAPS> = 66;
-:     key <CAPS> {         [       Control_L,       Control_L ] };
-:     modifier_map Control { <CAPS> };
+also
+:     <caps> = 66;
+:     key <caps> {         [       control_l,       control_l ] };
+:     modifier_map control { <caps> };
 
-** Further Problems
+** further problems
  - require look at
    - xkb_compatibility "complete"?
    - xkb_types "complete"?
@@ -398,6 +400,13 @@ command
 The reason - The xkm file was being generated in the directory the script was being called from. Meaning i've been using old files for a long time....
 :-\
 
+** SO I FINALLY FIGURED IT OUT
+*2 Step process - not sure how vital all steps are*
+1. Get rid of all xkbcomp "compile time errors" by deleting unused keys and then unused aliases
+   1. Not sure if this is a vital step.
+2. Logout of NX & Log back in
+   1. This is definitely vital
+3. May have to restart any terminals also but from experience i doubt it....
 
 * How Does This All fit Together?
 http://forums.gentoo.org/viewtopic.php?t=51783
@@ -414,7 +423,6 @@ The format of loadkeys and xmodmap files are similar, but they're *not* compatib
 khotkeys ?
 : ~/.kde/share/config/kglobalshortcutsrc
 : ~/.kde/share/config/khotkeysrc
-
 
 * In different linux distros 
 Debian - new:
@@ -516,7 +524,6 @@ https://wiki.archlinux.org/index.php/KEYMAP
 
 Configuring the Console Keymap
 Edit personal.map using your favorite editor. Examples:
-
 
 * How-To
 ** Make the Right Alt key same as Left Alt key (Emacs)

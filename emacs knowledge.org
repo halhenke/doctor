@@ -1771,7 +1771,7 @@ checks the feature list to see if a file has been loaded and if not
 it will try to load the file feature.el
 Alternatively it can take a filename optional argument to load.
 
-* TODO - Stuff
+* TODO - Smaller Stuff
 ** DONE A comment-region that comments out all lines that are being "touched" by the current region
 ** DONE A select-region and type that simultaneously deletes the previously selected region and inserts the new text instead of deselecting and inserting text
   - SOLVED -  (set delete-selection-mode t)
@@ -1850,6 +1850,7 @@ fixed-width font environments or certain modes.
 **** TODO Comments in general
 **** TODO Rspec
 **** TODO FactoryGirl
+** TODO When making a new frame - switch focus and maximize
 * TODO Bigger Ideas
 ** TODO Startup Javascript/Skewer-Mode
  - Load a scratch buffer and a bunch of helper functions
