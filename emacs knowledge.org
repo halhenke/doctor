@@ -34,7 +34,6 @@ Select what is probably the most recent session and
 : C-c C-c
 ** Print to the minibuffer from a lisp function
 : (print "Hey there pal!!") 
-
 ** Change the way something is interpreted in the syntax table
 e.g. Make `$' have the syntax of punctuation in Text mode.  Note the use of a character constant for `$'.
 : (modify-syntax-entry ?\$ "." text-mode-syntax-table)
@@ -42,17 +41,22 @@ e.g. Make `$' have the syntax of punctuation in Text mode.  Note the use of a ch
 e.g. Enable the use of the command `narrow-to-region' without  confirmation.
 :  (put 'narrow-to-region 'disabled nil)
 * Cool Things I Have Learned About Emacs
-** print out a Python style docstring
+** Print out a Python style docstring
 : (documentation 'foo)
-** open the file for a given library/feature 
+** Open the file for a given library/feature 
 i.e. given a package/feature of the type 
 : (require 'foo_mod)
 we can open that file with
 : (find-library "foo_mod")
-** Compile file
+** Byte Compiling Files & Code
+*** Byte Compiling Files
 : (byte-compile-file foo.el) 
 Will use current buffer file by default (with prompt) and compile.
-Will probably be useful when package management fails to build something properly - you can probably cmopile files manually yourself
+*** Byte Compiling Directories
+: (byte-recompile-directory directory &optional flag force)
+*** Batch Byte Compilation
+: (batch-byte-compile &optional noforce)
+Byte Compiles a list of files - kills emacs on completion of command
 ** To reload .emacs file after changes
 : M-x load-file ~/.emacs
 *OR* it is probably safer to select changes that you have made and then
@@ -66,7 +70,7 @@ or
 ** Get filename/path of current buffer
  - eval =bufferfile-name= function
 =\M-: (buffer-file-name)=
-** reload buffer from disk
+** Reload buffer from disk
 : s-u 
 ** Modes
 *** All Modes

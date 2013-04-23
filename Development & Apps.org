@@ -33,3 +33,5 @@ e.g. to always run something like:
 ** TODO Setup irbc so that different history files are created for each environment e.g. test, development etc
 * App that will get an easily navigable list of all questions and answers you have marked as helpful on StackOverflow
  - Kind of like an online cheat sheet for all those issues you always forget
+* A ctags extension - something more intelligent
+* An emacs equivalent to that vim word-completion extension
