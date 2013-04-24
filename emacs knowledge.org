@@ -1903,3 +1903,6 @@ Its an xorg/ncurses type error
 This line not being run? 
 : (setq auto-mode-alist (delq (rassoc 'javascript-generic-mode auto-mode-alist) auto-mode-alist))
 Whole file not being run?
+** Ruby-mode
+*** Weird Thing when typing "{"
+Whole line kind of jump-indented and point skipped forward several chars....
