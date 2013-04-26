@@ -164,7 +164,7 @@ From the command line
 : emacsclient -e "(save-buffers-kill-emacs)"
 or
 : emacsclient -e "(kill-emacs)"
-* File Type Associations & Manipulating Them
+* File Type Associations, a-lists & Manipulating Them
 ** Associate a particular filetype with a particular mode
 : (add-to-list 'auto-mode-alist '("\\.rake\\'" . ruby-mode))
 Add to list is supposed to add it to the front of the list so that it "shadows" the other value/s
@@ -1851,6 +1851,21 @@ fixed-width font environments or certain modes.
 **** TODO Rspec
 **** TODO FactoryGirl
 ** TODO When making a new frame - switch focus and maximize
+*** Selecting new frame
+add
+: (select-frame)
+to the hook
+: after-make-frame-functions
+*** Maximise
+#+BEGIN_SRC elisp
+      (set-frame-position  (selected-frame) 0 0)
+      (set-frame-size  (selected-frame) cols rows)
+#+END_SRC
+where cols and rows set by
+#+BEGIN_SRC elisp
+(/ (frame-pixel-height) (frame-char-height))
+(/ (frame-pixel-width) (frame-char-width))
+#+END_SRC
 * TODO Bigger Ideas
 ** TODO Startup Javascript/Skewer-Mode
  - Load a scratch buffer and a bunch of helper functions
