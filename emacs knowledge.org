@@ -142,6 +142,7 @@ Connect as a GUI
 Connect from the command line
 : emacsclient -t
 * emacs-server & emacsclient
+** Basic Usage...
 ** Doing it over a remote machine
 http://stackoverflow.com/questions/2231902/originate-edit-of-remote-file-using-emacs-tramp-from-ssh-session
 Cant get it working yet
@@ -160,10 +161,12 @@ only if i ran
 : server-start 
 from emacs
 ** Stopping emacs in server-mode
-From the command line
+*** From the command line
 : emacsclient -e "(save-buffers-kill-emacs)"
 or
 : emacsclient -e "(kill-emacs)"
+*** If you called 'server-start' from within emacs
+Nothing to do - quitting emacs stops the server
 * File Type Associations, a-lists & Manipulating Them
 ** Associate a particular filetype with a particular mode
 : (add-to-list 'auto-mode-alist '("\\.rake\\'" . ruby-mode))
@@ -1921,3 +1924,53 @@ Whole file not being run?
 ** Ruby-mode
 *** Weird Thing when typing "{"
 Whole line kind of jump-indented and point skipped forward several chars....
+
+* Hulk
+** Larsen
+I know he
+*** We arent talking about Hulks haircut but the main issue of the story
+Stan having a problem with the thrust of the story is not necessarily the same as some petty disagreement over Hulks haircut or whatever.
+
+I notice you tend to try and drop into black and white thinking or false dichotomies from time to time
+** The bias thing is a red herring
+** Pancakes vs something else for breakfast
+The fact that there might have been other options is not the problem for your hypothesis
+The fact that the answer chosen invalidates the whole chain of reasoning is the problem
+
+*** This is a totally inappropriate analogy
+Its not like Stan later decided on other solutions ("This bird is too strong for Hulk!")
+Its that later events such as The Abomination only make clear what should be obvious to anyone who is aware that the Hulk isnt a real person
+ - the original dilemma, as others have interpreted it, was a total non-issue
+*** So a better anlogy would be
+Me and Jack were worried about what to have for breakfast. It was a very difficult decision as we had no food! But we found some pancakes. 
+Later though we decided not to eat breakfast because we remembered that as immortal beings we had no need for Eartly sustenance.
+** It doesnt have to be a god
+The argument could be 
+1 Stan created a character who was a bird and thus could be stronger than the strongest human
+that doesnt change the idea that the central chain of reasoning doesnt make sense
+** Your two answers thing is irrelevant
+The fact that one answer to the question invalidates point 3 of your argument 
+1 Stan wanted to create someone stronger than the Hulk
+2 No human could be stronger than the Hulk
+3 we all know this bit
+
+The answer Stan came up with later wasnt just another thing which fit the criteria - it totally invalidated the original idea that there was a dilemma. 
+And as i said it should point out that the original idea that there  was a dilemma in reconciling Points 1 and 2 is absurd. Nobody would be more awre of this than Stan who was more aware than most people that he could just make up whatever he felt like.
+
+Your argument isnt that Stan later came up with other solutions - its that Stan later felt he was mistaken in the first place and essentially Satn and Jack went to all that effort for nothing
+
+*** The best you can do is claim that Stan later thought there was no dilemma involved in making a human stronger than the Hulk 
+Now that could still mean that at the time Stan had a total brain-implosion and thought he was in a real bind but that was still the reason they decided to make Thor a God - to create someone stronger than the hulk. But it substantially weakens your case. Which is already looking implausible given the added context we now have to the original questio/answer.
+
+I'm arguing that the question was something totally different
+*** But this still ignores all the evidence supplied from other bits of context that Stan wasnt trying to make someone stronger than the Hulk
+** Thats not my argument
+Its that 
+1) Stan Wanted to create someone stronger than the Hulk
+2) No human could be stronger than the Hulk - not for out of story reasons - but as if it was some weird physical impossibility
+
+The idea that i am saying Stan said "it had to be a god" is in fact a straw man argument itself.
+
+Its the premise of the "Hulk human => Thor God" argument that i am attacking - on a number of fronts - not the idea that there was only one solution. Your mistaking one of the arguments for the actual conlusion i am trying to prove.
+** I just cant buy the Reed angle at all
+I think this is a real death blow to the "human => God" hypothesis
