@@ -140,6 +140,23 @@ You can also set breakpoints whenever a XHR request is made under
 Scripts/XHR Breakpoints and clicking the box
 : Any XHR
 * jQuery
+** How to call/run some jQuery code even if your script is loaded before jQuery is
+Basically wrap it in a call like this:
+#+BEGIN_SRC javascript
+  window.onload = function(e) {
+      $('.some.class').on('click' function(e) {
+          console.log('We got clicked...');
+      });
+  };  
+#+END_SRC
+document.onload might be preferrable apparently but i couldnt get it working...
+** Setting up a binding that will also apply to future dynamically loaded DOM elements
+Use the jQuery 'on' method *but* you cant use it on the element/selector itself.
+
+Bind to the document and have it delegate the call to the appropriate event and selector. i.e.
+: $(document).on('click', '.admin_delete a', function(e) { 
+rather than
+: $('.admin_delete a').on('click', function(e) {
 ** Tell which version you are running from the command line
 : $().jquery; 
 or 
@@ -188,7 +205,6 @@ or if ! elemData.handle;
 : eventHadle = jQuery.event.dispatch.apply( eventHandle.elem, arguments ) 
 **** jQuery.event.dispatch
 : ret = ( (jQuery.event.special[ handleObj.origType ] || {}).handle || handleObj.handler ).apply( matched.elem, args );
-
 
 
 ** $.fn
