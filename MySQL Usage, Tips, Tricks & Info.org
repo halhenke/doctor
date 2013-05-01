@@ -59,3 +59,9 @@ But all i have is
 and
 : /opt/local/var/db/mysql55/.turd_mysql55-server
 See [[*Extra%20things%20you%20have%20to%20do%20in%20setup%20with%20Macports%20MySQL][Extra things you have to do in setup with Macports MySQL]] 
+
+* Using LIKE
+Can definitely use it on 'strings' and 'varchars'
+
+Can also use it on "datetime" fields
+: select id, start_time from sessions where start_time LIKE '%2012-10-01%';
