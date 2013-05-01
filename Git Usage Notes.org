@@ -230,6 +230,15 @@ Also apparently git chery will showw which branches contain an /equivalent chang
 : git cherry <upstream >
 Yeah not sure how to work that actually....
 
+*** Show all commits whose message does NOT contain a certain regexp
+Cant do this with just the standard
+: git log --grep=pattern
+Because you need the -v flag
+
+*So we gotta pipe* from the command line
+
+This will show all commits by me that dont contain a '#' character
+: git log --committer=hal.henke | grep -v "#"
 ** Seting up a global gitignore file
 : git config --global core.excludesfile ~/.gitignore_global
 ** Syntax in referring to previous commits

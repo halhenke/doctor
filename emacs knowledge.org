@@ -1332,6 +1332,8 @@ This uses the shell grep/regular expressions - not emacs ones i.e.
 : (hulk|crazy)
 not
 : \\(hulk\\|crazy\\)
+*** Trying to grep for "negative expressons" - i.e. looking for *commit messages* that DONT contain a given regexp
+See this [[file:Git%20Usage%20Notes.org::*Show%20all%20commits%20whose%20message%20does%20NOT%20contain%20a%20certain%20regexp][git log: Showing all commits whose message does NOT contain a certain regexp]]
 ** Troubleshooting
 *** A very annoying error - magit-show gives the error "branchname is not a commit or tree."
 It still mostly seems to work - but only in the one frame. 
@@ -1388,6 +1390,10 @@ or
 : diff-buffer-with-file
 or 
 : ediff-current-file
+* find-grep
+** Proper syntax for a reg-exp type search
+This works - no need to do emacs style escapes it seems - it prob runs a command line version
+: find ~/bridge/app/models/ -type f -exec grep -nH -e "validate.*email" {} +
 * isearch
 ** isearch variables
 : isearch-string
