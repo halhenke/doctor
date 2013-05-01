@@ -6,7 +6,7 @@
 Also see [[file:emacs%20knowledge.org::*TO%20DO][Emacs Knowledge: TO DO]]
 ** DONE Learn Mode creation
 ** Org-Mode
-** TODO Reorganise my docs
+** DONE Reorganise my docs
  - split stuff like *git*, *apache* etc out into separate org docs
 *** TODO Change Org-Mode Bindings & Add functions
   - want to keep some of the easy alt and shift bindings though
@@ -63,7 +63,7 @@ which i can get rid of with
 *** Org-Mode and Other Stuff
  - No linum-mode
  - Fancy font?
-** TODO Change word boundaries in haml and master word boundaries in general
+** DONE Change word boundaries in haml and master word boundaries in general
 Want it to recognise CamelCase? (underscores) as separate words...
 ** TODO Modify revbufs to also call update on all buffers that are directories
 Shouldnt be too hard...?
@@ -81,7 +81,7 @@ Shouldnt be too hard...?
 ** TODO learn cronjobs
 ** TODO learn about POSIX filesystem/inode stuff 
 that Alex/Brendan/Edward were talking about the other night
-** TODO get git bash completion going
+** DONE get git bash completion going
 ** TODO Different distro? BSD?
 ** TODO Learn about how to mount other directories - particularly from a virtual machine
  - This could be very cool in development
@@ -128,7 +128,7 @@ An Emacs Page etc
    - Lion/Mountain Lion support?
 http://infinite-labs.net/afloat/
 
-** Get a really good Key / *touchpad* remapper
+** TODO Get a really good Key / *touchpad* remapper
 *** KeyRemap with XML
 *** Ukelele
  - free?
@@ -142,7 +142,7 @@ http://www.xkeys.com/xkeys.php
 
 *** FunctionFlip - Change some media keys to function keys but not all
     http://kevingessner.com/software/functionflip/
-* TODO Catalyst
+* DONE Catalyst
 ** TODO Add stuff to my user package
  - .inputrc
  - .bashrc_local
@@ -160,13 +160,13 @@ http://www.xkeys.com/xkeys.php
 * TODO Personal
 ** TODO Find snus
 ** TODO Get charity
-** TODO Best Camera?
-** TODO Presents
+** DONE Best Camera?
+** DONE Presents
 ** TODO iPhone or Smasung
 ** TODO iPad Mini? Android Tablet?
 * TODO Online Services/Tech Products
 ** TODO Spotify? GrooveShark?
-** TODO Github Private?
+** DONE Github Private?
 ** TODO Git Paid Tool as pr Bruno?
 ** TODO Start Using a Password Generator and chnge all my online passwords accordingly
 

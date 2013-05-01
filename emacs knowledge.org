@@ -1869,6 +1869,12 @@ where cols and rows set by
 (/ (frame-pixel-height) (frame-char-height))
 (/ (frame-pixel-width) (frame-char-width))
 #+END_SRC
+** TODO When choosing a buffer that is a directory automatically refresh it
+Basically we want to call when we switch to a buffer that is a directory
+: revert-buffer
+or perhaps when 
+: dired-mode
+becomes active...
 * TODO Bigger Ideas
 ** TODO Startup Javascript/Skewer-Mode
  - Load a scratch buffer and a bunch of helper functions
