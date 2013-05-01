@@ -467,6 +467,19 @@ Better way - get proper scripts
 : Dir.entries('hal/scripts').select{|fn| not fn.include? "~"}
 then 
 : load('hal/scripts/' + Dir.entries('hal/scripts').select{|fn| not fn.include? "~"}[4])
+*** Questions/Things
+I made some changes to the Vacancy model and after i give the command reload!
+i get this back
+#+BEGIN_VERSE
+Reloading...
+Creating scope :active. Overwriting existing method Client.active.
+Creating scope :public. Overwriting existing method Vacancy.public.
+#+END_VERSE
+Kinda interesting That "vacancy.public" is overwritten....Not sure about Client
+
+**** *Actually prob ignore this*
+After further messing it didnt seem to have anything to do with the classes i had changed
+ - i dont know why those particular classes were mentioned but its the same every time....
 ** Sprockets
 *** Located in
 : app/assets/stylesheets/application.css/ 
@@ -602,7 +615,27 @@ When a partial is called with a pluralized collection, then the individual insta
 In Rails 3 you can also render a partial just by rendering a collection with the same name
 : = render @products
 will render the _product partial with the @products collection
-** ActiveRecord Queries - Issues
+** Stuff learned from debugging ActionController
+If you have a
+: respond_to |format|
+block and you want to see what happens in the block you pass to it 
+then step into it here
+which will take you to 
+: def respond_to(*mimes, &block)
+in 
+: lib/action_controller/metal/mime_responds.rb
+and step into the line
+: response ? response.call : default_render({})
+and this will put you in the block/Proc you passed to respond_to
+** ActiveRecord
+*** Structure Modules and Classes
+Basically ActiveRecord is a module
+: ActiveRecord.class
+ -> Module < Object
+While ActiveRecord::Base is the class
+: ActiveRecord::Base.class
+-> Class < Module
+*** Queries - Issues
 Probably MySQL related:
 This didnt work:
 : ReceivedEmail.where('"from" LIKE "%oleg.ivanov@jnsolutions.com.au%"')
@@ -1208,3 +1241,8 @@ This is valid
 : {1 => "twenty two"}
 This isnt
 : {1: => "twenty two"}
+** String interpolation only works in Double quoted strings!! :-o
+i.e. This works
+: "#{User.name} sucks"
+But this doesnt
+: '#{User.name} sucks'
