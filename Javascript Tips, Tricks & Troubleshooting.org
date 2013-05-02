@@ -206,7 +206,6 @@ or if ! elemData.handle;
 **** jQuery.event.dispatch
 : ret = ( (jQuery.event.special[ handleObj.origType ] || {}).handle || handleObj.handler ).apply( matched.elem, args );
 
-
 ** $.fn
 In jQuery, the fn property is just an alias to the prototype property.
 The jQuery identifier (or $) is just a constructor function, and all instances created with it, inherit from the constructor's prototype.
