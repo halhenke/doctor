@@ -82,6 +82,10 @@ See [[file:Shell%20Scripting%20Magic.org::*Capture%20the%20output%20and%20then%2
 But basically they will be available from the array ENV
 : ENV['HOME']
 Must be a string and not a symbol key
+** Fork another irb from the irb you are working in
+Just call 
+: irb 
+at the irb prompt!
 ** Gems from irb
 Use the Gem Module
 e.g.
@@ -467,6 +471,21 @@ Better way - get proper scripts
 : Dir.entries('hal/scripts').select{|fn| not fn.include? "~"}
 then 
 : load('hal/scripts/' + Dir.entries('hal/scripts').select{|fn| not fn.include? "~"}[4])
+*** reload! is equivalent to
+: reload!
+is equivalent to
+: Dispatcher.reset_application!
+*** Clear the console
+Apparently
+: Command k
+or 
+: Control l
+works
+*** Revert all database changes on exit
+Invoke command wth sandbox option
+: bundle exec rails console --sandbox
+or 
+: bundle exec rails console -s
 *** Questions/Things
 I made some changes to the Vacancy model and after i give the command reload!
 i get this back
