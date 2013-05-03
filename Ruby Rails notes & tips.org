@@ -622,6 +622,15 @@ Class Countries < ActiveRecord::Base
   set_table_name "cc"
 #+END_SRC 
     
+** ActiveRecord Queries
+*** Querying for null 
+These are equivalent apparently
+: User.where(['id = ? and active = ? and activation_code IS NULL', params[:id], 0]).first
+and
+: User.where({:id => params[:id], :active => 0, :activation_code => nil})
+*** Querying for NOT null 
+**** Squeel Gem
+: User.where({:id => params[:id], :active => 0, :activation_code => nil})
 ** You can visit/find modules, classes and helpers by using tags
 i.e. place cursor on the module/class name and press
 : M-.

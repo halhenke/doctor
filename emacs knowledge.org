@@ -1923,6 +1923,9 @@ Fixed with
 *** TODO Some weird differences between Unix and Mac versions
 **** TODO Unix version prompts after every request to "kill buffer"
 **** TODO Haml mode doesnt uncomment properly on Unix....
+** Based on my changes
+*** I have totally broken my incremental find command by using find at point
+I can see it not work in haml-mode, org-mode etc
 ** Unix
 *** On KDE - set-frame-font not working properly on initialization
 : (set-frame-font "DejaVu Serif-10" nil t)
