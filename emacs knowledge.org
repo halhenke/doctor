@@ -1882,6 +1882,14 @@ or perhaps when
 : dired-mode
 becomes active...
 * TODO Bigger Ideas
+** TODO From emacs in ruby-mode command to run "source_location" method on a class
+(Not sure if this would need a rails console running?)
+
+Create  a command would take a class and a method
+: Class.instance_method(:method).source_location
+and return first result as a file and second as a line....
+
+Perhaps visit that file/line also....
 ** TODO Startup Javascript/Skewer-Mode
  - Load a scratch buffer and a bunch of helper functions
    - e.g. a helper/substitute for console.log
@@ -1926,6 +1934,18 @@ Fixed with
 ** Based on my changes
 *** I have totally broken my incremental find command by using find at point
 I can see it not work in haml-mode, org-mode etc
+If I evaluate 
+: isearch-string 
+in org-mode when looking for "--theirs" i get:
+: #("Git--theirs" 0 3 (fontified t face org-level-1))
+or when i did the search when the cursor was over the word "merge" i get
+: #("mergetheirs" 0 5 (fontified t org-no-flyspell t face org-code))
+when i go back to an elisp file and retype theirs it goes back to normal....
+and similarly when i go back to an org-mode file again and do 
+: isearch-repeat-forward
+it works ok
+
+So obviously there is some extra-textual information in org-mode files that confuses this feature...
 ** Unix
 *** On KDE - set-frame-font not working properly on initialization
 : (set-frame-font "DejaVu Serif-10" nil t)

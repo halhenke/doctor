@@ -486,6 +486,14 @@ Invoke command wth sandbox option
 : bundle exec rails console --sandbox
 or 
 : bundle exec rails console -s
+*** Trying to create an object via the console with app.post
+I tried this: 
+: app.post(app.activities_path, {:activity => {:name => "LoveMeal", :description => "The art of War Sandwhich - created purely fromthe console line via a brave, brave call to app.post", :participant_cost => 22, :overhead_cost => 44, :total_budgeted_cost => 33, :organisation_id => 1, :site_id => 3, :created_by_id => 957, :activity_type_id => 117}})
+But i got 
+: WARNING: Can't mass-assign protected attributes: id
+and got a Response Code of 302
+
+Does this mean i did something wrong or we just cant actually create an object in the database from the console?
 *** Questions/Things
 I made some changes to the Vacancy model and after i give the command reload!
 i get this back

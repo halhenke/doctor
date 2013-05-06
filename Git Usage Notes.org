@@ -239,6 +239,8 @@ Because you need the -v flag
 
 This will show all commits by me that dont contain a '#' character
 : git log --committer=hal.henke | grep -v "#"
+and those that dont contain a '#' char or the word 'Merge'
+: git log --committer=hal.henke | grep -v "#\|Merge"
 ** Seting up a global gitignore file
 : git config --global core.excludesfile ~/.gitignore_global
 ** Syntax in referring to previous commits
