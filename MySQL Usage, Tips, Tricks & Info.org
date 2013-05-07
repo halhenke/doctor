@@ -65,3 +65,6 @@ Can definitely use it on 'strings' and 'varchars'
 
 Can also use it on "datetime" fields
 : select id, start_time from sessions where start_time LIKE '%2012-10-01%';
+* Tools, Tricks
+** mytop
+Like the unix command top but for mysql queries....

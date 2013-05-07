@@ -1197,6 +1197,14 @@ If not on =master= branch
 : git push heroku yourbranch:master --force
 
 
+* Cool Gems/Tools
+** Zeus
+*** Customizing
+http://stackoverflow.com/questions/16220292/how-to-run-rails-console-in-test-environment-with-zeus
+Change 
+**** zeus.json file
+**** custom_plan.rb
+
 * Cool & Weird Ruby tricks
 ** Hash Key Value Inversion
 In this example SESSION_TYPE_NAMES is a hash that converts symbols to more meaningful names

@@ -1934,6 +1934,20 @@ Fixed with
 *** TODO Some weird differences between Unix and Mac versions
 **** TODO Unix version prompts after every request to "kill buffer"
 **** TODO Haml mode doesnt uncomment properly on Unix....
+** Installing Packages
+*** Sublime Mode
+Installed via el-get I get:
+#+BEGIN_VERSE
+Warning (emacs): Unable to activate package `sass-mode'.
+Required package `haml-mode-3.0.14' is unavailable
+#+END_VERSE
+I hacked around this by editing
+: ~/.emacs.d/el-get/package/elpa/sass-mode-3.0.14/sass-mode-pkg.el
+and changing
+: (define-package "sass-mode" "3.0.14" "Major mode for editing Sass files" (quote ((haml-mode "3.0.14"))))
+to
+: (define-package "sass-mode" "3.0.14" "Major mode for editing Sass files" (quote ((haml-mode "3.1.0"))))
+
 ** Based on my changes
 *** I have totally broken my incremental find command by using find at point
 I can see it not work in haml-mode, org-mode etc
