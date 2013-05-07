@@ -931,6 +931,9 @@ Or to specify some traits ('dms' and 'suspended')
 : FactoryGirl.create(:des_contract_referral_detail, :dms, :suspended)
 Create a user with some roles (definition uses :ignore and :after create)
 : u1 = FactoryGirl.create(:user, :with_roles => "create_non_epf_purchase_claims_role_name")
+*** Every time you change code you have to reload FactoryGirl
+From the test console call
+: FactoryGirl.reload
 ** TopMost factory definition must match an existing model/table definition
 e.g 
 #+BEGIN_SRC ruby

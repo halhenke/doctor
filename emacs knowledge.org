@@ -1900,6 +1900,9 @@ change to a certain directory (prompt?) and run magit-status
 ** TODO Magit Hooks/Customization
 *** TODO Run revbuffs after a Pull
 *** TODO Push to multiple remotes
+** TODO Create a library famework for creating new emacs UIs
+There is a lot of emacs code out there - not much seems to be aimed at building blocks to help others make stuff......
+*** Something object oriented?
 * Bugs
 ** General
 *** TODO A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
