@@ -1901,7 +1901,7 @@ Basically we want to call when we switch to a buffer that is a directory
 or perhaps when 
 : dired-mode
 becomes active...
-* TODO Bigger Ideas
+* TODO - Bigger Ideas
 ** TODO From emacs in ruby-mode command to run "source_location" method on a class
 (Not sure if this would need a rails console running?)
 
@@ -1954,7 +1954,7 @@ Fixed with
 *** TODO Some weird differences between Unix and Mac versions
 **** TODO Unix version prompts after every request to "kill buffer"
 **** TODO Haml mode doesnt uncomment properly on Unix....
-** Installing Packages
+** Installing Packages via el-get/elpa
 *** Sublime Mode
 Installed via el-get I get:
 #+BEGIN_VERSE
@@ -1996,8 +1996,47 @@ Its an xorg/ncurses type error
 This line not being run? 
 : (setq auto-mode-alist (delq (rassoc 'javascript-generic-mode auto-mode-alist) auto-mode-alist))
 Whole file not being run?
-** Ruby-mode
-*** Weird Thing when typing "{"
+** In Third Party Code
+*** igrep
+**** xargs -e error on Mac
+On Mac I get the error
+: xargs: illegal option -- e
+total output:
+#+BEGIN_VERSE
+find /Users/Hal/.emacs.d/init-files -type d \( -name RCS -o -name CVS -o -name SCCS \) -prune -o -type f \! -name \*\~ \! -name \*\,v \! -name s.\* \! -name .\#\*  -print0 | xargs -0 -e grep -n  -e isearch  /dev/null
+.zshenv called...
+xargs: illegal option -- e
+usage: xargs [-0opt] [-E eofstr] [-I replstr [-R replacements]] [-J replstr]
+             [-L number] [-n number [-x]] [-P maxprocs] [-s size]
+             [utility [argument ...]]
+#+END_VERSE
+this works on linux however
+***** An explanation -
+From man page on Linux
+#+BEGIN_VERSE
+-e[eof-str]
+This option is a synonym for the -E option.  Use -E instead, because it is POSIX compliant while this option is not.  If eof-str is omitted, there is  no  end
+of file string.  If neither -E nor -e is used, no end of file string is used.
+#+END_VERSE
+***** Solutions?
+****** Redefine the command in el-get recipe after?
+****** Change xargs?
+****** *SOLUTION* Custom variables from igrep
+: igrep-find-use-xargs
+is currently set to gnu 
+
+Set to nil to use 
+: find exec
+instead of xargs
+****** Bulk edit Code
+If i change '-e' option to '-E' then i get this error:
+#+BEGIN_VERSE
+xargs -0 -E grep -n  -e \(kbd\ \"s-f\"\)  /dev/null
+.zshenv called...
+xargs: illegal argument count
+#+END_VERSE
+*** Ruby-mode
+**** Weird Thing when typing "{"
 Whole line kind of jump-indented and point skipped forward several chars....
 
 * Hulk
