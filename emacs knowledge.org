@@ -1248,12 +1248,14 @@ Pretty cool. Its in
 : (require 'hals_mode_customizations)
 * Outline-minor-mode
  - With the below for example you can hide or show functions with hide/show sub-trees
+#+BEGIN_SRC elisp
 ;; Better for PHP mode
 (add-hook 'php-mode-user-hook
 	  '(lambda ()
 	     (outline-minor-mode)
 	     (setq outline-regexp " *\\(private funct\\|public funct\\|funct\\|class\\|#head\\)")
 	     (hide-sublevels 1)))
+#+END_SRC
 * SLIME Mode
 ** Moving from self instllation to el-get automated packagae management
 I chucked out my old SLIME directory (which was just dumped in =.emacs.d=) and reloaded it via el-get.
@@ -1614,6 +1616,24 @@ End of file during parsing: /home/halhenke/.emacs.d/init-files/hals-el-get-setup
 #+END_VERSE
 
 I remember something like this happening before though
+** Cleaning up after a badly installed package
+If its an elpa package there will be symlinks into the el-get package directory. These will be removed.
+
+May have to change two files
+: ~/.emacs.d/el-get/.loaddefs.el
+and
+: ~/.emacs.d/el-get/.status.el
+set the status to something like
+: (sublime status "removed" recipe nil)
+remove the definitions from loaddefs
+which will begin with something like
+#+BEGIN_VERSE
+;;;### (autoloads (coffee-mode) "coffee-mode/coffee-mode" "coffee-mode/coffee-mode.el"
+;;;;;;  (20766 11763))
+;;; Generated autoloads from coffee-mode/coffee-mode.el
+#+END_VERSE
+and then remove the mention at the end of the file if necessary:
+: ;;;;;;  "slime/slime-autoloads.el" "slime/slime.el"
 * elpa
 ** List of installed packages
 Evaluate the following variable
@@ -1947,7 +1967,10 @@ and changing
 : (define-package "sass-mode" "3.0.14" "Major mode for editing Sass files" (quote ((haml-mode "3.0.14"))))
 to
 : (define-package "sass-mode" "3.0.14" "Major mode for editing Sass files" (quote ((haml-mode "3.1.0"))))
-
+**** yasnippet
+load yansippet problem
+**** ido-ubiquitous problem
+*** 
 ** Based on my changes
 *** I have totally broken my incremental find command by using find at point
 I can see it not work in haml-mode, org-mode etc
