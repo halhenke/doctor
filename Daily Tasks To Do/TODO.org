@@ -1,0 +1,67 @@
+#+TITLE: Daily Tasks
+
+* DONE Wash shoes again
+* DONE Wash the rest of my mouldy clothes
+** DONE Put on the line
+* TODO Spotify vs Grooveshark?
+* DONE Connect Spotify so that Play/Pause on headphones works
+* TODO Buy that chicks song
+* TODO Watch Ruby/Rails Videos
+* TODO Get zkbd/z-shell readline going
+* TODO Learn/Configure Pry
+** Get .pryrc Configured
+* TODO Fork some stuff on github or report issues
+** Haml Mode
+*** comment-dwim stuff not working
+*** 
+* TODO Check hair
+* TODO Check for sublime mode extensions to Emacs
+* TODO Check teeth enamel
+* TODO Merge Bookmarks between this and JN Account...
+* TODO Make a Code Snippets Repository
+ - Not designed to have useful refactored/library code but just snippets for ease of reuse/copying - show how something is done.
+ - Gonna be a bit ugly therefore
+** Ruby Examples
+ - A sample controller
+   - would have CRUD, before_filter etc
+** Javascript/jQuery examples
+** Emacs examples
+* TODO Get that code completion that Oleg has in vim for emacs
+* DONE Try Sublime Text Editor
+* DONE Get Bitbucket setup
+* DONE Make definitive ssh keys
+** Where to place them
+*** DONE Airbook
+*** DONE BigMac
+*** DONE github
+*** DONE bitbucket
+*** JN-Big
+*** JN-Little
+* DONE Order Minox
+* TODO Get bupropione
+* TODO test supppl?
+* TODO Teenage Mutant Ninja Turtles and Stickers
+* TODO Get a new phone
+* TODO Get a new android tablet
+* TODO Get a weights set/gym
+* TODO Sell Car
+* DONE Pay Aaron back $50
+* TODO Rsync files
+* TODO Backup this computer
+* TODO Get Apple Repair For BigMac
+* TODO Get music and comics from old PC
+
+* TODO Emacs Packages to investigate
+** emacschrome
+** emacs-setup
+** el-markup
+** el-spec
+** elscreen
+** ack
+** google-maps
+** google-translate
+** graphene
+** AutoComplete, CompanyMode or CompletionUI
+** YaSnippet
+** fakespace
+** @
