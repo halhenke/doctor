@@ -28,6 +28,8 @@
 ** Emacs examples
 * TODO Get that code completion that Oleg has in vim for emacs
 * DONE Try Sublime Text Editor
+** TODO Write Plugin For Alex
+Quit Sublime Text and Launch Emacs
 * DONE Get Bitbucket setup
 * DONE Make definitive ssh keys
 ** Where to place them
@@ -63,5 +65,12 @@
 ** graphene
 ** AutoComplete, CompanyMode or CompletionUI
 ** YaSnippet
+Sublime Style snippets?
 ** fakespace
 ** @
+Prototypes for elisp
+** ctags management
+** dialog
+Some widgets library for building other stuff?
+** frame+, framesize, framemove?
+Resizing moving frames

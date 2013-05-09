@@ -1801,6 +1801,7 @@ it will try to load the file feature.el
 Alternatively it can take a filename optional argument to load.
 
 * TODO - Smaller Stuff
+
 ** DONE A comment-region that comments out all lines that are being "touched" by the current region
 ** DONE A select-region and type that simultaneously deletes the previously selected region and inserts the new text instead of deselecting and inserting text
   - SOLVED -  (set delete-selection-mode t)
@@ -1936,6 +1937,19 @@ There is a lot of emacs code out there - not much seems to be aimed at building 
 *** Something object oriented?
 ** TODO El-get list of packages synchronisation 
 Basically a command to automatically write the current list of el-get pacakges to a file that we can then use to sync with on other machines. Might reuire a new hidden settings file
+** TODO Package with tabs for emacs?
+** TODO A Package to help people create and publish emacs packages to elpa, el-get etc
+Particularly will help to install stuff for info-mode with an easy interface
+* TODO Fork/Improve Emacs Packages etc
+** TODO Haml Mode
+*** Comments working
+Add 
+: comment-start-skip
+and
+: comment-end-skip
+*** Replace default javascript mode
+Currently highlights using crappy javascript mode
+Should at least provide a config value that offers to use js2-mode or perhaps even require it
 * Bugs
 ** General
 *** TODO A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window

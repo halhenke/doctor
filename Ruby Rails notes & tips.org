@@ -922,6 +922,7 @@ end
 #+END_SRC
 is called on Widget
 * FactoryGirl
+** Can include FactoryGirl Syntax in our Rspec and Factory code
 ** Can test from the console
 Must be in test environment
 : bundle exec rails c test
@@ -956,7 +957,33 @@ and then define user in your methods
 : 
 
 
+** in after/before callbacks we no longer use FactoryGirl syntax...
+So dont try to muck around with "association" etc
+e.g.
+#+BEGIN_SRC ruby
+    factory :book_appointment_job do
+      factory :book_appointment_job_with_ref do
+        after(:create) do |baj|
+          baj.refer_job = create :book_appointment_job
+          baj.save!        
+        end
+      end
+      #.......... OTHER STUFF
+    end
+#+END_SRC
 
+** Can be impossible to call debugger from within a factory
+It seems to not be recognised as a call to the debugger gem but instead seen as an uninitialised trait
+
+I got around this by creating the following script and running it from the Rails console in test environment
+and then stepping into the FactoryGirl.create method
+#+BEGIN_SRC ruby
+require 'debugger'
+debugger
+FactoryGirl.create :book_appointment_job_with_ref
+#+END_SRC
+
+Otherwise can declare it outside the Factory definition and you will step through as Factory girl defines/reads the factories
 * Converting vendor/plugins to Rails 3 and/or gems
 This is pretty in depth:
 http://bibwild.wordpress.com/2012/04/25/converting-a-more-complex-rails-2-3-style-plugin-to-non-deprecated-under-rails-3-2/
