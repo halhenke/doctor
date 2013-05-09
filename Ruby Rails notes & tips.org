@@ -1211,6 +1211,17 @@ In this example SESSION_TYPE_NAMES is a hash that converts symbols to more meani
 Apparently you can call invert to give the hash a value and get a key :-o
 :  SESSION_TYPE_NAMES.invert[session_type_name] || session_type_name
 
+** Creating a singleton object from a module
+if a module is defined with the command
+: extend self
+then its own methods become available as "Class Methods" while the Nodule it self cant be instantiated e.g.
+#+BEGIN_SRC ruby
+module DumbAss
+  extend self
+  def knowNothing
+  end
+end
+#+END_SRC
 * TODO PROBLEMS
 ** How to log *anything* from configuration file
 i.e. from development.rb or Hunome::Application.configure

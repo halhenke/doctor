@@ -1835,7 +1835,7 @@ Alternatively it can take a filename optional argument to load.
 ** DONE Good binding for Keyboard Macro invocation
 ** Bind Set mark - <Command Spacebar> ? (Prob not as necessary now that shift select is working good)
 ** DONE Binding for global and regional indent - <s-\>
-** KEYBINDINGS - Good available keybindings:
+** DONE KEYBINDINGS - Good available keybindings:
 -  <s-Return>
 -  <s-spacebar> - system bound to spotlight - UNBOUND!
 -  <s-escape> - system bound to Front Row - UNBOUND!
@@ -1879,6 +1879,17 @@ fixed-width font environments or certain modes.
 **** TODO Comments in general
 **** TODO Rspec
 **** TODO FactoryGirl
+*** DONE Better Default Bindings
+*** TODO Set outline-reg-exp for different modes/files extensions e.g. rake
+Perhaps can be done with "make-local-variable"? without coming up with a whole new rake mode?
+: (set (make-local-variable 'indent-line-function) 'haml-indent-line)
+
+Or look at this from the "elhome" package
+#+BEGIN_VERSE
+N.B. This feature requires after-load-functions, introduced in Emacs 23.2.
+
+Any time a file named foo.el is loaded, a file in settings called foo-settings.el is loaded if it exists. This lets you easily organize your customizations according to subject matter.
+#+END_VERSE
 ** TODO When making a new frame - switch focus and maximize
 *** Selecting new frame
 add
