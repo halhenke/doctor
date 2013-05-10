@@ -1913,6 +1913,7 @@ Basically we want to call when we switch to a buffer that is a directory
 or perhaps when 
 : dired-mode
 becomes active...
+** TODO 
 * TODO - Bigger Ideas
 ** TODO From emacs in ruby-mode command to run "source_location" method on a class
 (Not sure if this would need a rails console running?)
@@ -1935,6 +1936,11 @@ change to a certain directory (prompt?) and run magit-status
 ** TODO Create a library famework for creating new emacs UIs
 There is a lot of emacs code out there - not much seems to be aimed at building blocks to help others make stuff......
 *** Something object oriented?
+** TODO Create a library famework for adding modern data structures etc to emacs and possibly a front end to older stuff
+*** Like alists etc
+*** Some syntax more like json?
+*** A prototype object syntax?
+*** Something object oriented?
 ** TODO El-get list of packages synchronisation 
 Basically a command to automatically write the current list of el-get pacakges to a file that we can then use to sync with on other machines. Might reuire a new hidden settings file
 ** TODO Package with tabs for emacs?
@@ -1950,6 +1956,9 @@ and
 *** Replace default javascript mode
 Currently highlights using crappy javascript mode
 Should at least provide a config value that offers to use js2-mode or perhaps even require it
+** TODO  el-get
+*** TODO el-get-intalled function
+Echo list of installed packages
 * Bugs
 ** General
 *** TODO A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
