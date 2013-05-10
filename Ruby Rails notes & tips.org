@@ -843,6 +843,13 @@ Unlike say elisp where we require a tag that is provided in a loadpath by a =pro
 
 
 * Rspec
+** Invoking from the console - tricks
+*** To only call those with a particular regexp
+Use -e "string"
+: bundle exec rspec spec/models/book_appointment_job_spec.rb -e "Job Failed to Book an Appointment"
+*** To only call those at a particular line
+Say all in the block at line 75
+: bundle exec rspec spec/models/book_appointment_job_spec.rb:75
 ** Always run migrations first in test environment
 : bundle exec rake db:test:clone_structure
 ** It syntax
@@ -964,7 +971,6 @@ In before block
 : view.stub(:current_user => user)
 and then define user in your methods
 : 
-
 
 ** in after/before callbacks we no longer use FactoryGirl syntax...
 So dont try to muck around with "association" etc
