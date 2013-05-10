@@ -921,6 +921,15 @@ describe Widget do
 end
 #+END_SRC
 is called on Widget
+** What methods belong in which class
+*** RSpec::Core::ExampleGroup
+**** describe
+**** context
+**** it
+**** let
+**** let!
+**** subject
+*** RSpec::Core::Example
 * FactoryGirl
 ** Can include FactoryGirl Syntax in our Rspec and Factory code
 ** Can test from the console
