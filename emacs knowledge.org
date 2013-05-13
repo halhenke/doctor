@@ -1959,6 +1959,13 @@ Should at least provide a config value that offers to use js2-mode or perhaps ev
 ** TODO  el-get
 *** TODO el-get-intalled function
 Echo list of installed packages
+** TODO Skewer-Mode
+Basically i want something like a Chrom plugin if necessary or something i can do from emacs that will do the equivalent of running all of this from the console:
+#+BEGIN_SRC javascript
+$.getScript("http://localhost:8080/skewer")
+skewer.host = "http://127.0.0.1:8080"
+skewer()
+#+END_SRC
 * Bugs
 ** General
 *** TODO A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
