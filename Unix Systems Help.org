@@ -341,6 +341,13 @@ emacs-snapshot
 #+END_SRC bash
 
 
+
+* Displaying an xclient program on a particular $DISPLAY or x-server
+Call program with option
+: --display, -d DISPLAY       use X server DISPLAY
+e.g.
+: emacs -d $DISPLAY
+
 * Editing files on remote machines from EMACS via TRAMP
 
 Emacs will work the same on remote machines as when you are editing a file as root on the local machine.

@@ -132,7 +132,7 @@ or
 : dscl localhost -list .
 This works best
 : sudo dscl localhost -list /Local/Default/Users/Hal
-* Open NX keys
+* Open NX keys - Reorganise this one day
  - Basically you want to check out the section on [[file:my%20emacs%20and%20keybinding%20dilemma.org::*xkb][xkb]] from my emacs keybinding notes - this has everything to do with this problem?
 ** The Problem 
 When loggging in from OS X often the Opt/Alt keys and especially the Command key do not work.
@@ -322,7 +322,6 @@ directly to the xkbcomp input. For example, the command
 makes both steps run on the same (client) machine and loads a keyboard map into the server.
 #+END_VERSE
 
-
 ** How I began to solve the issue on the Mac
 I fiddled with the settings of my xkbcomp on the remote machine
 : xkbcomp $DISPLAY xkb-file.xkb
@@ -372,8 +371,6 @@ Then to apply changes, on the remote server:
 : xkbcomp xkb-file.xkb
 : xkbcomp xkb-file.xkm $DISPLAY
 
-
-
 ** The same modmap behaves badly when i am logging in from Ubunutu
 *** In Emacs
 Alt key produces Meta but Super key produces nothing with this keymapping... 
@@ -398,6 +395,7 @@ Command L   <LWIN>
 Command R  <RWIN>
 
 * Logging into Open NX from Home/Mac OSX when the session has been set to the xkb map derived from Work/KDE/Ubuntu
+** Some of the weird "defalt bindings" and how i struggled with them
 You need to paste 
 : xkbcomp ~/xkb-maps/home-login-mod.xkm $DISPLAY
 to the terminal and press enter
@@ -439,3 +437,13 @@ so to run i need to type
 in other words
 <AB09><AB10><AC03> <AD09>
 :  Super_R  ESC u =  q  r 8
+** The easy/sensible way
+Graphically open up a folder, navigate to
+: ~/bin/
+Copy the name of the script with mouse
+: ~/bin/do-experimental-home-login-setup
+Paste in terminal with mouse
+Press the '8' key for return
+Disconnect from the session and then login again with OpenNX and resume
+
+
