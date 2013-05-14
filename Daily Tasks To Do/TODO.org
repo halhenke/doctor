@@ -53,6 +53,7 @@ Quit Sublime Text and Launch Emacs
 * TODO Get Apple Repair For BigMac
 * TODO Get music and comics from old PC
 
+* TODO Install YaSnippet - fix el-get recipe with bad git/github address
 * TODO Emacs Packages to investigate
 ** emacschrome
 ** emacs-setup
@@ -74,3 +75,7 @@ Prototypes for elisp
 Some widgets library for building other stuff?
 ** frame+, framesize, framemove?
 Resizing moving frames
+** auto-async-byte-compile
+http://www.emacswiki.org/emacs/auto-async-byte-compile.el
+** AutoRecompile - for byte-compiling files automatically on save
+http://www.emacswiki.org/emacs/AutoRecompile

@@ -1946,7 +1946,7 @@ Basically a command to automatically write the current list of el-get pacakges t
 ** TODO Package with tabs for emacs?
 ** TODO A Package to help people create and publish emacs packages to elpa, el-get etc
 Particularly will help to install stuff for info-mode with an easy interface
-* TODO Fork/Improve Emacs Packages etc
+* TODO - Fork/Improve Emacs Packages etc
 ** TODO Haml Mode
 *** Comments working
 Add 
@@ -1956,9 +1956,13 @@ and
 *** Replace default javascript mode
 Currently highlights using crappy javascript mode
 Should at least provide a config value that offers to use js2-mode or perhaps even require it
-** TODO  el-get
+** TODO el-get
 *** TODO el-get-intalled function
 Echo list of installed packages
+*** TODO el-get-installed functions automatically sync across machines
+use 
+: el-get-list-installed-packages
+to store package list in the buffer (???) or a special settings file
 ** TODO Skewer-Mode
 Basically i want something like a Chrom plugin if necessary or something i can do from emacs that will do the equivalent of running all of this from the console:
 #+BEGIN_SRC javascript
