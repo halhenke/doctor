@@ -1,0 +1,13 @@
+#+TITLE: Some of my Thoughts on Development, Coding etc
+
+* Convention over Configuration
+** Why?
+ - So much easier when you are a maintainer/code reader
+ - Much less need to debug/trace code over lots of different things
+ - If you know one convention well you can be familiar with hunreds of projects that adhere to this convention
+** See Debugging Rails vs Debugging Javascript
+** Related to?
+*** TIMTOWTDI vs There Should Be One & Only One Way To Do It
+ - Perl vs Python etc
+ - Expressiveness at the cost of much higher cognitive load
+**** Still Syntactical Complexity can lead to greater terseness than is possible with a more simple language
