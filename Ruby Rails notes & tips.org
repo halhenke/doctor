@@ -111,6 +111,14 @@ But you still may have to do a Gem.refresh to get some of them
 *** All available Gems
 : Gem::Specification.all_names
 
+* Pry
+** Getting reload! and stuff to work in the console like in IRB
+
+#+BEGIN_SRC ruby
+  require 'rails/console/app'
+  require 'rails/console/helpers'
+  extend Rails::ConsoleMethods
+#+END_SRC
 
 * Require arbitrary file in irb
 If you are in an arbitrary directory and you want to require a module 
