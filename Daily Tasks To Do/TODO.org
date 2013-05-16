@@ -31,6 +31,7 @@
 ** TODO Write Plugin For Alex
 Quit Sublime Text and Launch Emacs
 * DONE Get Bitbucket setup
+** TODO Change everything from Github to BiitBucket
 * DONE Make definitive ssh keys
 ** Where to place them
 *** DONE Airbook
@@ -40,6 +41,7 @@ Quit Sublime Text and Launch Emacs
 *** JN-Big
 *** JN-Little
 * DONE Order Minox
+* TODO Order Contacts
 * TODO Get bupropione
 * TODO test supppl?
 * TODO Teenage Mutant Ninja Turtles and Stickers

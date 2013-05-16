@@ -6,8 +6,10 @@
  - Much less need to debug/trace code over lots of different things
  - If you know one convention well you can be familiar with hunreds of projects that adhere to this convention
 ** See Debugging Rails vs Debugging Javascript
-** Related to?
-*** TIMTOWTDI vs There Should Be One & Only One Way To Do It
+** Related Issues
+[[*TIMTOWTDI%20vs%20There%20Should%20Be%20One%20&%20Only%20One%20Way%20To%20Do%20It][TIMTOWTDI vs There Should Be One & Only One Way To Do It]]
+
+* TIMTOWTDI vs There Should Be One & Only One Way To Do It
  - Perl vs Python etc
  - Expressiveness at the cost of much higher cognitive load
-**** Still Syntactical Complexity can lead to greater terseness than is possible with a more simple language
+** Still Syntactical Complexity can lead to greater terseness than is possible with a more simple language

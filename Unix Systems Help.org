@@ -3,9 +3,10 @@
 *Other Org-Mode files with relevant info*
  - See [[file:Mac%20Use%20of%20Unix.org][UNIX tips specific to OS X]] for mac related differences
  - See [[file:Shell%20Scripting%20Magic.org][Shell Scripting Docs]] for some cool shell scripting commands and things that often trip me up
- -  Also see [[file:Z-Shell.org][Z-Shell]] setup, tips and tricks
+ - Also see [[file:Z-Shell.org][Z-Shell]] setup, tips and tricks
  - See [[file:psql%20commands.org][Postgres & psql]] for some more advice on that area (mostly psql atm)
- - See [[file:my%20emacs%20and%20keybinding%20dilemma.org][The Emacs/Linux/Super Key epic keybinding Odyssey.org]] for more info on changing keybindings in Linux
+ - See [[file:Keyboards%20&%20Terminals%20in%20Unix.org][Keyboards, Modifier keys, Consoles, Terminal Emulators etc in UNIX systems]] for what should be a hopefully alll encompassing exploration of the topic also including:
+   - [[file:my%20emacs%20and%20keybinding%20dilemma.org][The Emacs/Linux/Super Key epic keybinding Odyssey.org]] for more info on changing keybindings in Linux
  - See [[file:Git%20Usage%20Notes.org][Git Usage Notes]] for info on GIT usage
  - See [[file:Catalyst%20Related/Catalyst%20Related%20Tasks%20&%20Info.org][Catalyst Related Tasks & Info]] for stuff that was more specific to Catalyst Than Not
    - Covers
