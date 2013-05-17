@@ -1946,6 +1946,8 @@ Basically a command to automatically write the current list of el-get pacakges t
 ** TODO Package with tabs for emacs?
 ** TODO A Package to help people create and publish emacs packages to elpa, el-get etc
 Particularly will help to install stuff for info-mode with an easy interface
+** TODO Before Init-Hook - auto-recompile
+Check if files are out of date and re-byte-compile them?
 * TODO - Fork/Improve Emacs Packages etc
 ** TODO Haml Mode
 *** Comments working
@@ -2018,8 +2020,8 @@ to
 load yansippet problem
 **** ido-ubiquitous problem
 *** 
-** Based on my changes
-*** I have totally broken my incremental find command by using find at point
+** Based on my code/changes
+*** TODO I have totally broken my incremental find command by using find at point
 I can see it not work in haml-mode, org-mode etc
 If I evaluate 
 : isearch-string 
@@ -2033,7 +2035,9 @@ and similarly when i go back to an org-mode file again and do
 it works ok
 
 So obviously there is some extra-textual information in org-mode files that confuses this feature...
-** Unix
+*** TODO My Alt Select Code doesnt work if you go upwards 
+Can choose it to work up or down
+** TODO Unix
 *** On KDE - set-frame-font not working properly on initialization
 : (set-frame-font "DejaVu Serif-10" nil t)
 is giving me something insanely huge
