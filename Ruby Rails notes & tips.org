@@ -121,7 +121,6 @@ But you still may have to do a Gem.refresh to get some of them
 #+END_SRC
 
 * RVM
-
 ** How Oleg upgraded me to Ruby 2.0.0
 Upgrade rvm itself
 : rvm get stable
@@ -137,6 +136,13 @@ Because I only had the following gemsets
 and being in default nothing was working
 : rvm gemset create rails3
 : rvm gemset use rails3
+** "global" gemset is inherited from by oter gemsets
+** If you update rvm, reload it in any existing consoles
+So if you run something like:
+: rvm get stable
+then run
+: rvm reload
+Otherwise things will be messed up...
 * Require arbitrary file in irb
 If you are in an arbitrary directory and you want to require a module 
 at a path relative to yourself of
