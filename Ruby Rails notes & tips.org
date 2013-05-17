@@ -120,6 +120,23 @@ But you still may have to do a Gem.refresh to get some of them
   extend Rails::ConsoleMethods
 #+END_SRC
 
+* RVM
+
+** How Oleg upgraded me to Ruby 2.0.0
+Upgrade rvm itself
+: rvm get stable
+and automatically to 2.0.0-p195
+: rvm install 2.0.0 --autolibs=1
+Change Rubies
+: rvm use --default ruby-2.0.0
+Because I only had the following gemsets 
+#+BEGIN_VERSE
+=> (default)
+   global
+#+END_VERSE
+and being in default nothing was working
+: rvm gemset create rails3
+: rvm gemset use rails3
 * Require arbitrary file in irb
 If you are in an arbitrary directory and you want to require a module 
 at a path relative to yourself of
