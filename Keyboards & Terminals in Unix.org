@@ -9,23 +9,30 @@ Feel I need this as a master document o tie together some other stuff which is c
 
 The hierarchy of input:
 * Terminals
-* .Xdefaults/.XResources file and xrmdb
+* .Xdefaults/.XResources file and xrdb
 https://wiki.archlinux.org/index.php/Xdefaults
 The syntax of an Xresources file is as follows:
 : name.Class.resource: value
 https://github.com/sunaku/home/blob/master/.Xdefaults
 More on this
 http://www.klauser.com/lxug/ch12.pdf
-
-** Get properties with
+** See what has been already set in xrdb
+: xrdb -query -all
+** Get properties of a running process
+Probably most importantly its name/class
 : xprop
-** Set things in
+** Setting/Changing things Manually
+Put Settings you want in
 : .XResources
-reload databse with
+Then either completely reload the database with
 : xrdb .Xresources
-or 
+or merge changes in to old settings with
 : xrdb -merge .Xresources
 and then start xterm
+** Check raw output of keys
+Run command
+: cat -v
+and then look at output on screen...
 * xModmap/xkb/xserver
 * stty/putty
 * terminfo/termcap - tcap/tput
