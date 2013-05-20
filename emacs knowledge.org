@@ -1383,6 +1383,10 @@ those."
         (push (match-string 1) return-value)))
     return-value))
 #+END_SRC
+** Using for multiple repositories
+ - Set magit-repo-dirs to a list of directories
+ - Following command to switch between multiple repos
+: C-u M-x magit-status
 * ediff
 Can be done on regions as well as files
 : ediff-regions-linewise 
@@ -1926,13 +1930,6 @@ Perhaps visit that file/line also....
 ** TODO Startup Javascript/Skewer-Mode
  - Load a scratch buffer and a bunch of helper functions
    - e.g. a helper/substitute for console.log
-** TODO Startup Magit
-On init create a new frame programatically,
-change to a certain directory (prompt?) and run magit-status
- - Integrate with workgroups?
-** TODO Magit Hooks/Customization
-*** TODO Run revbuffs after a Pull
-*** TODO Push to multiple remotes
 ** TODO Create a library famework for creating new emacs UIs
 There is a lot of emacs code out there - not much seems to be aimed at building blocks to help others make stuff......
 *** Something object oriented?
@@ -1976,6 +1973,17 @@ skewer()
 *** TODO Load Javascript files
 We need a server/ajax request to get local files but 
 perhaps we can use emacs to eval a buffer/file - maybe in a skewer mode hook
+** TODO  Magit
+*** TODO Run Magit in a separate Emacs process with only a few buffers for speed?
+*** TODO Startup Magit
+On init create a new frame programatically,
+change to a certain directory (prompt?) and run magit-status
+ - Integrate with workgroups?
+*** TODO Magit Hooks/Customization
+**** DONE Run revbuffs after a Pull
+This actually seems to happen most of the time
+**** TODO NOT run revbufs after a pull
+**** TODO Push to multiple remotes
 * Bugs
 ** TODO General
 *** TODO A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
