@@ -1966,14 +1966,18 @@ use
 : el-get-list-installed-packages
 to store package list in the buffer (???) or a special settings file
 ** TODO Skewer-Mode
+*** DONE Full browser load solution
 Basically i want something like a Chrom plugin if necessary or something i can do from emacs that will do the equivalent of running all of this from the console:
 #+BEGIN_SRC javascript
 $.getScript("http://localhost:8080/skewer")
 skewer.host = "http://127.0.0.1:8080"
 skewer()
 #+END_SRC
+*** TODO Load Javascript files
+We need a server/ajax request to get local files but 
+perhaps we can use emacs to eval a buffer/file - maybe in a skewer mode hook
 * Bugs
-** General
+** TODO General
 *** TODO A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
 *** TODO delete-selection-mode stopped working when i saved a new buffer and text mode was enabled. 
 Started working again after i deactivated and re-activated the mode
@@ -2020,7 +2024,7 @@ to
 load yansippet problem
 **** ido-ubiquitous problem
 *** 
-** Based on my code/changes
+** TODO Based on my code/changes
 *** TODO I have totally broken my incremental find command by using find at point
 I can see it not work in haml-mode, org-mode etc
 If I evaluate 
@@ -2048,7 +2052,7 @@ This line not being run?
 : (setq auto-mode-alist (delq (rassoc 'javascript-generic-mode auto-mode-alist) auto-mode-alist))
 Whole file not being run?
 ** In Third Party Code
-*** igrep
+*** DONE igrep
 **** xargs -e error on Mac
 On Mac I get the error
 : xargs: illegal option -- e
@@ -2086,7 +2090,7 @@ xargs -0 -E grep -n  -e \(kbd\ \"s-f\"\)  /dev/null
 .zshenv called...
 xargs: illegal argument count
 #+END_VERSE
-*** Ruby-mode
+*** TODO Ruby-mode
 **** Weird Thing when typing "{"
 Whole line kind of jump-indented and point skipped forward several chars....
 
