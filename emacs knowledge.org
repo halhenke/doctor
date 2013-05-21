@@ -1424,6 +1424,8 @@ First you will need to get a more recent version of etags
 By default there is no etags alias to this new command so to generate emacs compatible tags call like this
 : ctags -eR app/
 the '-R' flag is recursive
+*** Can call  on more than one directory
+: ctags -eR app lib
 ** Additional ways to control the use of etags/ctags
 *** Specify output to a particular file
 Use the -f flag

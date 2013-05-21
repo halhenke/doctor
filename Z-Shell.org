@@ -18,14 +18,22 @@ in
 : "/Users/Hal/.oh-my-zsh/templates/zshrc.zsh-template"
 
 * Choosing a prompt
-: prompt clint
+** Previewing available prompts
+: prompt -p
+** Listing available prompts
+: prompt -l
+** Choosing prompt with parameter
+Choose fade prompt with red parameter
+: prompt fade 'red'
 
 * "Bash Completion"
 : typeset -A key
 : [[ -n "${key[Up]}"   ]]  && bindkey  "${key[Up]}"    history-beginning-search-backward
 : [[ -n "${key[Down]}" ]]  && bindkey  "${key[Down]}"  history-beginning-search-forward
 
-
+* And xterm
+** 'robbyrussell' theme has arrows and suff that dont work by default in xterm
+*** Solutions?
 * Grep and regular expressions dont seem to work the same
 When I ran the 'find-grep' command from emacs it would sometimes exit abnormally.
 Bascally whenever i had a character like 

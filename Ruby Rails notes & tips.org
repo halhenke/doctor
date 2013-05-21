@@ -443,7 +443,7 @@ https://github.com/mattdipasquale/gem_uninstall_r
 # OLD WAY, for historical purposes 
 : sudo gem install rubygems-update --no-rdoc --no-ri
 : sudo update_rubygems
-** Info on whre gems are installed etc
+** Info on where gems are installed etc
 From the command line
 : gem env
 or from irb
@@ -458,6 +458,10 @@ gem 'rspec-core', version
 load Gem.bin_path('rspec-core', 'rspec', version)
 #+END_SRC
 
+** Check which gems are loaded from irb/pry
+: Gem.loaded_specs
+** Find the location of a library file/gem you can require
+: gem which gemname
 * map command - block vs function syntax
 Apparently these are equivalent
 : Background.all.map(&:id)
