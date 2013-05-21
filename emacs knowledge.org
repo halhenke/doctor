@@ -1984,6 +1984,10 @@ change to a certain directory (prompt?) and run magit-status
 This actually seems to happen most of the time
 **** TODO NOT run revbufs after a pull
 **** TODO Push to multiple remotes
+*** TODO Magit-Switch-Repo-Shortcut-macro
+: C-u M-x magit-status
+to something like 
+: magit-choose-repo
 * Bugs
 ** TODO General
 *** TODO A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
@@ -2059,9 +2063,9 @@ Its an xorg/ncurses type error
 This line not being run? 
 : (setq auto-mode-alist (delq (rassoc 'javascript-generic-mode auto-mode-alist) auto-mode-alist))
 Whole file not being run?
-** In Third Party Code
-*** DONE igrep
-**** xargs -e error on Mac
+** TODO In Third Party Code
+*** TODO igrep
+**** DONE xargs -e error on Mac
 On Mac I get the error
 : xargs: illegal option -- e
 total output:
@@ -2098,6 +2102,12 @@ xargs -0 -E grep -n  -e \(kbd\ \"s-f\"\)  /dev/null
 .zshenv called...
 xargs: illegal argument count
 #+END_VERSE
+**** igrep sometimes doesnt find things....
+that find-grep will happily find....
+***** Why?
+****** Quotation marks?
+****** igrep -i option
+
 *** TODO Ruby-mode
 **** Weird Thing when typing "{"
 Whole line kind of jump-indented and point skipped forward several chars....
