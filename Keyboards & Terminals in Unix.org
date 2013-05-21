@@ -16,7 +16,12 @@ The syntax of an Xresources file is as follows:
 https://github.com/sunaku/home/blob/master/.Xdefaults
 More on this
 http://www.klauser.com/lxug/ch12.pdf
-
+** What is the syntax
+*** What are comments?
+It says 
+: ! This is a comment
+but it doesn seem to be
+: /* This is i think */
 ** Get properties with
 : xprop
 ** Set things in
@@ -27,6 +32,18 @@ or
 : xrdb -merge .Xresources
 and then start xterm
 * xModmap/xkb/xserver
+I think same stuff
+** OS X
+If i do 
+: xkbcomp $DISPLAY something.xkb
+It has no keycode or keysym info
+
+If I use the xkb configuration file that i use to log into uni from this kayboard then it seems to have pretty much the same effect on the local xterm/xerver....
+
+** Is a perfect xkb setup more or less keyboard dependet than anything else?
+As said before:
+
+If I use the xkb configuration file that i use to log into uni from this kayboard then it seems to have pretty much the same effect on the local xterm/xerver....
 * stty/putty
 * terminfo/termcap - tcap/tput
 Good info here:
@@ -216,3 +233,17 @@ https://wiki.archlinux.org/index.php/Extra_Keyboard_Keys
 http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 ** infocmp and tic to redefine key sequences
 http://stackoverflow.com/a/7975835/935470
+
+* A good portable, consistent setup
+One that has
+ - Emacs
+ - Mac Style bindings and use of command/super and Alt keys
+ - A console with similar bindings
+
+** xkb to bind keys to keysms and thus to bind to
+: AltL/AltR & SuperL/SuperR
+** Xresources to remap those keys to particular escape sequences in
+:  xterm*VT100.translations:	#override \n\
+** Z-Shell to bind these escape sequences to commands
+Possibly using some xterm builtin features also...
+** Tmux or Screen to give back the tab/split screen style features of a modern terminal

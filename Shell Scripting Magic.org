@@ -117,6 +117,10 @@ Similar to:
 Hey machine
 
 
+* List available true type fonts on the system
+: fc-list :fontformat=TrueType -f "%{family}\n" | sort -u | less 
+
+
 * Spaces in filenames
 These are equivalent and work:
 : touch ~/Documents/"A bad file"
