@@ -81,3 +81,10 @@ Resizing moving frames
 http://www.emacswiki.org/emacs/auto-async-byte-compile.el
 ** AutoRecompile - for byte-compiling files automatically on save
 http://www.emacswiki.org/emacs/AutoRecompile
+** Terminal Emulators
+*** screen-term
+*** nterm
+** Ruby/Rails Stuff
+*** Browse ruby documentation in emacs
+**** yari
+*** rspec-mode
