@@ -101,6 +101,11 @@ Add this to the view
 %script{ :src => 'http://localhost:8080/skewer'}
   skewer.host = "http://127.0.0.1:8080";
 #+END_SRC
+*** Adding it as a bookmarklet
+This one doesnt need jQuery
+#+BEGIN_SRC javascript
+javascript:(function(){var d=document;var s=d.createElement('script');s.src='http://localhost:8080/skewer';d.body.appendChild(s);skewer();})()
+#+END_SRC
 *** If it stops working and cant find the server
 First try running 
 : skewer()
