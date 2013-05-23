@@ -143,6 +143,8 @@ So if you run something like:
 then run
 : rvm reload
 Otherwise things will be messed up...
+** You can switch to default Rubies with
+: rvm use default
 * Require arbitrary file in irb
 If you are in an arbitrary directory and you want to require a module 
 at a path relative to yourself of
@@ -746,6 +748,9 @@ end
 
 See here also [[*Rails%20converting%20strings%20to%20symbols%20etc][Rails converting strings to symbols etc]]
 
+** Get a Class object from a string without using eval
+Obviously this is Rails oriented in then getting an instance/record but you get the idea
+: tag_object = Class.const_get(taggable.class.base_class.name).find taggable.id
 ** Operating system commands
 Strings enclosed with backquotes or =%x{}= are be considered by Ruby as operating system commands. Just try:
 : puts (`calc`)

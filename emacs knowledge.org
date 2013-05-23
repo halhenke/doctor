@@ -1975,7 +1975,7 @@ skewer()
 *** TODO Load Javascript files
 We need a server/ajax request to get local files but 
 perhaps we can use emacs to eval a buffer/file - maybe in a skewer mode hook
-** TODO  Magit
+** TODO Magit
 *** TODO Run Magit in a separate Emacs process with only a few buffers for speed?
 *** TODO Startup Magit
 On init create a new frame programatically,
@@ -1990,6 +1990,8 @@ This actually seems to happen most of the time
 : C-u M-x magit-status
 to something like 
 : magit-choose-repo
+**** TODO "My Snippets" repo pretty consistently doesnt work
+How comes?
 * Bugs
 ** TODO General
 *** TODO A fresh new buffer did not let me edit it/add any text fixed when i created new buffer in another window
@@ -2029,7 +2031,7 @@ on OS X and
 on Linux
 **** TODO Haml mode doesnt uncomment properly on Unix....
 ** Installing Packages via el-get/elpa
-*** Sublime Mode
+*** TODO Sublime Mode
 Installed via el-get I get:
 #+BEGIN_VERSE
 Warning (emacs): Unable to activate package `sass-mode'.
@@ -2128,6 +2130,7 @@ find ~/.emacs.d -type f -exec grep -nH -e Hulk {} +
 **** Weird Thing when typing "{"
 Whole line kind of jump-indented and point skipped forward several chars....
 
+*** TODO Magit
 * Hulk
 ** Larsen
 I know he
