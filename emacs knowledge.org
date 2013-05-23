@@ -40,6 +40,18 @@ e.g. Make `$' have the syntax of punctuation in Text mode.  Note the use of a ch
 ** Change whether emacs asks for confirmation or not for certain commands
 e.g. Enable the use of the command `narrow-to-region' without  confirmation.
 :  (put 'narrow-to-region 'disabled nil)
+** Eval and store/copy the outpit of a non-interactive command
+*** With buffer and prefix-argument
+If you do a prefix arg before 
+: eval-expression
+such as 
+: C-u M-:
+then it will insert result into current buffer at point.
+*** With 'values'
+The result of eval-expression is "consed to the front of the variable values
+Suppose you could eval this in scratch or do
+: (describe-variable 'values)
+and copy from that buffer
 * Cool Things I Have Learned About Emacs
 ** Print out a Python style docstring
 : (documentation 'foo)

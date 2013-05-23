@@ -139,6 +139,8 @@ Not really sure how to do this without refreshing the browser window....
 2. If still not working call 
 : skewer()
 from the browser console
+*** Cant get it to work on non-local sites 
+: [blocked] The page at https://training.jsbridge.com.au/clients/596991 ran insecure content from http://localhost:8080/skewer?_=1369282353769.
 * Console
 ** Look under Network/XHR to see pages/routes fetched by AJAX
 You can also set breakpoints whenever a XHR request is made under 
