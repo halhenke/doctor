@@ -1,0 +1,19 @@
+#+TITLE: My Ideal Coding Environment
+
+Inspired by frusttrations/temptations towards choosing Sublime Text over Emacs
+
+
+* Pros of Emacs
+** Open Source
+** Run in terminal and graphical
+* Cons of Emacs
+** Frequently Buggy
+** Sometimes slow
+** functional language makes it hard to find available commands
+I have a list - what the fuck can i do with it? 
+How do i find the command?
+* Pros of Sublime Text
+* Cons of Sublime Text
+
+
+* What I want - No bullshit, no legacy, From the Beginning.....
