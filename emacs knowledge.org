@@ -2020,6 +2020,13 @@ Fixed with
 : sudo ln -s /usr/share/emacs/24.1.50/etc/DOC-24.1.50.2 /usr/share/emacs/24.1.50/etc/DOC-24.1.50.1
 *** TODO Some weird differences between Unix and Mac versions
 **** TODO Unix version prompts after every request to "kill buffer"
+Reason
+: s-k
+is bound to 
+: kill-this-buffer
+on OS X and
+: ido-kill-buffer
+on Linux
 **** TODO Haml mode doesnt uncomment properly on Unix....
 ** Installing Packages via el-get/elpa
 *** Sublime Mode
@@ -2104,8 +2111,15 @@ xargs -0 -E grep -n  -e \(kbd\ \"s-f\"\)  /dev/null
 .zshenv called...
 xargs: illegal argument count
 #+END_VERSE
-**** igrep sometimes doesnt find things....
-that find-grep will happily find....
+**** igrep sometimes doesnt find things that find-grep will happily find....
+igrep command
+#+BEGIN_SRC shell
+find /Users/Hal/.emacs.d -type d \( -name RCS -o -name CVS -o -name SCCS \) -prune -o -type f \! -name \*\~ \! -name \*\,v \! -name s.\* \! -name .\#\* -name \*.org -exec grep -n -i -e Hulk \{\} /dev/null \;
+#+END_SRC
+find-grep
+#+BEGIN_SRC shell
+find ~/.emacs.d -type f -exec grep -nH -e Hulk {} +
+#+END_SRC
 ***** Why?
 ****** Quotation marks?
 ****** igrep -i option

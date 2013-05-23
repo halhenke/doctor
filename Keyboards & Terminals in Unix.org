@@ -9,15 +9,27 @@ Feel I need this as a master document o tie together some other stuff which is c
 
 The hierarchy of input:
 * Terminals
+** XTerm
+*** Source Code
+In file
+: input.c 
+#+BEGIN_SRC C
+static Bool
+TranslationsUseKeyword(Widget w, char **cache, const char *keyword, Bool onlyInsert)
+#+END_SRC
 * .Xdefaults/.XResources file and xrdb
 https://wiki.archlinux.org/index.php/Xdefaults
-The syntax of an Xresources file is as follows:
-: name.Class.resource: value
+
 https://github.com/sunaku/home/blob/master/.Xdefaults
 More on this
 http://www.klauser.com/lxug/ch12.pdf
 
-** What is the syntax
+** The X Toolkit
+This is what is being manipulated by the settings in a .Xresouces type file and stored in the database with .xrdb
+
+** What is the X Toolkit syntax
+The basic syntax of an Xresources file is as follows:
+: name.Class.resource: value
 *** What are comments?
 It says 
 : ! This is a comment
@@ -40,6 +52,26 @@ and then start xterm
 Run command
 : cat -v
 and then look at output on screen...
+** Setting Resources with the -xrm Option
+The -xrm command-line option, which is supported by all X Window System clients written with the X Toolkit, can be useful in specifying from the command line any specification that you would otherwise put into a resources file. e.g 
+: xterm -xrm 'xterm*Foreground: blue' &
+
+** How -name Affects Resources
+The following command sets the xterm instance name to bigxterm:
+: xterm -name bigxterm &
+When this command is run, the client uses any resources specified for bigxterm rather than for xterm.
+#+BEGIN_VERSE
+XTerm*Font:          8x13
+smallxterm*Font:     6x10
+smallxterm*Geometry: 80x10
+bigxterm*Font:       9x15
+bigxterm*Geometry:   80x55
+#+END_VERSE
+** Getting the list of Resources that apply only to one particular xclient
+Use the command appres
+: appres XTerm
+Or to get a named instance
+: appres XTerm bigxterm
 * xModmap/xkb/xserver
 I think same stuff
 ** OS X
