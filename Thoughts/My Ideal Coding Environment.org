@@ -6,14 +6,78 @@ Inspired by frusttrations/temptations towards choosing Sublime Text over Emacs
 * Pros of Emacs
 ** Open Source
 ** Run in terminal and graphical
+** Everything is a buffer
+Means we can run emacs commands, customisations, introspection etc in pretty much every place - such as the minibuffer - we can edit it like a normal emacs buffer - because it is. Contrast that to vim.
+** Lots of stuff is run in e-lisp and not hardcoded in C which means we can re-script it
+customisability
+** Docstrings and Self-Documenting nature
+Its not too hard to find info on a function, module or variable by using 
+: describe function
+: describe-variable
+or info-mode
+** Extensively customisable
 * Cons of Emacs
+** Antiquated names, default settings
+** Takes a long time to customize
 ** Frequently Buggy
+** Lots of stuff is run in e-lisp and not hardcoded in C which means it is slow
+And gets slower as we add more and more elisp customisation
+customisability
 ** Sometimes slow
 ** functional language makes it hard to find available commands
 I have a list - what the fuck can i do with it? 
 How do i find the command?
+** No proper namespacing
+All commands and variables more or les live in the same global space and a lot of diffferent 'modes" run side by side. POtential for weird interactions
+** Is there a better metaphor than "everything is a buffer"
+** Semi-closed development process
+*** Not on github
+*** Hard to get involved and contribute
+** No real tabs
 * Pros of Sublime Text
+** Works reasonably well "out of box"
+** Can be customised
+** Single developer responsible for fixing most grievous bugs
 * Cons of Sublime Text
 
 
 * What I want - No bullshit, no legacy, From the Beginning.....
+
+* Ideas to fix improve Emacs
+** Hotpluggable Emacs
+*** If we wish to change something in to C - to statically code it we need to recompile
+*** If we had a way to translate from tried and trusted elisp code to an intermediary "R-Python" type language that did not need complete re-compilation of the interpreter. Could dynamically be loaded - perhaps like C++
+
+* My Current Problem/Solution - Stringing together Emacs/XTerm/Tmux
+Xterm + Tmux is basically a way to get around the problem of being stuck with a terminal-emulator such as 
+1. Terminator
+2. Gnome Terminal
+which does not allow one to bind Super keys etc to 
+ - arbitrary internal commands
+   - beginning of line
+ - or to escape sequences that we can the bind in z-shell
+** Key bindings - Shouldnt Be This Fucking Hard
+*** The Journey from Key Press to ACTION
+1. Press key
+2. Is interpreted by xServer via xkb into KeySym
+3. KeySym is broken down by Terminal/Terminal Emulator into byte sequence
+   1. Byte Sequence is interpreted by Shell Readilne and either bound to commands or executed as code
+   2. Emacs or whatever deals with the key sym
+*** The xkb binding procedure
+1. So in "xkb_keycodes" section xkb takes a number (ASCII?) 
+2. Generates a keycode to label that number - can be anything
+   1. <LALT> = 23;
+3. In "xkb_symbols" mode associates a keysym with that Keycode - again can be anything but can be different keysyms in different "Groups/States"
+   1. key <LALT> {         [           Alt_L,          Meta_L ] };
+4. Bind keycodes/keysyms to Modifiers - if a keycode has been bound to a keysym and is placed in a modifier map then both keycode and keysym are thus associated
+   1. modifier_map Mod1 { <LALT> };
+
+*** The problems with my emacs/xterm/tmux thing
+**** Its getting pretty fucking convoluted
+**** I dont want to have to learn another set of key combinations - context switching
+**** I want to bind some things only in tmux mode
+e.g.
+1. Super-t makes a new window
+2. Super } switches to a new window
+
+
