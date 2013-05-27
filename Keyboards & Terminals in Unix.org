@@ -19,11 +19,9 @@ TranslationsUseKeyword(Widget w, char **cache, const char *keyword, Bool onlyIns
 #+END_SRC
 * .Xdefaults/.XResources file and xrdb
 https://wiki.archlinux.org/index.php/Xdefaults
-
 https://github.com/sunaku/home/blob/master/.Xdefaults
 More on this
 http://www.klauser.com/lxug/ch12.pdf
-
 ** The X Toolkit
 This is what is being manipulated by the settings in a .Xresouces type file and stored in the database with .xrdb
 
@@ -283,16 +281,6 @@ Not sure where this goes....
 If TERM=xterm-color and key is Home
 : set-option -g terminal-overrides "xterm-color:khome=\033[1~"
 
-* Sources of info
-
-** General Overview
-http://vigna.dsi.unimi.it/bsdel/bsdel/x58.html
-https://wiki.archlinux.org/index.php/Extra_Keyboard_Keys
-** xterm and escape sequences
-http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-** infocmp and tic to redefine key sequences
-http://stackoverflow.com/a/7975835/935470
-
 * A good portable, consistent setup
 One that has
  - Emacs
@@ -306,3 +294,16 @@ One that has
 ** Z-Shell to bind these escape sequences to commands
 Possibly using some xterm builtin features also...
 ** Tmux or Screen to give back the tab/split screen style features of a modern terminal
+
+* Sources of info
+
+** General Overview
+http://vigna.dsi.unimi.it/bsdel/bsdel/x58.html
+https://wiki.archlinux.org/index.php/Extra_Keyboard_Keys
+
+** How a terminal basically works as intercepting stdin and stdout
+http://sqizit.bartletts.id.au/2011/02/14/pseudo-terminals-in-python/
+** xterm and escape sequences
+http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+** infocmp and tic to redefine key sequences
+http://stackoverflow.com/a/7975835/935470

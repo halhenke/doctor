@@ -18,7 +18,7 @@
 * TODO Check for sublime mode extensions to Emacs
 * TODO Check teeth enamel
 * TODO Merge Bookmarks between this and JN Account...
-* TODO Make a Code Snippets Repository
+* DONE Make a Code Snippets Repository
  - Not designed to have useful refactored/library code but just snippets for ease of reuse/copying - show how something is done.
  - Gonna be a bit ugly therefore
 ** Ruby Examples
@@ -30,7 +30,7 @@
 * DONE Try Sublime Text Editor
 ** TODO Write Plugin For Alex
 Quit Sublime Text and Launch Emacs
-* DONE Get Bitbucket setup
+* TODO Get Bitbucket setup
 ** TODO Change everything from Github to BiitBucket
 * DONE Make definitive ssh keys
 ** Where to place them
@@ -50,6 +50,9 @@ Quit Sublime Text and Launch Emacs
 * TODO Get a weights set/gym
 * TODO Sell Car
 * DONE Pay Aaron back $50
+* TODO Reorganise Org Note Docs into Directories
+** TODO Thoughts/Docs etc
+** TODO Change any bad hyperlinks
 * TODO Rsync files
 * TODO Backup this computer
 * TODO Get Apple Repair For BigMac
