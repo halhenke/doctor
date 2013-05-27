@@ -1844,19 +1844,12 @@ Seems to be something like
 : (modify-syntax-entry ?_ "." c++-mode-syntax-table)
 ** Outstanding
 *** TODO Follow links in directories in current window
-*** TODO Fix the require stuff for rinari - stuff should be in util subdirectory?
 *** TODO Some form of command binding to help - (global-set-key (remap 'x) 'y) ? ;x and y have to be functions not key bindings in that case
 *** TODO Bind Set mark - <Command Spacebar> ? (Prob not as necessary now that shift select is working good)
 *** TODO An irb/interpreter mode for running irb (and perhaps Python) over a shell. The main thing would be to start a new interactive
 command history - so that we dont get irb commands in our bash history and vice versa
 *** TODO Bindings for the trackpad multitouch gestures?
-*** TODO Interactive lisp - call eval-print-last-sexp such that it evals the S-expression that the cursor is inside of OR the last one if not inside one
-      - could be a little dangerous - we might be in an "implicit lisp environment"
 *** TODO A function to evaluate a region of lisp functions (a la eval-region) but then capture the output of each s-expression (a la eval-print-last-sexp) in a new buffer
-*** TODO If not available - create a means of navigating in directory mode similar to in Mac OSX Finder - 
-- <Command-up> up a directory
-- <Command-right> open a directory
-- Should still allow global buffer/frame/window navigation as much as possible so will have to think hard about bindings to use
 *** TODO Get Lisp-interaction-mode running by default in .el files
 **** Tried adding lisp-interactio-mode as a hook in the elisp-mode-hook
 I got the following bug
@@ -1910,6 +1903,14 @@ which should be non-nil
 **** Secondary
 Perhspas more related to command
 : save-some-buffers
+** Maybe less interested in doing now
+*** TODO If not available - create a means of navigating in directory mode similar to in Mac OSX Finder - 
+- <Command-up> up a directory
+- <Command-right> open a directory
+- Should still allow global buffer/frame/window navigation as much as possible so will have to think hard about bindings to use
+*** TODO Interactive lisp - call eval-print-last-sexp such that it evals the S-expression that the cursor is inside of OR the last one if not inside one
+      - could be a little dangerous - we might be in an "implicit lisp environment"
+*** TODO Fix the require stuff for rinari - stuff should be in util subdirectory?
 ** Tried to fix but not satisfactory
 *** TODO When making a new frame - switch focus and maximize
 **** Selecting new frame
