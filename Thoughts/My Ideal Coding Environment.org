@@ -1,6 +1,6 @@
 #+TITLE: My Ideal Coding Environment
 
-Inspired by frusttrations/temptations towards choosing Sublime Text over Emacs
+Inspired by frustrations/temptations towards choosing Sublime Text over Emacs
 
 
 * Pros of Emacs
@@ -16,6 +16,8 @@ Its not too hard to find info on a function, module or variable by using
 : describe-variable
 or info-mode
 ** Extensively customisable
+** Eval/Debug/Run elisp in emacs
+You can eval stuff in buffer that will
 * Cons of Emacs
 ** Antiquated names, default settings
 ** Takes a long time to customize
@@ -37,17 +39,56 @@ All commands and variables more or les live in the same global space and a lot o
 * Pros of Sublime Text
 ** Works reasonably well "out of box"
 ** Can be customised
+** "Hot-Pluggable" Extensions
 ** Single developer responsible for fixing most grievous bugs
+** All keybindings/settings per plugin/user/env in a single JSON file
+Great balance of modularity and centralization of settings
+
+** Python Libraries 
+ - not Sublime specific but can be pulled in and used to do...anything?
+ - API limited though
 * Cons of Sublime Text
+** Closed Source
+** Limited API?
+** Python is kind of annoying
+
+** Mouse needed to switch between windows?
+** Too much OS integration in File/Sys IO?
+Uses OS windows etc to select files.
+Not as cool as using a buffer...
+** Limited API  -What /cant/ be done?
+** Console kind of sucks?
+* What I want to be able to do in Sublime Text
 
 
 * What I want - No bullshit, no legacy, From the Beginning.....
-
+** Governing ideas
+*** We only have a limited ammount of mental real estate - should avoid too much context switching
+*** A consistent interface with other programs
+** Ideas
+*** Extensibility
+*** Self-Documenting
+*** More than just a Text Editor
+ - More than just the vim philosophy of editing text
+ - Able to adapt to different environments and usages that may not have been anticipated
+**** Things that are more important than quickly editing text
+***** Finding files
+***** Quickly switching between different parts of a project and viewing code from different locations but semantically related at the same time
+*** Fundamentally build on a few good, composable ideas
+ - e.g. something /like/ "everything is  a buffer" 
+** Features
+*** Reasonably Fast
+*** Reasonably Good Looking
+*** Ability to interface well with command line/shell/OS
+*** Deeply integrated with a good language
+*** Namespaces
 * Ideas to fix improve Emacs
-** Hotpluggable Emacs
-*** If we wish to change something in to C - to statically code it we need to recompile
-*** If we had a way to translate from tried and trusted elisp code to an intermediary "R-Python" type language that did not need complete re-compilation of the interpreter. Could dynamically be loaded - perhaps like C++
+** Hotpluggable Emacs with fast/static code
+*** Solves the problem of Emacs getting too slow for some new features
+**** If we wish to change something in to C - to statically code it we need to recompile
+**** But If we had a way to translate from tried and trusted elisp code to an intermediary "R-Python" type language that did not need complete re-compilation of the interpreter. Could dynamically be loaded - perhaps like C++
 
+** Add Tabs
 * My Current Problem/Solution - Stringing together Emacs/XTerm/Tmux
 Xterm + Tmux is basically a way to get around the problem of being stuck with a terminal-emulator such as 
 1. Terminator
@@ -74,10 +115,18 @@ which does not allow one to bind Super keys etc to
 
 *** The problems with my emacs/xterm/tmux thing
 **** Its getting pretty fucking convoluted
+**** XTerm may not be capable of displaying some things/fonts well
 **** I dont want to have to learn another set of key combinations - context switching
 **** I want to bind some things only in tmux mode
 e.g.
 1. Super-t makes a new window
 2. Super } switches to a new window
 
+*** The main problem seems to be tmux 
+while xterm can bind escape sequences pretty well to arbitrary key presses tmux cant bind actions to some of them for some reason...
 
+* Writing my own terminal Emulator?
+Basically something to intercept stdin and sstdout and rebind keys as i wish....
+Would take keysyms from xkb and generate escape sequences for tmux or whatever.
+** Would i do it in Emacs?
+** Do it in Python?

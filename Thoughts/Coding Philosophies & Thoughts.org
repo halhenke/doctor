@@ -13,3 +13,11 @@
  - Perl vs Python etc
  - Expressiveness at the cost of much higher cognitive load
 ** Still Syntactical Complexity can lead to greater terseness than is possible with a more simple language
+* Code as Data
+Means we can metaprogram easily
+
+* UNIX - Everything is a stream
+Ability to pipe things from one prohram from another
+* Emacs - Everything is a buffer
+* Haskell - Everything is a function
+* Ruby - Everything is an object
