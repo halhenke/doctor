@@ -890,6 +890,13 @@ Use -e "string"
 *** To only call those at a particular line
 Say all in the block at line 75
 : bundle exec rspec spec/models/book_appointment_job_spec.rb:75
+*** To call only a group that you specify
+use the
+: focus => true 
+option as in
+: describe "when out of area job", :focus => true do      
+or 
+: it "should pas validation", :focus => true do      
 ** Always run migrations first in test environment
 : bundle exec rake db:test:clone_structure
 ** It syntax
