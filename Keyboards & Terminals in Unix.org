@@ -249,6 +249,25 @@ xterm|X11 terminal emulator,
 : kf61=\EO4P, kf62=\EO4Q, kf63=\EO4R, 
 : sgr=\E[0%?%p6%t;1%;%?%p2%t;4%;%?%p1%p3%|%t;7%;%?%p4%t;5%;%?%p7%t;8%;m%?%p9%t\E(0%e\E(B%;,
 : sgr0=\E[m\E(B,
+** Making a terminfo entry
+http://www.jbase.com/r5/knowledgebase/howto/general/common/CreateTerminfo/modify.htm
+#+BEGIN_VERSE
+The mechanism for modifying an existing terminfo definition is quite simple.
+
+Create a source definition for the terminal.
+Edit the source definition for the terminal.
+Compile the source definition for the terminal into a binary entry in the terminfo database.
+These 3 simple steps are shown below for the vt100 definition (Note the 'vi' editor commands not shown).
+
+: cd $HOME/source
+: pwd
+/home/slipper/source
+: infocmp vt100 > vt100.ti
+: vi vt100.ti
+: su -
+Password:
+# tic /home/slipper/source/vt100.ti
+#+END_VERSE
 * Escape Sequences and Modifier Keys
 This is source code from TMux
 #+BEGIN_SRC C
@@ -264,6 +283,56 @@ if pressed with nothing it gives
 * showkeys/dumpkeys/loadkeys
 https://wiki.archlinux.org/index.php/Extra_Keyboard_Keys_in_Console
 https://lists.gnu.org/archive/html/screen-users/2009-12/msg00144.html
+
+Very hard to find info on this 
+ - think its something used by xkb stuff - a low level tool
+ - but not sure
+
+Apparently they have to be run in a "real console"
+i.e. the type you get from pressing
+: Ctrl+Alt+Fn, n = 1-6.
+** Heres what some guy online had to say
+https://lists.gnu.org/archive/html/screen-users/2009-12/msg00144.html
+#+BEGIN_VERSE
+> Is it possible to use the "Windows" key (Super_L) (between Ctrl and
+> Alt) as the screen escape key?  If so, how do you set this in your
+> .screenrc?
+
+1. Using one of your Virtual Consoles (Ctrl-Alt-Fn)
+In the Linux virtual console, I think you stand a better chance.  As
+root, you can run showkey, which will show you the keycode which
+corresponds to your windows keys.  On my laptop, Super_L is 125 and
+Super_R is 126.
+
+Then you can run dumpkeys to see what actions are taken when these
+keys are pressed:
+
+# dumpkeys | grep -E "keycode *125|126"
+keycode  125 = 
+keycode  126 = 
+
+This means that the keymap the kernel loads doesn't emit anything when
+these keys are pressed.
+
+You can use the loadkeys program to map the keycodes to another key,
+or to map them to emit a string of your choosing.
+
+The code looks like this:
+# loadkeys - <<EOF
+> keycode 125 = F60 F61 F62 F63 F64 F65
+> string F60 = "F60"
+> string F61 = "F61"
+> string F62 = "F62"
+> string F63 = "F63"
+> string F64 = "F64"
+> string F65 = "F65"
+EOF
+
+Now, when you hit Super_L in the virtual console, the string F60 is
+entered for you.  Shift+Super_L yields F61.  Ctrl+Super_L yields F64,
+which is the sequence you'll care about.  You should read `man loadkeys
+#+END_VERSE
+
 * Readline - Bash and Z-Shell
 * Screen/TMux
 ** And Bindings
@@ -272,6 +341,17 @@ http://unix.stackexchange.com/questions/1636/how-do-i-bind-the-tmux-prefix-to-a-
 https://plus.google.com/110389149377588379226/posts/Nrtw5HFV1ov
 ** Looking for key bindings in the source file
 : "/Users/Hal/code/tmux/trunk/xterm-keys.c"
+** When TMux kills XTerm bindings...
+First you should try this in your tmux.conf
+: set-window-option -g xterm-keys on
+That helped Alt-Left and Right to work but not Super-Left and Right...
+$TERM was now 'screen'
+*** More solutions
+From here
+https://wiki.archlinux.org/index.php/Tmux
+#+BEGIN_VERSE
+If you enable xterm-keys in your tmux.conf, then you need to build a custom terminfo to declare the new escape codes or applications will not know about them. Compile the following with tic and you can use "xterm-screen-256color" as your TERM:
+#+END_VERSE
 * If your terminal starts printing gibberish 
 ...prob because you read a non-ascii file and an escape sequence reset something then you should be able to reset things with
 : tput init
