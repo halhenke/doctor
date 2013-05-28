@@ -89,6 +89,12 @@ Not as cool as using a buffer...
 **** But If we had a way to translate from tried and trusted elisp code to an intermediary "R-Python" type language that did not need complete re-compilation of the interpreter. Could dynamically be loaded - perhaps like C++
 
 ** Add Tabs
+*** Implementation
+From what I have seen of the source this would basically involve treating some frames as "master/root frames" and others as "leaf frames"
+ - Hopefully there is a way to do this which would be as non-interfering as possible with other C Code and not interfere at all with existing elisp code - unless one wished to.
+*** More Details?
+ - Default would be that every frame is a master frame as before
+ - Could change a parameter/flag though to set this to different behaviour
 * My Current Problem/Solution - Stringing together Emacs/XTerm/Tmux
 Xterm + Tmux is basically a way to get around the problem of being stuck with a terminal-emulator such as 
 1. Terminator
@@ -125,6 +131,27 @@ e.g.
 *** The main problem seems to be tmux 
 while xterm can bind escape sequences pretty well to arbitrary key presses tmux cant bind actions to some of them for some reason...
 
+*** The problem with binding from xterm to z-shell/tmux
+Xterm translations takes key combinations including modifiers and 
+turns them into string outputs including escape sequences
+
+Z-shell bind-key and tmux sem to only take key inputs to bind from
+This is OK in the case of the Function keys but for example i cant get something like this to work 
+: ! Super<Key>z:    string("^X^U")\n\
+This just produces the string on the right whereas
+: Control X Control U
+is actually a bit modified key...sequence thing....
+
+For more on this see here 
+http://unix.stackexchange.com/questions/31498/is-it-possible-to-send-a-control-sequence-to-a-terminal-emulator-using-the-keybo
+#+BEGIN_VERSE
+VT100s responded to character sequences sent to them as output. So echo'ing characters works because the terminal sees it as output. Typing characters is input; the terminal will respond only if the characters are echoed by the receiving computer. Your typical shell doesn't echo ESC, it interprets ESC as the prefix for some interactive input command. Run cat and type ESC Z RETURN and you'll see the usual VT100 response.
+#+END_VERSE
+*** Solved!... (mostly)
+**** Generating Control-x etc from other keys
+Control characters have ascii code equivalents.
+This binds Super z to Control X (18), Control U (15)
+: ! Super<Key>z:  string(0x18) string(0x15)\n\
 * Writing my own terminal Emulator?
 Basically something to intercept stdin and sstdout and rebind keys as i wish....
 Would take keysyms from xkb and generate escape sequences for tmux or whatever.
