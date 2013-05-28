@@ -25,14 +25,120 @@ http://www.klauser.com/lxug/ch12.pdf
 ** The X Toolkit
 This is what is being manipulated by the settings in a .Xresouces type file and stored in the database with .xrdb
 
-** What is the X Toolkit syntax
+*** The Translation Table
+All X Toolkit widgets contain a translation table.
+The translation table specifies the translation from an event sequence to the actions that are then invoked.
+Each translation is separated from one another by a newline.
+**** Event Sequence
+Comma separated list of X Event descriptions.
+A single description has 3 parts:
+1. The X Event Type
+2. A prefix consisting of the X Modifier bits
+3. An event specific suffix
+**** Action Sequence
+Each action sequence call is the name of an action procedure and a parenthesized list of parameters.
+
+**** replace/augment/override
+Something like
+: #override
+or
+: #replace
+specifies whether to replace, augment or override the existing table.
+**** Translation Table Syntax
+http://lesstif.sourceforge.net/doc/super-ux/g1ae03e/part1/appb.html
+The syntax of a translation table is :
+#+BEGIN_VERSE
+translationTable	= [ directive ] { production }
+directive	= ( "#replace" | "#override" | "#augment" ) "\\n"
+production	= lhs ":" rhs "\\n"
+lhe	= ( event | keyseq ) ( "," (event | keyseq) )
+keyseq	= """ keychar (keychar) """
+keychar	= [ "^" | "$" | "\\" ] <ISO Latin 1 character>
+event	= [modifier_list] "<"event_type">" [ "(" count["+"] ")" ] {detail}
+modifier_list	= ( ["!"] [":"] {modifier} ) | "None"
+modifier	= ["~"] modifier_name
+count	= (" 1 " | "2" | "3" | "4" |... )
+modifier_name	= "@" <keysym> | <see ModifierNames table below>
+event_type	= <see Event Types table below>
+detail	= <event specific details>
+rhs	= { name "(" [params] ")" }
+name	= namechar { namechar }
+namechar	= { "a"-"z" | "A"-"Z" | "0"-"9" | "_" | "-" }
+params	= string { "," string }
+string	= quoted_string | unquoted_string
+quoted_string	= """ {<Latin 1 character> | escape_char) ["\\\\" ] """
+escape_char	= "\\""
+unquoted_string	= t<Latin 1 character except space, tab, ",", "\\n", ")">)
+#+END_VERSE
+**** Specifically related to modifier keys
+Modifier Names
+
+The modifier field is used to specify standard X keyboard and button modifier mask bits. Modifiersare legal on event types KeyPress, KeyRelease, ButtonPress, ButtonRelease, MotionNotify, EnterNotify, LeaveNotify, and their abbreviations. An error is generated when a translation table that contains modifiers for any other events is parsed.
+
+ - If the modifier list has no entries and is not "None", it means "don't care" on all modifiers.
+ - If an exclamation point (!) is specified at the beginning of the modifier list, it means that the listed modifiers must be in the correct state and no other modifiers can be asserted.
+ - If any modifiers are specified and an exclamation point (!) is not specified, it means that the listed modifiers must be in the correct state and "don't care" about any other modifiers.
+ - If a modifier is preceded by a tilde (~), it means that that modifier must not be asserted.
+ - If "None" is specified, it means no modifiers can be asserted.
+ - If a colon (:) is specified at the beginning of the modifier list, it directs the Intrinsics to apply any standard modifiers in the event to map the event keycode into a KeySym. The default standard modifiers are Shift and Lock, with the interpretation as defined in X Window System Protocol, Section 5. The resulting KeySym must exactly match the specified KeySym, and the nonstandard modifiers in the event must match the modifier list. For example, ":<Key>a" is distinct from ":<Key>A", and ":Shift<Key>A" is distinct from ":<Key>A".
+ - If both an exclamation point (!) and a colon (:) are specified at the beginning of the modifier list, it means that the listed modifiers must be in the correct state and that no other modifiers except the standard modifiers can be asserted. Any standard modifiers in the event are applied as for colon (:) above.
+ - If a colon (:) is not specified, no standard modifiers are applied. Then, for example, "<Key>A" and "<Key>a" are equivalent.
+ - In key sequences, a circumflex (^) is an abbreviation for the Control modifier, a dollar sign ($) is an abbreviation for Meta, and a backslash (\) can be used to quote any character, in particular a double quote ("), a circumflex (^), a dollar sign ($), and another backslash (\). 
+
+Briefly:
+|---------------------------------+-------------+----------------|
+| Description                     | Mod List    | event          |
+|---------------------------------+-------------+----------------|
+| No Modifiers:                   | None        | <event> detail |
+| Any Modifiers:                  |             | <event> detail |
+| Only these Modifiers:           | ! mod1 mod2 | <event> detail |
+| These modifiers and any others: | mod1 mod2   | <event> detail |
+|---------------------------------+-------------+----------------|
+The use of "None" for a modifier list is identical to the use of an exclamation point with no modifiers.
+**** Modifier List
+|----------+--------------+--------------------------|
+| Modifier | Abbreviation | Meaning                  |
+|----------+--------------+--------------------------|
+| Ctrl     | c            | Control modifier bit     |
+| Shift    | s            | Shift modifier bit       |
+| Lock     | l            | Lock modifier bit        |
+| Meta     | m            | Meta key modifier        |
+| Hyper    | h            | Hyper key modifier       |
+| Super    | su           | Super key modifier       |
+| Alt      | a            | Alt key modifier         |
+| Mod1     |              | Mod1 modifier bit        |
+| Mod2     |              | Mod2 modifier bit        |
+| Mod3     |              | Mod3 modifier bit        |
+| Mod4     |              | Mod4 modifier bit        |
+| Mod5     |              | Mod5 modifier bit        |
+| Button1  |              | Button1 modifier bit     |
+| Button2  |              | Button2 modifier bit     |
+| Button3  |              | Button3 modifier bit     |
+| Button4  |              | Button4 modifier bit     |
+| Button5  |              | Button5 modifier bit     |
+| None     |              | No modifiers             |
+| Any      |              | Any modifier combination |
+|----------+--------------+--------------------------|
+A key modifier is any modifier bit one of whose corresponding KeyCodes contains the corresponding left or right KeySym. For example, "m" or "Meta" means any modifier bit mapping to a KeyCode whose KeySym list contains XK_Meta_L or XK_Meta_R. Note that this interpretation is for each display, not global or even for each application context. The Control, Shift, and Lock modifier names refer explicitly to the corresponding modifier bits; there is no additional interpretation of KeySyms for these modifiers.
+
+Because it is possible to associate arbitrary KeySyms with modifiers, the set of key modifiers is extensible. The "@" <keysym> syntax means any modifier bit whose corresponding KeyCode contains the specified KeySym name.
+
+A modifier_list/KeySym combination in a translation matches a modifiers/KeyCode combination in an event in the following ways:
+
+1. If a colon (:) is used, the Intrinsics call the display's XtKeyProc with the KeyCode and modifiers. To match, (modifiers & ~modifiers_return) must equal modifier_list, and keysym_return must equal the given KeySym.
+2. If (:) is not used, the Intrinsics mask off all don't-care bits from the modifiers. This value must be equal to modifier_list. Then, for each possible combination of don't-care modifiers in the modifier list, the Intrinsics call the display's XtKeyProc with the KeyCode and that combination ORed with the cared-about modifier bits from the event. Keysym_return must match the KeySym in the translation.
+**** 
+*** What is the X Toolkit syntax
 The basic syntax of an Xresources file is as follows:
 : name.Class.resource: value
-*** What are comments?
+**** Things that may stop things working
+Avoid blank spaces at the beginning and end of lines in the .Xresources file.
+**** What are comments?
 It says 
 : ! This is a comment
 but it doesn seem to be
 : /* This is i think */
+**** Modifier key semantics/Syntax
 ** See what has been already set in xrdb
 : xrdb -query -all
 ** Get properties of a running process
@@ -261,6 +367,10 @@ and if pressed with Modifier 3 it would be
 : \033[1;3C
 if pressed with nothing it gives
 : \033[C
+** Generating Control-x etc from other keys
+Control characters have ascii code equivalents.
+This binds Super z to Control X (18), Control U (15)
+: ! Super<Key>z:  string(0x18) string(0x15)\n\
 * showkeys/dumpkeys/loadkeys
 https://wiki.archlinux.org/index.php/Extra_Keyboard_Keys_in_Console
 https://lists.gnu.org/archive/html/screen-users/2009-12/msg00144.html
@@ -270,8 +380,20 @@ https://lists.gnu.org/archive/html/screen-users/2009-12/msg00144.html
 You cant bind to arbitrary strings or escape sequences - only certain keys....
 http://unix.stackexchange.com/questions/1636/how-do-i-bind-the-tmux-prefix-to-a-super
 https://plus.google.com/110389149377588379226/posts/Nrtw5HFV1ov
-** Looking for key bindings in the source file
+** Tmux
+*** Looking for key bindings in the source file
 : "/Users/Hal/code/tmux/trunk/xterm-keys.c"
+also 
+: "/Users/Hal/code/tmux/trunk/tmux.h"
+
+Look at this hardcoded shit - does this match our setup?
+#+BEGIN_VERSE
+/* Key modifier bits. */
+#define KEYC_ESCAPE 0x2000
+#define KEYC_CTRL 0x4000
+#define KEYC_SHIFT 0x8000
+#define KEYC_PREFIX 0x10000
+#+END_VERSE
 * If your terminal starts printing gibberish 
 ...prob because you read a non-ascii file and an escape sequence reset something then you should be able to reset things with
 : tput init
