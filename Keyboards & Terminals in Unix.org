@@ -214,11 +214,17 @@ It seems emacs shell typically sets itself to
 Is a text based database of info according to terminal emulators the value of which is stored in $TERM
 : /lib/terminfo/x/xterm
 ** termcap
+This was the old fashioned way of doing terminfo type databasess
 ** tcap & tput
 http://docstore.mik.ua/orelly/unix/upt/ch41_10.htm
 #+BEGIN_VERSE
 For each terminal in the database, there is a list of terminal capabilities ( 41.11 ) . The tput program (standard on any system with terminfo ) lets you print out the value of any individual capability. The tcap program does the same for systems using termcap . ( tcap was originally named tc . We renamed it to avoid conflicts with tc , the ditroff interpreter program for Tektronix 4015 terminals.) This makes it possible to use terminal capabilities such as those for standout mode in shell programs.
 #+END_VERSE
+** outputting an escape sequence for a key from terminfo with tput
+To look at the ewcape sequence for the F6 function key for the default value of $TERM:
+: tput kf6 | cat -v ; echo
+for another terminal such as xterm use the -T flag
+: tput -T xterm kf6 | cat -v ; echo
 ** To read a terminfo file according to your TERM value
 Call
 : infocmp
@@ -450,11 +456,13 @@ which is the sequence you'll care about.  You should read `man loadkeys
 
 * Readline - Bash and Z-Shell
 * Screen/TMux
-** And Bindings
+** Tmux
+*** And Bindings
 You cant bind to arbitrary strings or escape sequences - only certain keys....
 http://unix.stackexchange.com/questions/1636/how-do-i-bind-the-tmux-prefix-to-a-super
 https://plus.google.com/110389149377588379226/posts/Nrtw5HFV1ov
-** Tmux
+
+When i try to bind F33 it says unknown key.....bullshit
 *** Looking for key bindings in the source file
 : "/Users/Hal/code/tmux/trunk/xterm-keys.c"
 also 
@@ -468,23 +476,65 @@ Look at this hardcoded shit - does this match our setup?
 #define KEYC_SHIFT 0x8000
 #define KEYC_PREFIX 0x10000
 
-** When TMux kills XTerm bindings...
+*** When TMux kills XTerm bindings...
 First you should try this in your tmux.conf
 : set-window-option -g xterm-keys on
 That helped Alt-Left and Right to work but not Super-Left and Right...
 $TERM was now 'screen'
-*** More solutions
+**** More solutions
 From here
 https://wiki.archlinux.org/index.php/Tmux
 #+BEGIN_VERSE
 If you enable xterm-keys in your tmux.conf, then you need to build a custom terminfo to declare the new escape codes or applications will not know about them. Compile the following with tic and you can use "xterm-screen-256color" as your TERM:
 #+END_VERSE
-** Tmux has problems with scrolling and terminals
+*** Tmux has problems with scrolling and terminals
 Particularly in split panes.
 Worse with xterm but present everywhere
-*** Solution - Copy Mode
-Seems to be the waay to get around this.
+**** Solution - Copy Mode
+Seems to be the way to get around this.
 May even be kind of cool.
+*** Tmux seems to have problems binding to tables such as 'emacs-copy' from tmux.config file?
+*** Tmux cant/doesnt read from terminfo it seems and thus you are stuck with a certain number of hardcoded keys/escape sequences to target
+**** In the source-code
+It looks up keys with the function 
+: key_string_lookup_string
+in the file
+: key-string.c
+***** key_string_lookup_string
+1. First checks if its hexadecimal string
+2. Then checks for modifiers
+3. Then checks if its a standard ascii string
+   1. If its not it looks up the key in "the table"
+   2. Calls 'key_string_search_table(string)'
+      1. key_string_search_table looks at a hash called key_string_table with the hardcoded values of F1-F20 etc
+	 1. Theres not a lot in here
+      2. If it doesnt find it returns KEYC_NONE
+   3. If you use xterm mode then it must decide to use the xterm escape sequences associated with the keys in key_string_table which can be found in the hash xterm_keys_entry in the file xterm-keys.c
+
+**** Workaround?
+You can see 'available' keys and current terminfo information in tmux by running
+: tmux-server-info
+from the command line
+
+The crazy thing is the output of this doesnt even match what you use to bind keys
+e.g. This is how i bound the 'F20' key to Super-T
+: Super<Key>t:	      string("\033[34;1~")\n\
+and this is what "tmux-server-info" told me that 'F20' waas according to xterm
+: kf20: (string) \033[19;2~ 
+which is the same info as reported by terminfo *ALTHOUGH* it doesnt seem to read any function keys above F20
+**** The extra/available keys
+tmux seems to allow for a bunch of modifier keys to be used along with the "Home" key etc
+e.g. some output of
+: tmux server-info
+#+BEGIN_VERSE
+82: kHOM: (string) \033[1;2H
+83: kHOM3: [missing]
+84: kHOM4: [missing]
+85: kHOM5: [missing]
+86: kHOM6: [missing]
+87: kHOM7: [missing]
+88: khome: (string) \033OH
+#+END_VERSE
 * If your terminal starts printing gibberish 
 ...prob because you read a non-ascii file and an escape sequence reset something then you should be able to reset things with
 : tput init
