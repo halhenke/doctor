@@ -152,6 +152,15 @@ VT100s responded to character sequences sent to them as output. So echo'ing char
 Control characters have ascii code equivalents.
 This binds Super z to Control X (18), Control U (15)
 : ! Super<Key>z:  string(0x18) string(0x15)\n\
+*** New Problem...TMux "kills" non-standard xterm escape sequences before z-shell can grab them
+**** Solutions?
+1. Some solved by adding line to tmux.config
+2. Apparently can get around rest by compiling own terminfo file with escape sequences defined
+3. Or perhaps we can bind 
+: Super-L/Super-R
+to one of the other Function keys and having z-shell/bindkey bind command to that?
+
+Kinda sucks....
 * Writing my own terminal Emulator?
 Basically something to intercept stdin and sstdout and rebind keys as i wish....
 Would take keysyms from xkb and generate escape sequences for tmux or whatever.
