@@ -1037,15 +1037,25 @@ e.g.
 ** Can be impossible to call debugger from within a factory
 It seems to not be recognised as a call to the debugger gem but instead seen as an uninitialised trait
 
+I couldnt seem to get it to work by putting it in a block or begin/end bit either.
+
+How about an eval "debugger" bit?
+
 I got around this by creating the following script and running it from the Rails console in test environment
-and then stepping into the FactoryGirl.create method
+and then stepping into the FactoryGirl.create method:
 #+BEGIN_SRC ruby
 require 'debugger'
 debugger
 FactoryGirl.create :book_appointment_job_with_ref
 #+END_SRC
 
-Otherwise can declare it outside the Factory definition and you will step through as Factory girl defines/reads the factories
+*IMPORTANT* This (the debugger gem that is) only works with irb - not pry so, if you are on Linux you will want to invoke the console like so:
+: IRB=true bundle exec rails c test
+
+ - Otherwise can declare it outside the Factory definition and you will step through as Factory girl defines/reads the factories. Obviously not much use if you are trying to test them.
+ - Also a problem if calling a factory from rspec and wanting to see whats wrong with it
+
+
 * Converting vendor/plugins to Rails 3 and/or gems
 This is pretty in depth:
 http://bibwild.wordpress.com/2012/04/25/converting-a-more-complex-rails-2-3-style-plugin-to-non-deprecated-under-rails-3-2/
