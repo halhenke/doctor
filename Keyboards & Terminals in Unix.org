@@ -7,7 +7,32 @@ Feel I need this as a master document o tie together some other stuff which is c
  - [[file:Z-Shell.org][Z-Shell]]
  - etc
 
-The hierarchy of input:
+The hierarchy of input - in details:
+
+* Key Encoding
+** ASCII
+ASCII is 7 bits by default. 
+ASCII includes definitions for 128 characters: 33 are non-printing control characters (many now obsolete) that affect how text and space are processed and 95 printable characters, including the space (which is considered an invisible graphic).
+*** The first 33 codes are allocated to
+1. Control sequences (C-a, C-c etc)
+2. Line Feed, Carriage Return etc
+*** Characters 32 to 126
+Printable characters
+1. Upper case letters
+2. Lower case letters
+3. Symbols
+4. Space etc
+These are arranged/numbered so that the Shift-Keyed version is 32 less than the other version. 
+Thats because the Shift key flips the 5th bit on the byte. 2^5 = 32
+** Modifiers
+*** Shift and Control
+As we can see Shift and some Control keys are represented in the 7 bits of ASCII.
+*** Meta Key
+In a certain mode the Meta/Alt key will be encoded in the eighth bit.
+*** Escape Sequences
+With only 8 bits to encode keys we need to have multiple words/bytes to represent other modifiers or greater combinations of existing keys.
+An escape sequence consists of the Escape Key followed by one or more keys.
+Can be recognised as something significant and responded to as such.
 * Terminals
 ** XTerm
 *** Source Code
@@ -397,6 +422,12 @@ and if pressed with Modifier 3 it would be
 : \033[1;3C
 if pressed with nothing it gives
 : \033[C
+** Control Key bit
+This bit from tmux FAQ makes me think this part of the escape sequence is for indicating if Ctrl is also pressed: 
+#+BEGIN_VERSE
+tmux also passes through
+the ctrl (bit 5 set, for example ^[[5~ to ^[[5^) modifier in non-xterm(1) mode;
+#+END_VERSE
 ** Generating Control-x etc from other keys
 Control characters have ascii code equivalents.
 This binds Super z to Control X (18), Control U (15)
@@ -455,7 +486,7 @@ which is the sequence you'll care about.  You should read `man loadkeys
 #+END_VERSE
 
 * Readline - Bash and Z-Shell
-* Screen/TMux
+* Screen/Tmux
 ** Tmux
 *** And Bindings
 You cant bind to arbitrary strings or escape sequences - only certain keys....
@@ -463,6 +494,9 @@ http://unix.stackexchange.com/questions/1636/how-do-i-bind-the-tmux-prefix-to-a-
 https://plus.google.com/110389149377588379226/posts/Nrtw5HFV1ov
 
 When i try to bind F33 it says unknown key.....bullshit
+*** Overriding xterm escape sequences/outputs when in tmux
+According to tmux FAQ you can do this and overrride some bindings only when in tmux (1.2 and above)
+: set -g terminal-overrides "xterm*:kLFT5=\eOD:kRIT5=\eOC:kUP5=\eOA:kDN5=\eOB:smkx@:rmkx@"
 *** Looking for key bindings in the source file
 : "/Users/Hal/code/tmux/trunk/xterm-keys.c"
 also 
@@ -511,6 +545,22 @@ in the file
       2. If it doesnt find it returns KEYC_NONE
    3. If you use xterm mode then it must decide to use the xterm escape sequences associated with the keys in key_string_table which can be found in the hash xterm_keys_entry in the file xterm-keys.c
 
+***** The number of files where a hardcoded key_code is mentioned
+Its referenced in the following files and lines
+#+BEGIN_VERSE
+|------------------+-----------------------------------------------------------------------|
+| input-keys.c:61: | { KEYC_F15,             "\033[28~",     0 },                          |
+| key-string.c:47: | { "F15",        KEYC_F15 },                                           |
+| tmux.h:202:      |  KEYC_F15,                                                            |
+| tty-keys.c:122:  | { 0,    "\033[28^",     KEYC_F15 KEYC_CTRL,     TTYKEY_RAW },         |
+| tty-keys.c:149:  | { 0,    "\033[28$",     KEYC_F15 KEYC_SHIFT,    TTYKEY_RAW },         |
+| tty-keys.c:176:  | { 0,    "\033[28@",     KEYC_F15 KEYC_CTRL KEYC_SHIFT,  TTYKEY_RAW }, |
+| tty-keys.c:206:  | { TTYC_KF15,    NULL,           KEYC_F15,               0 },          |
+| xterm-keys.c:74: | { KEYC_F15,     "\033[28;_~" },                                       |
+|------------------+-----------------------------------------------------------------------|
+
+#+END_VERSE
+Might be possible to recompile with a bunch of extra keys? :-O
 **** Workaround?
 You can see 'available' keys and current terminfo information in tmux by running
 : tmux-server-info
@@ -545,6 +595,9 @@ If TERM=xterm-color and key is Home
 : set-option -g terminal-overrides "xterm-color:khome=\033[1~"
 
 * A good portable, consistent setup
+
+See [[file:Thoughts/My%20Ideal%20Coding%20Environment.org::*My%20Current%20Problem%20and%20Solutions%20-][Possible Solutions to the Keybinding/Terminal/Linux/Emacs problem]]
+
 One that has
  - Emacs
  - Mac Style bindings and use of command/super and Alt keys
@@ -558,8 +611,18 @@ One that has
 Possibly using some xterm builtin features also...
 ** Tmux or Screen to give back the tab/split screen style features of a modern terminal
 
+* A Basic Idea Of What Happens - I Think
+1. Keyboard/driver produces a stream input from keyboard in ASCII
+2. In the x-server xkb translates these keys and key combinations into keysyms
+3. A shell is a program that runs on the server and takes commands and gives output.
+4. A terminal emulator sits in between the x-server/xkb and the shell intercepts stdin and spits out stdout
+   1. It takes combinations of keysyms from xkb and outputs...bytes? Escape sequences?
+      1. Some escape sequences are intended for/intercepted by the terminal itself.
+	 1. Change Colour
+	 2. Change Mode
+	 3. Scroll Up/Down etc
+   2. Escape Sequences that are not bound by the terminal can then be bound by a shell such as zsh - thats why all default bindkey commands are escape/control sequences
 * Sources of info
-
 ** General Overview
 http://vigna.dsi.unimi.it/bsdel/bsdel/x58.html
 https://wiki.archlinux.org/index.php/Extra_Keyboard_Keys

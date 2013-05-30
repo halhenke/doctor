@@ -19,5 +19,8 @@ Means we can metaprogram easily
 * UNIX - Everything is a stream
 Ability to pipe things from one prohram from another
 * Emacs - Everything is a buffer
+ - Every window can be treated kind of the same
 * Haskell - Everything is a function
+ - input and output
 * Ruby - Everything is an object
+ - not quite true

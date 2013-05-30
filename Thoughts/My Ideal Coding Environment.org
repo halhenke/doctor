@@ -60,7 +60,25 @@ Not as cool as using a buffer...
 ** Console kind of sucks?
 * What I want to be able to do in Sublime Text
 
-
+* General Thoughts on IDE/Editing
+ - I think its desirable to avoid context switching.
+ - Avoids cognitive load
+   - Less need to try and mentally navigate/memorize current context
+   - More automation of low level tasks
+ - An interface should work /fudamentally/ the same most/all of the time
+ - This is my main problem with vim.
+** Vim
+*** Modal Editing
+ - Some advantages
+   - We use modal editing to an extent in emacs
+ - Taken too far
+   - Doesnt provide efficient file navigation in insert mode
+     - leads to too much cursor scrolling
+ - Can we add more modes? If we run out of "easy" bindings in normal mode?
+*** Extremely portable
+ - Very few problems as I have described them due to the lessened need to use extensive modifiers
+ -
+*** Plenty of plugins/extensions
 * What I want - No bullshit, no legacy, From the Beginning.....
 ** Governing ideas
 *** We only have a limited ammount of mental real estate - should avoid too much context switching
@@ -95,22 +113,34 @@ From what I have seen of the source this would basically involve treating some f
 *** More Details?
  - Default would be that every frame is a master frame as before
  - Could change a parameter/flag though to set this to different behaviour
-* My Current Problem/Solution - Stringing together Emacs/XTerm/Tmux
-Xterm + Tmux is basically a way to get around the problem of being stuck with a terminal-emulator such as 
+* My Current Problem and Solutions - 
+** Why i am doing this
+Basically a way to get around the problem of being stuck with a terminal-emulator such as 
 1. Terminator
 2. Gnome Terminal
-which does not allow one to bind Super keys etc to 
+which dont allow one to bind Super keys and exotic sequences to 
  - arbitrary internal commands
    - beginning of line
- - or to escape sequences that we can the bind in z-shell
-** Key bindings - Shouldnt Be This Fucking Hard
-*** The Journey from Key Press to ACTION
+ - or to escape sequences that we can then bind in z-shell
+** Stringing together Emacs/XTerm/Tmux
+*** Advantages
+1. Tmux has some potentially cool features...maybe
+   1. Detaching processes and persisting them etc
+2. "Low Tech"
+*** Disadvantages
+1. We now have an increasingly ridiculous chain of dependencies to solve a particular problem
+2. A convoluted series of keybindings/configurations
+   1. xkb -> Keysym => xterm -> Escape Sequence/xterm command
+      1. z-shell -> bindkey
+      2. t-mux -> bindkey
+*** Key bindings - Shouldnt Be This Fucking Hard
+**** The Journey from Key Press to ACTION
 1. Press key
 2. Is interpreted by xServer via xkb into KeySym
 3. KeySym is broken down by Terminal/Terminal Emulator into byte sequence
    1. Byte Sequence is interpreted by Shell Readilne and either bound to commands or executed as code
    2. Emacs or whatever deals with the key sym
-*** The xkb binding procedure
+**** The xkb binding procedure
 1. So in "xkb_keycodes" section xkb takes a number (ASCII?) 
 2. Generates a keycode to label that number - can be anything
    1. <LALT> = 23;
@@ -119,19 +149,19 @@ which does not allow one to bind Super keys etc to
 4. Bind keycodes/keysyms to Modifiers - if a keycode has been bound to a keysym and is placed in a modifier map then both keycode and keysym are thus associated
    1. modifier_map Mod1 { <LALT> };
 
-*** The problems with my emacs/xterm/tmux thing
-**** Its getting pretty fucking convoluted
-**** XTerm may not be capable of displaying some things/fonts well
-**** I dont want to have to learn another set of key combinations - context switching
-**** I want to bind some things only in tmux mode
+**** The problems with my emacs/xterm/tmux thing
+***** Its getting pretty fucking convoluted
+***** XTerm may not be capable of displaying some things/fonts well
+***** I dont want to have to learn another set of key combinations - context switching
+***** I want to bind some things only in tmux mode
 e.g.
 1. Super-t makes a new window
 2. Super } switches to a new window
 
-*** The main problem seems to be tmux 
+**** The main problem seems to be tmux 
 while xterm can bind escape sequences pretty well to arbitrary key presses tmux cant bind actions to some of them for some reason...
 
-*** The problem with binding from xterm to z-shell/tmux
+**** The problem with binding from xterm to z-shell/tmux
 Xterm translations takes key combinations including modifiers and 
 turns them into string outputs including escape sequences
 
@@ -147,13 +177,13 @@ http://unix.stackexchange.com/questions/31498/is-it-possible-to-send-a-control-s
 #+BEGIN_VERSE
 VT100s responded to character sequences sent to them as output. So echo'ing characters works because the terminal sees it as output. Typing characters is input; the terminal will respond only if the characters are echoed by the receiving computer. Your typical shell doesn't echo ESC, it interprets ESC as the prefix for some interactive input command. Run cat and type ESC Z RETURN and you'll see the usual VT100 response.
 #+END_VERSE
-*** Solved!... (mostly)
-**** Generating Control-x etc from other keys
+**** Solved!... (mostly)
+***** Generating Control-x etc from other keys
 Control characters have ascii code equivalents.
 This binds Super z to Control X (18), Control U (15)
 : ! Super<Key>z:  string(0x18) string(0x15)\n\
-*** New Problem...TMux "kills" non-standard xterm escape sequences before z-shell can grab them
-**** Solutions?
+**** New Problem...TMux "kills" non-standard xterm escape sequences before z-shell can grab them
+***** Solutions?
 1. Some solved by adding line to tmux.config
 2. Apparently can get around rest by compiling own terminfo file with escape sequences defined
 3. Or perhaps we can bind 
@@ -161,8 +191,42 @@ This binds Super z to Control X (18), Control U (15)
 to one of the other Function keys and having z-shell/bindkey bind command to that?
 
 Kinda sucks....
+*** Compile my own version of tmux?
+I could pretty easily add the recognition of large numbers of arbitrary keys I would think by adding to the key_tables in the source....
+**** Advantages
+1. Could have as many keys as I want more or less
+2. Think its prob fast enough to compile - seems smallish
+**** Disadvantages
+1. Not very portable - at all
+   1. My whole connfig thing would by default be useless on other computers. Or at least a lot of features unusable
+   2. Would the binary be portable?
+2. Would have to get the source each time its upgraded, patch it and recompile
+
+*** Use terminal overrides script to automatically get info from terminfo?
+Something like
+#+BEGIN_VERSE
+for key in terminfo
+ val = $(tput(key) | cat -v echo)
+ tmux terminaloverrides "xterm:key=val"
+end
+#+END_VERSE
+Then i would just have to get the extra keys to be recognised....
+** Running shells from inside emacs
+*** Advantages
+1. Get panes/windows etc for free
+2. Can edit the command line/output with potential great ease and power
+3. Might be more portable and less fragile than the xterm/tmux setup
+*** Disadvantages
+1. Dumb terminal stuff
+   1. Might not be that big  problem
+2. Pager doesnt work
+   1. Can we work around this?
+   2. Pipe into tee/less by default?
+3. Z-Shell/Bash completion not working
+   1. If this cant be worked around this is pretty fucking huge....
 * Writing my own terminal Emulator?
-Basically something to intercept stdin and sstdout and rebind keys as i wish....
-Would take keysyms from xkb and generate escape sequences for tmux or whatever.
+  Basically something to intercept stdin and sstdout and rebind keys as i wish....
+  Would take keysyms from xkb and generate escape sequences for tmux or whatever.
 ** Would i do it in Emacs?
 ** Do it in Python?
+
