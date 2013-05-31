@@ -3,6 +3,10 @@
 Inspired by frustrations/temptations towards choosing Sublime Text over Emacs
 
 
+* Some Great Quotes
+"Emacs is a refugee from the long dead culture of LispMachines. It's an asylum seeker in the UnixCulture."
+"Vi is a command, Emacs is an environment"
+
 * Pros of Emacs
 ** Open Source
 ** Run in terminal and graphical

@@ -1157,6 +1157,13 @@ or via lisp code:
 * Themes
 ** List themes
 : M-x customize-themes
+* Making Emacs Faster/Snappier
+** Delay Fontification
+From http://tsengf.blogspot.com.au/2012/11/slow-scrolling-speed-in-emacs.html
+#+BEGIN_VERSE
+Slow scrolling speed in Emacs
+When a large buffer is open which requires fontification, you may notice that continuous scrolling becomes choppy. Fontification by default is not deferred and takes place immediately. This causes the fontification of large buffers to slow down the act of scrolling. The effect is magnified when the size of the Emacs window is increased. To address this problem, defer fontification by setting an idle time after which deferred fontification should take place. Add the following code to your .emacs file. You can tweak the value to suit your system requirements.
+#+END_VERSE
 * Info Mode
 ** Where are Info files loaded from?
 Hard to find stuff through help commands because they start with capital letters

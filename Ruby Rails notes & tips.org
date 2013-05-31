@@ -1350,6 +1350,12 @@ into grep
 ....I bloody did this already....cant remember how...
 ** TODO Bundle exec cache - quicker version of whatever bundle install does?
 ** TODO Awesome gem for rails console test?
+** TODO A Cheat Sheet of Rails Magic Methods
+e.g. the sort of method missing stuff that 'creates' methods like
+*_updated?
+: name_updated?
+: date_updated?
+*** Think this would help me learn faster and disstinguish 'real' methods from 'magic' ones
 * Rails Learning Resources
 Code Academy
 Rails 4 Zombies
