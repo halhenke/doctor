@@ -26,6 +26,12 @@ You can eval stuff in buffer that will
 And gets slower as we add more and more elisp customisation
 customisability
 ** Sometimes slow
+ - Given what you can actually do with the extensibility of
+   - elisp
+   - the emacs API
+   - connecting to external processes, shells etc
+ - that may make this the most important limiting factor of them all.
+ - If computer speed was still increasing wouldnt be a problem....
 ** functional language makes it hard to find available commands
 I have a list - what the fuck can i do with it? 
 How do i find the command?
@@ -66,19 +72,68 @@ Not as cool as using a buffer...
    - Less need to try and mentally navigate/memorize current context
    - More automation of low level tasks
  - An interface should work /fudamentally/ the same most/all of the time
- - This is my main problem with vim.
+   - This is my main problem with vim.
 ** Vim
-*** Modal Editing
- - Some advantages
-   - We use modal editing to an extent in emacs
- - Taken too far
-   - Doesnt provide efficient file navigation in insert mode
-     - leads to too much cursor scrolling
- - Can we add more modes? If we run out of "easy" bindings in normal mode?
-*** Extremely portable
- - Very few problems as I have described them due to the lessened need to use extensive modifiers
- -
-*** Plenty of plugins/extensions
+*** Thoughts on its Cool and Not So Cool Features
+**** Modal Editing
+***** Advantages
+  - We use modal editing to an extent in emacs
+  - Gets around a lot of the problems with modifier keys by default
+***** Taken too far
+  - Insert mode can be super limiting
+  - Doesnt provide efficient file navigation in insert mode
+    - leads to too much cursor scrolling
+  - Mode switching all the time can be super annoying and time consuming
+***** Questions?
+  - Can we add more modes? If we run out of "easy" bindings in normal mode?
+  - How extensible is vim as compared to emacs?
+**** Extremely portable
+  - Very few problems as I have described them due to the lessened need to use extensive modifiers
+**** Its everywhere by default
+**** Plenty of plugins/extensions
+**** It goes very comfortably with Terminal Emulators
+  - Not that fussy due to modal editing
+**** Can be used in a low footprint and a high footprint way
+**** Documentation not that great
+**** Core Philosophy is directed towards editing text
+  - Can make it very fast at changing a lot of text
+  - Pure text editing is prob actually not that big a part of most modern software development
+**** Vimscript
+  - Probably not the best way to extend an editor
+  - Particularly large projects
+  - Difficult to learn
+*** Cool things I have discovered from mucking about in spf13 setup
+**** Tagbar
+ - Wow - this is exactly what i wanted from Speedbar
+   - works effortlessly
+   - Like a more usable minimap or more convenient outline mode
+ - A bit less impressive in elisp files
+   - Only picked up on a couple of functions/def-keys per file
+**** Neocomplcache
+ - An amazingly effective autocomplete setting
+ - Just seems to work at least in Ruby
+**** Fugitive
+ - Not bad
+ - Not quite magit maybe, but still...
+**** Control-P
+ - Pretty good Sublime Text style window
+*** What bindings and customizations would be needed to make VIM truly nice to use?
+**** Easy switching between windows
+**** Rebind those god-awful help navigation keys
+**** Can we emulate emacs style modes? 
+Apparently we only have syntax highlighting in different files - not full on modes with their own bindings and commands
+**** A good binding for both Control AND escape keys
+Perhaps use command for alternate Control key....
+**** A much easier binding for getting into command mode than ':'
+**** Ability to easily move around if not manipulate the command line
+**** ido like ability to easily switch between buffers
+ - something better than 
+: buffer 3
+or the horrible
+: 3 C-^
+**** Can we Ruby Script as fast as Vim Script?
+*** What could I never get going from emacs
+Very hard to tell...
 * What I want - No bullshit, no legacy, From the Beginning.....
 ** Governing ideas
 *** We only have a limited ammount of mental real estate - should avoid too much context switching
@@ -202,6 +257,15 @@ I could pretty easily add the recognition of large numbers of arbitrary keys I w
    2. Would the binary be portable?
 2. Would have to get the source each time its upgraded, patch it and recompile
 
+**** Basic Instructions
+#+BEGIN_VERSE
+To get and build the latest from version control:
+
+	$ git clone git://git.code.sf.net/p/tmux/tmux-code tmux
+	$ cd tmux
+	$ sh autogen.sh
+	$ ./configure && make
+#+END_VERSE
 *** Use terminal overrides script to automatically get info from terminfo?
 Something like
 #+BEGIN_VERSE
@@ -216,14 +280,25 @@ Then i would just have to get the extra keys to be recognised....
 1. Get panes/windows etc for free
 2. Can edit the command line/output with potential great ease and power
 3. Might be more portable and less fragile than the xterm/tmux setup
+4. Might be relatively straightforward
+   1. The main challenge is matching shell input to output....no?
 *** Disadvantages
-1. Dumb terminal stuff
+1. Z-Shell/Bash completion not working
+   1. If this cant be worked around this is pretty fucking huge....
+   2. Emacs completes file/directory stuff pretty well and some command stuff
+      1. Z-Shell completes pretty much /everything/ very well.
+2. Dumb terminal stuff
    1. Might not be that big  problem
-2. Pager doesnt work
+3. Pager doesnt work
    1. Can we work around this?
    2. Pipe into tee/less by default?
-3. Z-Shell/Bash completion not working
-   1. If this cant be worked around this is pretty fucking huge....
+*** Z Shell Seems to work much better by default inside Linux rather than in OS X
+My Dev linux version says
+: GNU Emacs 24.1.50.1 (x86_64-pc-linux-gnu, GTK+ Version 2.20.1)
+: of 2012-09-19 on papaya, modified by Debian
+My OS X version says
+: GNU Emacs 24.2.1 (x86_64-apple-darwin, NS apple-appkit-1038.36)
+: of 2012-08-27 on bob.porkrind.org
 * Writing my own terminal Emulator?
   Basically something to intercept stdin and sstdout and rebind keys as i wish....
   Would take keysyms from xkb and generate escape sequences for tmux or whatever.
