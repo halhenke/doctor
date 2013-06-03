@@ -68,8 +68,83 @@ Uses OS windows etc to select files.
 Not as cool as using a buffer...
 ** Limited API  -What /cant/ be done?
 ** Console kind of sucks?
+* With experience
+** Whats good
+*** Intellisense is pretty awesome
+*** Code commenting is pretty perfect straight up
+** Whats not
+*** I really miss tab auto-indent
 * What I want to be able to do in Sublime Text
+* Vim
+** Thoughts on its Cool and Not So Cool Features
+*** Modal Editing
+**** Advantages
+ - We use modal editing to an extent in emacs
+ - Gets around a lot of the problems with modifier keys by default
+**** Taken too far
+ - Insert mode can be super limiting
+ - Doesnt provide efficient file navigation in insert mode
+   - leads to too much cursor scrolling
+ - Mode switching all the time can be super annoying and time consuming
+**** Questions?
+ - Can we add more modes? If we run out of "easy" bindings in normal mode?
+ - How extensible is vim as compared to emacs?
+*** Extremely portable
+ - Very few problems as I have described them due to the lessened need to use extensive modifiers
+*** Its everywhere by default
+*** Plenty of plugins/extensions
+*** It goes very comfortably with Terminal Emulators
+ - Not that fussy due to modal editing
+*** Can be used in a low footprint and a high footprint way
+*** Documentation not that great
+*** Core Philosophy is directed towards editing text
+ - Can make it very fast at changing a lot of text
+ - Pure text editing is prob actually not that big a part of most modern software development
+*** Vimscript
+ - Probably not the best way to extend an editor
+ - Particularly large projects
+ - Difficult to learn
+** Cool things I have discovered from mucking about in spf13 setup
+*** Tagbar
+ - Wow - this is exactly what i wanted from Speedbar
+   - works effortlessly
+   - Like a more usable minimap or more convenient outline mode
+ - A bit less impressive in elisp files
+   - Only picked up on a couple of functions/def-keys per file
+*** Neocomplcache
+ - An amazingly effective autocomplete setting
+ - Just seems to work at least in Ruby
+*** Fugitive
+ - Not bad
+ - Not quite magit maybe, but still...
+*** Control-P
+ - Pretty good Sublime Text style window
+** What bindings and customizations would be needed to make VIM truly nice to use?
+*** Easy switching between windows
+*** Rebind those god-awful help navigation keys
+*** Can we emulate emacs style modes? 
+Apparently we only have syntax highlighting in different files - not full on modes with their own bindings and commands
+*** A good binding for both Control AND escape keys
+Perhaps use command for alternate Control key....
+*** A much easier binding for getting into command mode than ':'
+*** Ability to easily move around if not manipulate the command line
+*** ido like ability to easily switch between buffers
+ - something better than 
+: buffer 3
+or the horrible
+: 3 C-^
+*** Can we Ruby Script as fast as Vim Script?
+** What could I never get going from emacs
+Very hard to tell...
 
+** My attempt to come up with a personal vim binding/setup
+*** Bindings
+**** Caps Lock
+ - Control?
+ - Escape?
+**** Super Keys
+**** Alt Keys
+**** Control Keys
 * General Thoughts on IDE/Editing
  - I think its desirable to avoid context switching.
  - Avoids cognitive load
@@ -77,67 +152,6 @@ Not as cool as using a buffer...
    - More automation of low level tasks
  - An interface should work /fudamentally/ the same most/all of the time
    - This is my main problem with vim.
-** Vim
-*** Thoughts on its Cool and Not So Cool Features
-**** Modal Editing
-***** Advantages
-  - We use modal editing to an extent in emacs
-  - Gets around a lot of the problems with modifier keys by default
-***** Taken too far
-  - Insert mode can be super limiting
-  - Doesnt provide efficient file navigation in insert mode
-    - leads to too much cursor scrolling
-  - Mode switching all the time can be super annoying and time consuming
-***** Questions?
-  - Can we add more modes? If we run out of "easy" bindings in normal mode?
-  - How extensible is vim as compared to emacs?
-**** Extremely portable
-  - Very few problems as I have described them due to the lessened need to use extensive modifiers
-**** Its everywhere by default
-**** Plenty of plugins/extensions
-**** It goes very comfortably with Terminal Emulators
-  - Not that fussy due to modal editing
-**** Can be used in a low footprint and a high footprint way
-**** Documentation not that great
-**** Core Philosophy is directed towards editing text
-  - Can make it very fast at changing a lot of text
-  - Pure text editing is prob actually not that big a part of most modern software development
-**** Vimscript
-  - Probably not the best way to extend an editor
-  - Particularly large projects
-  - Difficult to learn
-*** Cool things I have discovered from mucking about in spf13 setup
-**** Tagbar
- - Wow - this is exactly what i wanted from Speedbar
-   - works effortlessly
-   - Like a more usable minimap or more convenient outline mode
- - A bit less impressive in elisp files
-   - Only picked up on a couple of functions/def-keys per file
-**** Neocomplcache
- - An amazingly effective autocomplete setting
- - Just seems to work at least in Ruby
-**** Fugitive
- - Not bad
- - Not quite magit maybe, but still...
-**** Control-P
- - Pretty good Sublime Text style window
-*** What bindings and customizations would be needed to make VIM truly nice to use?
-**** Easy switching between windows
-**** Rebind those god-awful help navigation keys
-**** Can we emulate emacs style modes? 
-Apparently we only have syntax highlighting in different files - not full on modes with their own bindings and commands
-**** A good binding for both Control AND escape keys
-Perhaps use command for alternate Control key....
-**** A much easier binding for getting into command mode than ':'
-**** Ability to easily move around if not manipulate the command line
-**** ido like ability to easily switch between buffers
- - something better than 
-: buffer 3
-or the horrible
-: 3 C-^
-**** Can we Ruby Script as fast as Vim Script?
-*** What could I never get going from emacs
-Very hard to tell...
 * What I want - No bullshit, no legacy, From the Beginning.....
 ** Governing ideas
 *** We only have a limited ammount of mental real estate - should avoid too much context switching

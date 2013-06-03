@@ -14,8 +14,8 @@
 ** Haml Mode
 *** comment-dwim stuff not working
 *** 
-* TODO Check hair
-* TODO Check for sublime mode extensions to Emacs
+* DONE Check hair
+* DONE Check for sublime mode extensions to Emacs
 * TODO Check teeth enamel
 * TODO Merge Bookmarks between this and JN Account...
 * DONE Make a Code Snippets Repository
@@ -58,6 +58,9 @@ Quit Sublime Text and Launch Emacs
 * TODO Get Apple Repair For BigMac
 * TODO Get music and comics from old PC
 
+* TODO Uninstall gems from Sameera's talk
+* TODO Setup usable vim stuff
+* TODO Build my own tmux
 * TODO Install YaSnippet - fix el-get recipe with bad git/github address
 * TODO Emacs Packages to investigate
 ** emacschrome
