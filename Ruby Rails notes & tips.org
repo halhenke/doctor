@@ -984,6 +984,21 @@ is called on Widget
 **** let!
 **** subject
 *** RSpec::Core::Example
+** Marking failing specs as "pending"
+*** An individual example
+Add an 'x' in front of the spec
+: xit "should create a windows job" do
+*** A whole examplegroup
+To mark everything within a describe/context block as pending
+add a before pending block
+#+BEGIN_SRC rspec
+describe "A lot of bad stuff" do
+  before do
+    pending "Everything here is terrible and worthless"
+  end
+  ....
+end
+#+END_SRC
 * FactoryGirl
 ** Can include FactoryGirl Syntax in our Rspec and Factory code
 ** Can test from the console
