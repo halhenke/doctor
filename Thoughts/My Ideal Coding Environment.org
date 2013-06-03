@@ -121,6 +121,8 @@ Not as cool as using a buffer...
  - Pretty good Sublime Text style window
 ** What bindings and customizations would be needed to make VIM truly nice to use?
 *** Easy switching between windows
+*** Readable Text - Font & Bg Colour combos...
+Seriously
 *** Rebind those god-awful help navigation keys
 *** Can we emulate emacs style modes? 
 Apparently we only have syntax highlighting in different files - not full on modes with their own bindings and commands
