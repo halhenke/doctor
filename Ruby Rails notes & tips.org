@@ -1000,6 +1000,10 @@ describe "A lot of bad stuff" do
 end
 #+END_SRC
 * FactoryGirl
+** Trying to get FactoryGirl to register factories
+Calling 
+: FactoryGirl.find_definitions
+can help to find places where definitions are...
 ** Can include FactoryGirl Syntax in our Rspec and Factory code
 ** Can test from the console
 Must be in test environment
@@ -1069,7 +1073,20 @@ FactoryGirl.create :book_appointment_job_with_ref
 
  - Otherwise can declare it outside the Factory definition and you will step through as Factory girl defines/reads the factories. Obviously not much use if you are trying to test them.
  - Also a problem if calling a factory from rspec and wanting to see whats wrong with it
+ 
+*** Can do it straight from the command line also
+: debugger; FactoryGirl.create :user
+** Stepping into a FactoryGirl.create call with debugger to get to the actual factory
 
+in
+:
+: FactoryRunner.new(name, strategy_name, traits_and_overrides).run(&block)
+
+in
+: gems/factory_girl-4.1.0/lib/factory_girl/factory_runner.rb: 23
+: factory.run(runner_strategy, @overrides, &block)
+
+in
 
 * Converting vendor/plugins to Rails 3 and/or gems
 This is pretty in depth:

@@ -186,6 +186,11 @@ and then start xterm
 Run command
 : cat -v
 and then look at output on screen...
+Can also run
+: od -a 
+or
+: od - c
+for something similar
 ** Setting Resources with the -xrm Option
 The -xrm command-line option, which is supported by all X Window System clients written with the X Toolkit, can be useful in specifying from the command line any specification that you would otherwise put into a resources file. e.g 
 : xterm -xrm 'xterm*Foreground: blue' &

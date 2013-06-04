@@ -60,6 +60,9 @@ Quit Sublime Text and Launch Emacs
 
 * TODO Uninstall gems from Sameera's talk
 * TODO Setup usable vim stuff
+* TODO Get cables
+** Long Antenna cable
+** Get rgb cables for 24 inch monitor
 * TODO Build my own tmux
 * TODO Install YaSnippet - fix el-get recipe with bad git/github address
 * TODO Emacs Packages to investigate
