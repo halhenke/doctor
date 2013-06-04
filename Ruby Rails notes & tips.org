@@ -1077,7 +1077,7 @@ FactoryGirl.create :book_appointment_job_with_ref
 *** Can do it straight from the command line also
 : debugger; FactoryGirl.create :user
 ** Stepping into a FactoryGirl.create call with debugger to get to the actual factory
-
+*** A stack trace of sorts
 in
 :
 : FactoryRunner.new(name, strategy_name, traits_and_overrides).run(&block)
@@ -1088,6 +1088,8 @@ in
 
 in
 
+*** Could set a breakpoint here
+: break /Users/Hal/code/hunome/hunomeGems/ruby/1.9.1/gems/factory_girl-4.1.0/lib/factory_girl/configuration.rb:14
 * Converting vendor/plugins to Rails 3 and/or gems
 This is pretty in depth:
 http://bibwild.wordpress.com/2012/04/25/converting-a-more-complex-rails-2-3-style-plugin-to-non-deprecated-under-rails-3-2/
