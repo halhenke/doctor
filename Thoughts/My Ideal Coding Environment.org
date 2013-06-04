@@ -72,8 +72,16 @@ Not as cool as using a buffer...
 ** Whats good
 *** Intellisense is pretty awesome
 *** Code commenting is pretty perfect straight up
+*** Things just work most of the time
+*** The automatic project management/restore is pretty huge
+Effortlessly does what I have been trying to get Emacs to do....
 ** Whats not
 *** I really miss tab auto-indent
+*** Can be realllllly slow over Open NX
+ - For some reason not from my dev box but is from home???
+ - A pretty big problem
+*** Seems kind of difficult to casually extend/modify
+Its either like you change a keybinding or a font or you write a whole damn plugin
 * What I want to be able to do in Sublime Text
 * Vim
 ** Thoughts on its Cool and Not So Cool Features

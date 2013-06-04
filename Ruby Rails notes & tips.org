@@ -721,6 +721,9 @@ and on the second gives
 
 This also works
 : ReceivedEmail.where('received_emails.from LIKE "%oleg%"')
+*** Listing callbacks for a particular model
+In this case we can get all the save callbacks for the class Model and filter it to those that occur before saving
+: Model._save_callbacks.select {|cb| cb.kind == :before}
 * Ruby Meta/Magic Stuff
 ** You can call methods based on strings with the send method
 : object.send("add_#{@type_of_fruit}", d)

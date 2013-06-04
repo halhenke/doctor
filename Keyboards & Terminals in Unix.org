@@ -638,3 +638,15 @@ http://sqizit.bartletts.id.au/2011/02/14/pseudo-terminals-in-python/
 http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 ** infocmp and tic to redefine key sequences
 http://stackoverflow.com/a/7975835/935470
+
+* At The Macro Level -  What Gnome Reports As Modifiers
+** Can be checked from Keyboard Shortcuts in System Preferences
+
+For 
+: Super + Left
+it gives
+: Mod4 + Left
+and it gives
+: Alt + Left
+for the alt/option key
+ 
