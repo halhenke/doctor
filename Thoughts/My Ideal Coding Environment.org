@@ -74,7 +74,9 @@ Not as cool as using a buffer...
 *** Code commenting is pretty perfect straight up
 *** Things just work most of the time
 *** The automatic project management/restore is pretty huge
-Effortlessly does what I have been trying to get Emacs to do....
+    Effortlessly does what I have been trying to get Emacs to do....
+*** Reasonably easy to configure key bindings
+*** Consistent Interface across OS's
 ** Whats not
 *** I really miss tab auto-indent
 *** Can be realllllly slow over Open NX
@@ -82,6 +84,7 @@ Effortlessly does what I have been trying to get Emacs to do....
  - A pretty big problem
 *** Seems kind of difficult to casually extend/modify
 Its either like you change a keybinding or a font or you write a whole damn plugin
+*** Lack of modes - packages dont seem to add lots of conditionally available commands.....
 * What I want to be able to do in Sublime Text
 * Vim
 ** Thoughts on its Cool and Not So Cool Features

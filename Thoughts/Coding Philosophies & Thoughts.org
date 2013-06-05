@@ -13,6 +13,30 @@
  - Perl vs Python etc
  - Expressiveness at the cost of much higher cognitive load
 ** Still Syntactical Complexity can lead to greater terseness than is possible with a more simple language
+
+* Objects vs Prototypes
+Object/Prototypes are the basic modern, encapsulated datatypes
+** Objects
+ - Are sort of a description or  a blueprint for 
+** Prototypes
+* Namesapacing, Interfaces vs Inheritance
+
+** Namespaces
+ - Can prevent code from running into each other - dont have to worry about symbols with the same names, can also partition large code projects into different things
+** Interfaces
+ - 
+** Inheritance
+*** Advantages
+ - Makes it easy to define reusable bits of code
+*** Disadvantages
+ - Hierarchies can become convoluted
+   - Introduce acertain ammount of non-locality
+ - We can
+   - add methods
+   - overide methods
+   - but we probably cant remove them
+ - What about
+   - traits/tags/mixins?
 * Code as Data
 Means we can metaprogram easily
 
@@ -24,3 +48,36 @@ Ability to pipe things from one prohram from another
  - input and output
 * Ruby - Everything is an object
  - not quite true
+* Python - Significant whitespace
+** Advantages
+ - Clean look means there is less room for errors to hide
+** Disadvantages
+ - Limits language expressiveness
+   - Hard to sensibly nest and pass blocks of code that are only delimited by whitespace
+
+* Macros
+** Macros as compared to method missing
+* Macros vs Functions
+Lets consider what can and cant be refactored by macros and functions
+
+A macro shoulf be able to refactor anything since ts equivalent to a compile time rewrite. Might be dependent on several expansions however.
+** Linear functions
+f(xy) = x f(y)
+
+We could maybe write a macro that was equiv to some code such as
+m(x,y,z) =
+abba = x + z
+f(y) z
+Could we do the same with a function?
+Depends.
+Depends - maybe the scope is different e.g.
+m(x,y,z)
+kill(abba)
+would make sense
+but 
+f(x,y,z)
+kill(abba)
+would not - "abba" would not be in scope.
+
+
+* Comparing Different paradigms via Homomorphic Mathematical Analysis
