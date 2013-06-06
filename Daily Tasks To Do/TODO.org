@@ -3,33 +3,37 @@
 * DONE Wash shoes again
 * DONE Wash the rest of my mouldy clothes
 ** DONE Put on the line
-* TODO Spotify vs Grooveshark?
+* DONE Spotify vs Grooveshark?
 * DONE Connect Spotify so that Play/Pause on headphones works
 * TODO Buy that chicks song
-* TODO Watch Ruby/Rails Videos
-* TODO Get zkbd/z-shell readline going
-* TODO Learn/Configure Pry
-** Get .pryrc Configured
-* TODO Fork some stuff on github or report issues
-** Haml Mode
-*** comment-dwim stuff not working
-*** 
-* DONE Check hair
-* DONE Check for sublime mode extensions to Emacs
-* TODO Check teeth enamel
-* TODO Merge Bookmarks between this and JN Account...
-* DONE Make a Code Snippets Repository
- - Not designed to have useful refactored/library code but just snippets for ease of reuse/copying - show how something is done.
- - Gonna be a bit ugly therefore
-** Ruby Examples
- - A sample controller
-   - would have CRUD, before_filter etc
-** Javascript/jQuery examples
-** Emacs examples
-* TODO Get that code completion that Oleg has in vim for emacs
-* DONE Try Sublime Text Editor
-** TODO Write Plugin For Alex
+* Health
+** DONE Check hair
+** TODO Check teeth enamel
+** TODO test supppl?
+* IT Stuff
+** TODO Watch Ruby/Rails Videos
+** TODO Get zkbd/z-shell readline going
+** DONE Learn/Configure Pry
+*** Get .pryrc Configured
+** TODO Fork some stuff on github or report issues
+*** Haml Mode
+**** comment-dwim stuff not working
+**** 
+** DONE Check for sublime mode extensions to Emacs
+** DONE Make a Code Snippets Repository
+  - Not designed to have useful refactored/library code but just snippets for ease of reuse/copying - show how something is done.
+  - Gonna be a bit ugly therefore
+*** Ruby Examples
+  - A sample controller
+    - would have CRUD, before_filter etc
+*** Javascript/jQuery examples
+*** Emacs examples
+** TODO Macros vs Functions - What power do we need to refactor properly
+** DONE Try Sublime Text Editor
+*** TODO Write Plugin For Alex
 Quit Sublime Text and Launch Emacs
+* TODO Merge Bookmarks between this and JN Account...
+* TODO Get that code completion that Oleg has in vim for emacs
 * TODO Get Bitbucket setup
 ** TODO Change everything from Github to BiitBucket
 * DONE Make definitive ssh keys
@@ -40,30 +44,36 @@ Quit Sublime Text and Launch Emacs
 *** DONE bitbucket
 *** JN-Big
 *** JN-Little
-* DONE Order Minox
 * TODO Order Contacts
+* TODO Build my own tmux
 * TODO Get bupropione
-* TODO test supppl?
+* TODO Setup usable vim stuff
 * TODO Teenage Mutant Ninja Turtles and Stickers
-* TODO Get a new phone
-* TODO Get a new android tablet
-* TODO Get a weights set/gym
-* TODO Sell Car
-* DONE Pay Aaron back $50
+* Things to Get
+** TODO Get a new phone
+** TODO Get a new android tablet
+** TODO Wireless headphones
+** TODO Speakers - Wireless?
+** TODO ASUS Multitouch Mouse/Magic TrackPad
+** TODO Normal headphones for work
+** TODO Get a weights set/gym
+** TODO Get a comfortable chair/seat for work
+** TODO Find a new media center that also does digital TV reception
+** DONE Order Minox
+* Mundane Stuff
+** DONE Sell Car
+** DONE Pay Aaron back $50
+** TODO Get cables
+*** Long Antenna cable
+*** Get rgb cables for 24 inch monitor
+** TODO Get Apple Repair For BigMac
+** TODO Get music and comics from old PC
 * TODO Reorganise Org Note Docs into Directories
 ** TODO Thoughts/Docs etc
 ** TODO Change any bad hyperlinks
 * TODO Rsync files
 * TODO Backup this computer
-* TODO Get Apple Repair For BigMac
-* TODO Get music and comics from old PC
-
 * TODO Uninstall gems from Sameera's talk
-* TODO Setup usable vim stuff
-* TODO Get cables
-** Long Antenna cable
-** Get rgb cables for 24 inch monitor
-* TODO Build my own tmux
 * TODO Install YaSnippet - fix el-get recipe with bad git/github address
 * TODO Emacs Packages to investigate
 ** emacschrome

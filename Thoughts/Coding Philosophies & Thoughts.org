@@ -14,13 +14,27 @@
  - Expressiveness at the cost of much higher cognitive load
 ** Still Syntactical Complexity can lead to greater terseness than is possible with a more simple language
 
-* Objects vs Prototypes
-Object/Prototypes are the basic modern, encapsulated datatypes
-** Objects
- - Are sort of a description or  a blueprint for 
+* Classes vs Prototypes (& Modules)
+Object are the basic modern, encapsulated datatypes
+** Classes
+ - Are sort of a description or a blueprint for an object
+ - Factories for objects
+ - What separates a class from an object?
+*** Objects in Class Based Systems
+ - Objects can only have variables
+ - And a pointer to a table or object that stores methods
 ** Prototypes
+ - More general than objects?
+ - A prototype is an object that can have functions and variables
+ - Maybe also have pointers to ancestors
+*** Objects in Prototype Based Systems
+ - We create new objects as copies of other objects
+   - clone strategy
+     - Deep or Shallow?
+** Modules
+ - Basic namespaces
+ - can contain
 * Namesapacing, Interfaces vs Inheritance
-
 ** Namespaces
  - Can prevent code from running into each other - dont have to worry about symbols with the same names, can also partition large code projects into different things
 ** Interfaces
