@@ -53,6 +53,7 @@ Quit Sublime Text and Launch Emacs
 ** TODO Get a new phone
 ** TODO Get a new android tablet
 ** TODO Wireless headphones
+** TODO New beard trimmer
 ** TODO Speakers - Wireless?
 ** TODO ASUS Multitouch Mouse/Magic TrackPad
 ** TODO Normal headphones for work
@@ -68,6 +69,7 @@ Quit Sublime Text and Launch Emacs
 *** Get rgb cables for 24 inch monitor
 ** TODO Get Apple Repair For BigMac
 ** TODO Get music and comics from old PC
+** TODO Fix kitchen tap - change washer
 * TODO Reorganise Org Note Docs into Directories
 ** TODO Thoughts/Docs etc
 ** TODO Change any bad hyperlinks

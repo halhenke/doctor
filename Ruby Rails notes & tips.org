@@ -145,6 +145,17 @@ then run
 Otherwise things will be messed up...
 ** You can switch to default Rubies with
 : rvm use default
+** You can manipulate rvm from within Ruby itself by loading some code
+something like this:
+#+BEGIN_SRC ruby
+if Dir.exists? "#{Dir.home}/.rvm/lib"
+  $LOAD_PATH << "#{Dir.home}/.rvm/lib"
+  require "rvm"
+end
+#+END_SRC
+*Actually* the rvm gem is included by default with rvm so just
+: require "rvm"
+is required i think
 * Require arbitrary file in irb
 If you are in an arbitrary directory and you want to require a module 
 at a path relative to yourself of
