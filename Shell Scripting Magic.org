@@ -199,6 +199,19 @@ Use this instead:
 : sudo bash -c " export RAILS_ENV=production; cd /app/mynbcs/current/; /usr/local/bin/rake --silent delayed_job:touch_file "
 
 
+* Using a script (shell/ruby), subshells and environemnt variables
+** To change anything in the original/parent shell you must use 'source'
+e.g.
+: source do-stuff.sh
+or
+: . do-stuff.sh
+If you execute the script by making it executable etc you will merely create a new sub-shell. When the script finishes the sub-shell will be destroyed and command is returned to the parent where the variables are not set.
+** If you 'exec' the script then the original shell will be replaced with the script process
+This means we can effectively replace the original shell with a new shell. May allow us to effectively do the same thing as if we had sourced the new changes.
+http://stackoverflow.com/a/2660833/935470
+
+i.e. Our script can itself create a new shell via exec and we will then be running that shell
+
 * Inputrc files readline & BASH vs Z-Shell
 ** BASH vs Z-Shell
 Readline is different between bash and z-shell

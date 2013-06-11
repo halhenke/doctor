@@ -3,6 +3,9 @@ To restart passenger do
 : touch tmp/restart.txt
 
 
+* Using Ruby in conjunction with shell scripts - limitations
+See [[file:Shell%20Scripting%20Magic.org::*Using%20a%20script%20(shell/ruby),%20subshells%20and%20environemnt%20variables][Using a script (shell/ruby), subshells and environemnt variables]] 
+
 * Bundler
 ** See local configuration options
 : bundle config --local
