@@ -1,0 +1,184 @@
+#+TITLE: Sublime Text
+
+* How to
+** Show Commands/Bindings in the console
+In the console enter
+: sublime.log_commands(True)
+or 
+: sublime.log_input(True)
+** Switch windows
+: Sublime.windows()
+: Sublime.active_window()
+* Syntax Highlighting
+Basically carried over from TextMate
+
+Consists of a syntax file which creates/captures scopes based on regular expressions
+and the theme files which can then be used to style these "scopes".
+** Geting Setting Colours for a Syntax
+This was actually pretty easy - I just whacked the following in the 
+: Packages/Color Scheme - Default/Blackboard.tmTheme
+file
+#+BEGIN_SRC xml
+<dict>
+			<key>name</key>
+			<string>diff.header</string>
+			<key>scope</key>
+			<string>meta.diff, meta.diff.header</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#75715E</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>diff.deleted</string>
+			<key>scope</key>
+			<string>markup.deleted</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#F92672</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>diff.inserted</string>
+			<key>scope</key>
+			<string>markup.inserted</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#A6E22E</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>diff.changed</string>
+			<key>scope</key>
+			<string>markup.changed</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#E6DB74</string>
+			</dict>
+		</dict>
+<dict>
+			<key>name</key>
+			<string>diff.header</string>
+			<key>scope</key>
+			<string>meta.diff, meta.diff.header</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#75715E</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>diff.deleted</string>
+			<key>scope</key>
+			<string>markup.deleted</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#F92672</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>diff.inserted</string>
+			<key>scope</key>
+			<string>markup.inserted</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#A6E22E</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>diff.changed</string>
+			<key>scope</key>
+			<string>markup.changed</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#E6DB74</string>
+			</dict>
+		</dict>
+#+END_SRC
+** Getting/Setting Colours for diff
+Basically the "scopes"/patterns i want to alter in appearance are called in the 
+: Packages/Diff/Diff.tmLanguage file
+file :
+: markup.inserted.diff
+and
+: markup.deleted.diff
+* Some API style Documentation
+http://docs.sublimetext.info/en/latest/reference/reference.html
+
+http://www.sublimetext.com/docs/2/api_reference.html
+* Troubleshooting/Bugs/Problems
+** Binding Alt over Open NX from Macbook
+For whatever reason 
+: "alt+left" 
+etc does not bind but
+: "meta+left" 
+does.
+*HOWEVER* - when i do this it also binds all arrow keys
+*** Whats Going On?
+**** Based on the above I would guess that Meta is not being passed on as a real modifier key?
+**** Based on looking at the console log
+when 
+: sublime.log_input(True)
+is enabled I see that only "left" and "right" are being passed to Sublime when alt is pressed...
+
+
+
+
+9:50 rit
+10:45 cod
+
+* xkb Alt and keymaps over Open NX
+** Fiddling about
+1198
+modifier_map Mod2 { Alt_L };
+modifier_map Mod2 { Alt_R };
+changed to 
+modifier_map Alt { Alt_L };
+modifier_map Alt { Alt_R };
+that dont work - can only use Mod2 etc
+** Modifiers State in hexidecimal
+From xev I get
+|---------+-------|
+| Key     | State |
+|---------+-------|
+| Super   |  0x40 |
+| Control |   0x4 |
+| Alt     |  0x10 |
+| Shift   |   0x1 |
+|---------+-------|
+
+** Setting Alt to Mod2 didnt work for some reason - changed it to Mod1 and everything seems good
+e.g.
+#+BEGIN_VERSE
+modifier_map Mod1 { Alt_L };
+modifier_map Mod1 { Alt_R };
+#+END_VERSE
+Also bindings set in gconf-editor now seem to work.
+Perhaps there was something in xmodmap that I hadnt cleared or whatever that bound Alt to this modifier
+After I have
+|-----+-------|
+| Key | State |
+|-----+-------|
+| Alt |  0x8  |
+|-----+-------|
+
+
+* gconf-editor and keybindings
+For some reason I cant seem to bind to certain keys
+: <Alt>`
+wont work but
+: <Alt>a
+will to cycle through windows of an application for example....
