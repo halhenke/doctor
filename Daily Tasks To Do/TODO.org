@@ -64,6 +64,9 @@ Quit Sublime Text and Launch Emacs
 * Things to Watch/Listen to/Read
 ** TODO Room 237
 ** DONE Order Minox
+** TODO Trailers
+*** Superman
+*** Thor
 * Mundane Stuff
 ** DONE Sell Car
 ** DONE Pay Aaron back $50
@@ -73,11 +76,19 @@ Quit Sublime Text and Launch Emacs
 ** TODO Get Apple Repair For BigMac
 ** TODO Get music and comics from old PC
 ** TODO Fix kitchen tap - change washer
-* TODO Get password manager
-** LastPass?
+** TODO Get Merrell shoes
+* IT User Stuff
+** TODO Get password manager
+*** LastPass?
 Free or $12 a year?
-* TODO Readability or Pocket?
+** TODO Readability or Pocket?
 Need a password for Readability....
+** TODO Get a calendar for drugs
+*** Has to have events that can be triggered/added by button.
+**** Colour Coded
+**** Some Customisation - e.g. dose
+*** Track/Aggregeate over time
+*** Desktop/Web App also preferrably
 * TODO Reorganise Org Note Docs into Directories
 ** TODO Thoughts/Docs etc
 ** TODO Change any bad hyperlinks
