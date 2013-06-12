@@ -77,6 +77,7 @@ Quit Sublime Text and Launch Emacs
 ** TODO Get music and comics from old PC
 ** TODO Fix kitchen tap - change washer
 ** TODO Get Merrell shoes
+** TODO Get Application Specific Passwords for Google Chrome
 * IT User Stuff
 ** TODO Get password manager
 *** LastPass?

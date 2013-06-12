@@ -95,3 +95,12 @@ would not - "abba" would not be in scope.
 
 
 * Comparing Different paradigms via Homomorphic Mathematical Analysis
+* Interfaces
+** Command Lines vs Menus
+*** A bare command line is a terrible interface from a mnemonic perspective
+*** A menu is a great interface from a mnemonic perspective
+*** A command line is /potentially/ fast to navigate
+**** A bare command line is not articularly fast to navigate
+***** Need to touch type everyhing
+**** With tab completion and command history it can easily be made very fast
+*** A menu is not particularly fast to navigate and doesnt have much potential for improvement

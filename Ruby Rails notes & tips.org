@@ -1049,6 +1049,17 @@ and cant write
 : des_contract_referral_details
 
 ** Be careful with associations
+** Using asociations with traits and factories that have different names than the association
+requires a special kind of syntax
+#+BEGIN_SRC ruby
+factory :rails_process_jrrr_job, class: ProcessJrrrJob do        
+        queue { "rails" }
+        association :refer_job, :factory => :windows_process_jrrr_job
+        trait :requested_date do           
+          association :refer_job, :factory => [:windows_process_jrrr_job, :requested_date ]
+        end
+      end
+#+END_SRC
 ** Stub current_user
 In before block
 : view.stub(:current_user => user)

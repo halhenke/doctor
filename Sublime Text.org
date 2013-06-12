@@ -150,6 +150,7 @@ modifier_map Alt { Alt_L };
 modifier_map Alt { Alt_R };
 that dont work - can only use Mod2 etc
 ** Modifiers State in hexidecimal
+*** At home
 From xev I get
 |---------+-------|
 | Key     | State |
@@ -159,7 +160,16 @@ From xev I get
 | Alt     |  0x10 |
 | Shift   |   0x1 |
 |---------+-------|
-
+*** At work
+From xev I get
+|---------+-------|
+| Key     | State |
+|---------+-------|
+| Super   |  0x40 |
+| Control |   0x4 |
+| Alt     |   0x8 |
+| Shift   |   0x1 |
+|---------+-------|
 ** Setting Alt to Mod2 didnt work for some reason - changed it to Mod1 and everything seems good
 e.g.
 #+BEGIN_VERSE
@@ -174,7 +184,7 @@ After I have
 |-----+-------|
 | Alt |  0x8  |
 |-----+-------|
-
+which basically matches what I had at work previously.....
 
 * gconf-editor and keybindings
 For some reason I cant seem to bind to certain keys
