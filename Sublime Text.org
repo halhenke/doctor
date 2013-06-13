@@ -1,5 +1,10 @@
 #+TITLE: Sublime Text
 
+* Default Location of Configuration Files
+** On OS X
+: ~/Library/Application Support/Sublime Text 2/
+** On Linux
+: ~/.config/sublime-text-2/
 * How to
 ** Show Commands/Bindings in the console
 In the console enter
@@ -115,6 +120,57 @@ file :
 : markup.inserted.diff
 and
 : markup.deleted.diff
+** Command for changing a files syntax
+** To get a new Syntax to show up in the Syntax Menu/Command Palette
+*** I thought you had to do this
+Need to save a file in your 
+: Packages/User
+directory with the name corresponding to the name of the Syntax you want to define
+: comicboards.sublime-settings
+In this file you want to define any new file associations you may be using
+#+BEGIN_SRC json
+{
+    "extensions":
+    [
+        "comic"
+    ]
+}
+#+END_SRC
+*** ...but i think it was just that
+I hadnt set the name property of my Syntax Definition...
+*** What the menu does
+When you choose a different syntax from the menu this is called
+: set_file_type {"syntax": "Packages/Text/Plain text.tmLanguage"}
+*** Weird command i found
+On the other hand
+: Packages/RSpec/RSpecDetectFileType.py
+has the command
+#+BEGIN_SRC python
+def set_syntax(view, syntax, path=None):
+	if path is None:
+		path = syntax
+	view.settings().set('syntax', 'Packages/'+ path + '/' + syntax + '.tmLanguage')
+	print("Switched syntax to: " + syntax)
+#+END_SRC
+*** Also
+: view.set_syntax_file()
+* Introspection
+** Can use the SublimeREPL from the REPLPackage
+*** Doesnt have the same environment as the proper sublime console
+In standard console
+: dir()
+gives
+: ['LogWriter', '__builtins__', '__doc__', '__name__', '__package__', 'signal', 'sublime', 'sublimelog', 'sys', 'thread', 'view', 'window']
+whereas in SublimeREPL it gives
+: ['__builtins__', '__name__']
+*** Add some stuff back to the SublimeREPL
+So load this
+: import sublime
+: import sublime_plugin
+: from sublime import sublime.View as view
+: from sublime import sublime.Window as window
+** Get syntax scope from the console
+: view.syntax_name(view.buffer_id())
 * Some API style Documentation
 http://docs.sublimetext.info/en/latest/reference/reference.html
 

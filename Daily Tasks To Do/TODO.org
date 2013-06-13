@@ -32,6 +32,11 @@
 ** DONE Try Sublime Text Editor
 *** TODO Write Plugin For Alex
 Quit Sublime Text and Launch Emacs
+** TODO Refactor Z Shell Setup files
+*** Break out keybindings for example into separate file
+*** Unify linux and mac keybindings -a lot of duplication at present
+*** Put everything into a .zshell folder?
+**** Everything is kinda spilling everywhere atm....
 * TODO Merge Bookmarks between this and JN Account...
 * TODO Get that code completion that Oleg has in vim for emacs
 * TODO Get Bitbucket setup
@@ -78,6 +83,7 @@ Quit Sublime Text and Launch Emacs
 ** TODO Fix kitchen tap - change washer
 ** TODO Get Merrell shoes
 ** TODO Get Application Specific Passwords for Google Chrome
+** TODO Get Private Health Insurance BEFORE JUNE 30TH
 * IT User Stuff
 ** TODO Get password manager
 *** LastPass?
