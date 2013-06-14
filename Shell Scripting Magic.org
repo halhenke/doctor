@@ -121,6 +121,20 @@ Hey machine
 : fc-list :fontformat=TrueType -f "%{family}\n" | sort -u | less 
 
 
+* Job/Process management
+** jobs command
+An alternatiev to the ps command is jobs
+: jobs -l
+*** Killling a stuck process with the jobs command
+Get a numbered list of jobs (children of the current terminal/tty)
+: jobs -l
+Bring the misbehaving app to the foreground (stdin/stdout are redirected to terminal)
+In this case the second job in the list
+: fg %2
+Terminate with Control-C
+
+
+
 * Spaces in filenames
 These are equivalent and work:
 : touch ~/Documents/"A bad file"
