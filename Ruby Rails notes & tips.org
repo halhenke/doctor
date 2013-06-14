@@ -1,10 +1,178 @@
-* Passenger
-To restart passenger do
-: touch tmp/restart.txt
+#+TITLE: Ruby, Rails &Related Tools - Tips, Tricks & Notes
+
+* Ruby HowTo
+** Check if is a subclass of
+*** If you are dealing with two classes:
+*NO THIS IS WRONG*
+=kind_of= is an instance method
+# : EpfClaim.kind_of? PurchaseClaim.class
+# gotta remeber the "class" call for the second argument
+*** If you are dealing with an object/instance:
+: this_Claim.kind_of? PurchaseClaim.
+no "class" call for both caller or argument
+** Using __FILE__ etc to load code
+*** Basics
+: __FILE__
+is a variable that shows the path of the current file /relative from the execution directory
+Therefore its a relative path. 
+*** To get an absolute path from it
+: File.expand_path(FILE)
+*** To execute/load/inspect files relative to the current file 
+the following should be sufficient
+: "#{File.dirname(__FILE__)}/../hals_output.rb"
+*** May work differently in Ruby 1.9.2 vs Ruby 1.9.3
+To work around this then perhaps the following is preferable
+: File.expand_path(File.dirname(__FILE__) + "/relative/path/to/file")
+* Ruby Class/Metaclass/Object/Module Hierarchy
+** Root Class
+Before Ruby 1.9 it was 
+: Object
+After it is
+: BasicObject
+
+** Parent vs Superclass?
+Superclass is  a Class instance method
+: File.superclass
+parent seems to be a module thing
+Also parents and ancestors
+* Ruby Meta/Magic Stuff
+** You can call methods based on strings with the send method
+: object.send("add_#{@type_of_fruit}", d)
+Heres a more involved example
+#+BEGIN_SRC ruby
+      	["backgrounds","knowtypes","interests","languages","cities","countries"].each do |t|
+          if params["user_profile_#{t}"].present? 
+            params["user_profile_#{t}"].each do |d|
+              @user_profile.send("add_#{t.singularize}", d)
+            end
+          end
+      	end
+#+END_SRC
+*** If locally defined method (same class) then do like this
+same for Rails associations
+#+BEGIN_SRC ruby
+class UserProfileInterest < ActiveRecord::Base
+  def bat_kill()
+    send("bat_karate")
+  end
+  def bat_karate()
+  end
+end
+#+END_SRC
+
+See here also [[*Rails%20converting%20strings%20to%20symbols%20etc][Rails converting strings to symbols etc]]
+
+** Get a Class object from a string without using eval
+Obviously this is Rails oriented in then getting an instance/record but you get the idea
+: tag_object = Class.const_get(taggable.class.base_class.name).find taggable.id
+** Operating system commands
+Strings enclosed with backquotes or =%x{}= are be considered by Ruby as operating system commands. Just try:
+: puts (`calc`)
+: puts ("Current directory content is: #{%x/dir/}")
+* map command - block vs function syntax
+Apparently these are equivalent
+: Background.all.map(&:id)
+and
+: Background.all.map{ |bg| bg.id }
+* Diagnostics & How to See Whats Going On
+inspect?
+: @object.inspect
+** Check to see if a variable is defined
+To check variable 'var'
+: defined? var
+** Rails
+*** Print a message from a controller/view
+#+BEGIN_SRC ruby
+render :json => 'This is the string'
+#+END_SRC ruby
+*** Print a debug message to the log
+: logger.(debug|info|warn|error|fatal)
+e.g.
+: logger.debug "Person attributes hash: #{@person.attributes.inspect}"
+ Calling it as =Rails.logger= is also valid
+
+*** Using the =ruby-debug= gem
+**** Setup/installation
+See this blog
+http://chrisadams.me.uk/2009/04/28/how-to-set-up-a-debugger-with-mod_railspassenger/
+
+Actually that might be outdated - the whole thing took ages but below instructions should be good for Rails 3 and Ruby 1.9
+
+***** Installing the Gem
+# Problems with Ruby 1.9. I couldnt do it in Bundler (didnt try =sudo bundler= though)had to do this:
+# : sudo gem install ruby-debug19
+put 
+: gem 'debugger'
+in your Gemfile
+
+***** No configuration necesary if using a Rails server such as thin
+When you want to invoke the debugger in the code just add to the line
+: require 'debugger'; debugger
+***** Otherwise
+****** Other Configuration to be done once per app - applies to Apache/Passenger
+******* Whack this in config/environments/development.rb
+#+BEGIN_SRC ruby
+  if File.exists?(File.join(Rails.root,'tmp', 'debug.txt'))
+    Debugger.wait_connection = true
+    Debugger.start_remote
+    File.delete(File.join(Rails.root,'tmp', 'debug.txt'))
+  end
+#+END_SRC
+can specify port and host if you like
+#+BEGIN_SRC ruby
+  remote_host = '127.0.0.1' 
+  remote_port = 7000 
+  if File.exists?(File.join(Rails.root,'tmp', 'debug.txt'))
+    Debugger.wait_connection = true
+    Debugger.start_remote(remote_host, remote_port)
+    File.delete(File.join(Rails.root,'tmp', 'debug.txt'))
+  end
+#+END_SRC
+******* Create a rake restart task
+Heres what i have in a =lib/tasks/rails_debug.rake= file
+#+BEGIN_SRC ruby
+    desc "Restarts passenger if in debug mode"
+    task :restart do
+      system("touch tmp/restart.txt")
+      system("touch tmp/debug.txt") if ENV["DEBUG"] == 'true'
+    end
+#+END_SRC
+******* Create an rdebug.rc file
+ - either in home directory or current directory
+ - This may have been crucial - not sure
+At any rate heres what i have in my ./rdebug.rc file
+#+BEGIN_VERSE
+set autolist
+set autoeval
+set autoreload
+#+END_VERSE
+****** Configuration to be done whenever you want to start the debugger
+******* Call restart of passenger via rake task with DEBUG env variable set to true
+: bundle exec rake restart DEBUG=true
+******* THEN - VERY IMPORTANT - you must load a NEW page to get server to work
+any page it doesnt matter
+******* Open a remote debug session with
+: bundle exec rdebug -c
+or if port and host specified earlier
+: bundle exec rdebug -c -p 7000 -h 127.0.0.1
+
+*** Checking for the existance of a =params= key/value
+: if params[:country_list].present?
 
 
 * Using Ruby in conjunction with shell scripts - limitations
 See [[file:Shell%20Scripting%20Magic.org::*Using%20a%20script%20(shell/ruby),%20subshells%20and%20environemnt%20variables][Using a script (shell/ruby), subshells and environemnt variables]] 
+* Running Shell commands from Ruby
+Several methods
+** %x(command)
+: %x(command)
+By default does not return stderr
+Can run 
+: %x(command 2>&1)
+to append stderr to stout
+** Open3 builtin module
+** Open4 gem
+
 
 * Bundler
 ** See local configuration options
@@ -24,16 +192,19 @@ but this doesnt seem to work
 *** caching?
 *** Just organising everything into a script/subshell to be run with bundle exec?
  - Might be hard to get back any results
+* Passenger
+To restart passenger do
+: touch tmp/restart.txt
 
 * Rake
-Show all tasks
+** Show all tasks
 : rake -T
 or 
 : rake -D
-* How does Rake work
+** Calling Rake in a directory with a Rakefile
 Call rake in a directory it will automatically call the Rakefile
 
-** Example of hurricane app
+*** Example of hurricane app
 In this case it then requires these files:
 #+BEGIN_SRC ruby
 require 'config/boot'
@@ -171,14 +342,6 @@ You gotta remember the
 and leave off the
 : ".rb"
 
-* Routing
-** member vs collection
-http://stackoverflow.com/questions/3028653/difference-between-collection-route-and-member-route-in-ruby-on-rails
-                URL                 Helper                      Description
-----------------------------------------------------------------------------------------------------------------------------------
-member          /photos/1/preview   preview_photo_path(photo)   Acts on a specific resource so required id (preview specific photo)
-collection      /photos/search      search_photos_url           Acts on collection of resources(display all photos)
-
 * Ruby/Rails & nil & iterating over it
 ** The Problem
 Because Ruby uses blocks for iteration can cause problems when the class is nil.
@@ -206,128 +369,61 @@ as something to be looked up with that method e.g.
 Which will fetch the value associated with the key "uploaded_data" if it is present
 e.g. equivalent to
 : params[:attachment][:uploaded_data]
+* Gem Commands
+** Check which gems a gem depends on (i.e. it needs)
+: gem dependency rails
+** ALSO check which gems depend on this gem (i.e. which need it)
+: gem dependency -R rails
+** Install a gem
+sudo gem install -r zzzzzz
 
-* Ruby Class/Metaclass/Object/Module Hierarchy
-** Root Class
-Before Ruby 1.9 it was 
-: Object
-After it is
-: BasicObject
+** Install a gem with version
+** Adding a source to the gem package source list
+: gem  sources -a http://gems.github.com
+** Uninstalling a gem and all dependencies
+*** Shell Script - doesnt seem to recursively delete dependencies
+Modified from:
+for gem in `gem list --no-version`; do
+  gem uninstall -aIx $gem
+done
 
-** Parent vs Superclass?
-Superclass is  a Class instance method
-: File.superclass
-parent seems to be a module thing
-Also parents and ancestors
-* Running Shell commands from Ruby
-Several methods
-** %x(command)
-: %x(command)
-By default does not return stderr
-Can run 
-: %x(command 2>&1)
-to append stderr to stout
-** Open3 builtin module
-** Open4 gem
+for gem in `gem dependency rails -v=3.2.1`; do
+  gem uninstall -aIx $gem
+done
+*** Ruby Script from GitHub
+https://github.com/mattdipasquale/gem_uninstall_r
 
-* Commenting out Stuff in a Rails web template
-Comments out both HTML and Ruby logic
-#+BEGIN_SRC web
-<%# if false %>
-  ...old bit here
-<% end %>
-#+END_SRC web
+** Searching for all version of rails gems on remote server
+: gem search -ra "rails" | egrep "^rails "
+** Install a particular gem version - DOES THIS HAVE PROBLEMS?
+: sudo gem install -r rails -v=2.3.14
+** Update the gem executable/rubygems
+# New way
+: sudo gem update --system
+# OLD WAY, for historical purposes 
+: sudo gem install rubygems-update --no-rdoc --no-ri
+: sudo update_rubygems
+** Info on where gems are installed etc
+From the command line
+: gem env
+or from irb
+: Gem.path
 
-
-* Roles
-** To add an admin role
-Find admin role in Roles table
-: addy = Roles.where()
-: User.find(1).roles << addy
-* Diagnostics & How to See Whats Going On
-inspect?
-: @object.inspect
-** Check to see if a variable is defined
-To check variable 'var'
-: defined? var
-** Rails
-*** Print a message from a controller/view
+** What does this mean? (from the rspec executable)
+All this occurs after:
+: require 'rubygems'
+but we have 'gem' method and a call to bin_path
 #+BEGIN_SRC ruby
-render :json => 'This is the string'
-#+END_SRC ruby
-*** Print a debug message to the log
-: logger.(debug|info|warn|error|fatal)
-e.g.
-: logger.debug "Person attributes hash: #{@person.attributes.inspect}"
- Calling it as =Rails.logger= is also valid
-
-*** Using the =ruby-debug= gem
-**** Setup/installation
-See this blog
-http://chrisadams.me.uk/2009/04/28/how-to-set-up-a-debugger-with-mod_railspassenger/
-
-Actually that might be outdated - the whole thing took ages but below instructions should be good for Rails 3 and Ruby 1.9
-
-***** Installing the Gem
-# Problems with Ruby 1.9. I couldnt do it in Bundler (didnt try =sudo bundler= though)had to do this:
-# : sudo gem install ruby-debug19
-put 
-: gem 'debugger'
-in your Gemfile
-
-***** No configuration necesary if using a Rails server such as thin
-When you want to invoke the debugger in the code just add to the line
-: require 'debugger'; debugger
-***** Otherwise
-****** Other Configuration to be done once per app - applies to Apache/Passenger
-******* Whack this in config/environments/development.rb
-#+BEGIN_SRC ruby
-  if File.exists?(File.join(Rails.root,'tmp', 'debug.txt'))
-    Debugger.wait_connection = true
-    Debugger.start_remote
-    File.delete(File.join(Rails.root,'tmp', 'debug.txt'))
-  end
+gem 'rspec-core', version
+load Gem.bin_path('rspec-core', 'rspec', version)
 #+END_SRC
-can specify port and host if you like
-#+BEGIN_SRC ruby
-  remote_host = '127.0.0.1' 
-  remote_port = 7000 
-  if File.exists?(File.join(Rails.root,'tmp', 'debug.txt'))
-    Debugger.wait_connection = true
-    Debugger.start_remote(remote_host, remote_port)
-    File.delete(File.join(Rails.root,'tmp', 'debug.txt'))
-  end
-#+END_SRC
-******* Create a rake restart task
-Heres what i have in a =lib/tasks/rails_debug.rake= file
-#+BEGIN_SRC ruby
-    desc "Restarts passenger if in debug mode"
-    task :restart do
-      system("touch tmp/restart.txt")
-      system("touch tmp/debug.txt") if ENV["DEBUG"] == 'true'
-    end
-#+END_SRC
-******* Create an rdebug.rc file
- - either in home directory or current directory
- - This may have been crucial - not sure
-At any rate heres what i have in my ./rdebug.rc file
-#+BEGIN_VERSE
-set autolist
-set autoeval
-set autoreload
-#+END_VERSE
-****** Configuration to be done whenever you want to start the debugger
-******* Call restart of passenger via rake task with DEBUG env variable set to true
-: bundle exec rake restart DEBUG=true
-******* THEN - VERY IMPORTANT - you must load a NEW page to get server to work
-any page it doesnt matter
-******* Open a remote debug session with
-: bundle exec rdebug -c
-or if port and host specified earlier
-: bundle exec rdebug -c -p 7000 -h 127.0.0.1
 
-*** Checking for the existance of a =params= key/value
-: if params[:country_list].present?
+** Check which gems are loaded from irb/pry
+: Gem.loaded_specs
+** Find the location of a library file/gem you can require
+: gem which gemname
+
+
 
 * Modules and loading/accessing their innards
 ** See loaded modules
@@ -425,64 +521,6 @@ This will be pretty big....
 ** List included modules in a specific module? Not sure
 : (class << helper; self; end).send :included_modules
 
-* Gem Commands
-** Check which gems a gem depends on (i.e. it needs)
-: gem dependency rails
-** ALSO check which gems depend on this gem (i.e. which need it)
-: gem dependency -R rails
-** Install a gem
-sudo gem install -r zzzzzz
-
-** Install a gem with version
-** Adding a source to the gem package source list
-: gem  sources -a http://gems.github.com
-** Uninstalling a gem and all dependencies
-*** Shell Script - doesnt seem to recursively delete dependencies
-Modified from:
-for gem in `gem list --no-version`; do
-  gem uninstall -aIx $gem
-done
-
-for gem in `gem dependency rails -v=3.2.1`; do
-  gem uninstall -aIx $gem
-done
-*** Ruby Script from GitHub
-https://github.com/mattdipasquale/gem_uninstall_r
-
-** Searching for all version of rails gems on remote server
-: gem search -ra "rails" | egrep "^rails "
-** Install a particular gem version - DOES THIS HAVE PROBLEMS?
-: sudo gem install -r rails -v=2.3.14
-** Update the gem executable/rubygems
-# New way
-: sudo gem update --system
-# OLD WAY, for historical purposes 
-: sudo gem install rubygems-update --no-rdoc --no-ri
-: sudo update_rubygems
-** Info on where gems are installed etc
-From the command line
-: gem env
-or from irb
-: Gem.path
-
-** What does this mean? (from the rspec executable)
-All this occurs after:
-: require 'rubygems'
-but we have 'gem' method and a call to bin_path
-#+BEGIN_SRC ruby
-gem 'rspec-core', version
-load Gem.bin_path('rspec-core', 'rspec', version)
-#+END_SRC
-
-** Check which gems are loaded from irb/pry
-: Gem.loaded_specs
-** Find the location of a library file/gem you can require
-: gem which gemname
-* map command - block vs function syntax
-Apparently these are equivalent
-: Background.all.map(&:id)
-and
-: Background.all.map{ |bg| bg.id }
 * Rails
 ** Console
 *** Start the console in a particuar environment
@@ -738,73 +776,31 @@ This also works
 *** Listing callbacks for a particular model
 In this case we can get all the save callbacks for the class Model and filter it to those that occur before saving
 : Model._save_callbacks.select {|cb| cb.kind == :before}
-* Ruby Meta/Magic Stuff
-** You can call methods based on strings with the send method
-: object.send("add_#{@type_of_fruit}", d)
-Heres a more involved example
-#+BEGIN_SRC ruby
-      	["backgrounds","knowtypes","interests","languages","cities","countries"].each do |t|
-          if params["user_profile_#{t}"].present? 
-            params["user_profile_#{t}"].each do |d|
-              @user_profile.send("add_#{t.singularize}", d)
-            end
-          end
-      	end
-#+END_SRC
-*** If locally defined method (same class) then do like this
-same for Rails associations
-#+BEGIN_SRC ruby
-class UserProfileInterest < ActiveRecord::Base
-  def bat_kill()
-    send("bat_karate")
-  end
-  def bat_karate()
-  end
-end
-#+END_SRC
-
-See here also [[*Rails%20converting%20strings%20to%20symbols%20etc][Rails converting strings to symbols etc]]
-
-** Get a Class object from a string without using eval
-Obviously this is Rails oriented in then getting an instance/record but you get the idea
-: tag_object = Class.const_get(taggable.class.base_class.name).find taggable.id
-** Operating system commands
-Strings enclosed with backquotes or =%x{}= are be considered by Ruby as operating system commands. Just try:
-: puts (`calc`)
-: puts ("Current directory content is: #{%x/dir/}")
+* Roles
+** To add an admin role
+Find admin role in Roles table
+: addy = Roles.where()
+: User.find(1).roles << addy
+* Commenting out Stuff in a Rails web template
+Comments out both HTML and Ruby logic
+#+BEGIN_SRC web
+<%# if false %>
+  ...old bit here
+<% end %>
+#+END_SRC web
+* Routing
+** member vs collection
+http://stackoverflow.com/questions/3028653/difference-between-collection-route-and-member-route-in-ruby-on-rails
+                URL                 Helper                      Description
+----------------------------------------------------------------------------------------------------------------------------------
+member          /photos/1/preview   preview_photo_path(photo)   Acts on a specific resource so required id (preview specific photo)
+collection      /photos/search      search_photos_url           Acts on collection of resources(display all photos)
 * Navigating directory tree from the console
 Basically - the Dir module
 pwd
 : Dir.pwd
 ls
 : Dir.entries "app"
-
-
-* Ruby HowTo
-** Check if is a subclass of
-*** If you are dealing with two classes:
-*NO THIS IS WRONG*
-=kind_of= is an instance method
-# : EpfClaim.kind_of? PurchaseClaim.class
-# gotta remeber the "class" call for the second argument
-*** If you are dealing with an object/instance:
-: this_Claim.kind_of? PurchaseClaim.
-no "class" call for both caller or argument
-* Heroku
-** Transferring a PostGres Database to and from heroku
-http://www.ryandaigle.com/a/pgtransfer-is-the-new-taps
-First install pg transfer
-: heroku plugins:install https://github.com/ddollar/heroku-pg-transfer
-*** Yeah i dont know Heres what I had to do
-First put the database on a publically accessible url
- - in this case inside the =public_html= directory on my Net Virtue server
-   - I had to make the enclosing =Hunome= directory and the =dev2prod.sql= file both readable and executable by the world
-then i could run 
-: heroku pgbackups:restore DATABASE 'http://halhenke.net/Hunome/dev_2_prod.sql' --confirm hunome-dev
-and this worked - needed =--confirm hunome-dev= to 'force' this change
-
-Sort of like this:
-https://devcenter.heroku.com/articles/heroku-postgres-import-export#import
 
 * Rails converting strings to symbols etc
 This module does it:
@@ -833,6 +829,7 @@ but this doesnt handle nesting
  - the name determines what the key will be in the post form - if you have a [] at the end of the name then the values will be placed in an array
  - If you have =accepts_nested_attributes_for user_profile= in your =user= model *and* =user_profile= =belongs_to= =user= then it should work
    - you may have to write a =user_profile_attributes=(attributes)= method in =user= yourself
+
 ** More on different methods of building Forms
  - We are creating an HTML form that will update/create/edit a specific instance of a Rais model
  - So we have to specify fields for different model attributes we wish to edit.
@@ -892,12 +889,35 @@ end
 To check do:
 : irb(main):049:0> User.find(1).valid_password?('hunomerocks')
 on the Rails console it returns "true"
+* Compiling stuff for Production Mode
+: bundle exec rake assets:precompile
+: git add public/assets
+: git commit -m "vendor compiled assets"
+** To put on heroku
+If not on =master= branch
+: git push heroku yourbranch:master --force
 * Requiring code
 We require files - not modules or namespaces
 i.e.
 =require(''active_record/deprecation)=
 Unlike say elisp where we require a tag that is provided in a loadpath by a =provide= statement
 
+
+* Heroku
+** Transferring a PostGres Database to and from heroku
+http://www.ryandaigle.com/a/pgtransfer-is-the-new-taps
+First install pg transfer
+: heroku plugins:install https://github.com/ddollar/heroku-pg-transfer
+*** Yeah i dont know Heres what I had to do
+First put the database on a publically accessible url
+ - in this case inside the =public_html= directory on my Net Virtue server
+   - I had to make the enclosing =Hunome= directory and the =dev2prod.sql= file both readable and executable by the world
+then i could run 
+: heroku pgbackups:restore DATABASE 'http://halhenke.net/Hunome/dev_2_prod.sql' --confirm hunome-dev
+and this worked - needed =--confirm hunome-dev= to 'force' this change
+
+Sort of like this:
+https://devcenter.heroku.com/articles/heroku-postgres-import-export#import
 
 * Rspec
 ** Invoking from the console - tricks
@@ -1118,6 +1138,49 @@ in
 
 *** Could set a breakpoint here
 : break /Users/Hal/code/hunome/hunomeGems/ruby/1.9.1/gems/factory_girl-4.1.0/lib/factory_girl/configuration.rb:14
+* Haml - (from hunome doc)
+** Emacs Mode
+*** Default Indentation Behaviour is annoying.
+ - Indentation behaviour is currently set according to the value of the variable =indent-line-function=
+ - And in haml this function is =haml-indent-line=
+ - Should make something that will indent and un-indent based on Tab and Shift-Tab/Backtab
+** Some working example
+*** Setting a style tag on a page
+#+BEGIN_SRC haml
+%style
+  dt {color:red; font-weight:bold;}
+#+END_SRC
+*** Fields in a form
+ - These are /roughly/ equivalent in terms of output:
+: %input{ :type => "text", :value => "First Name"}
+and:
+: = text_field :user, :firstname, :value => "Hey pal"
+although the second will have name and id set to =user[firstname]= and the first wont.
+
+Or if you have a =form_for= block
+: = f.text_field :firstname
+
+#+BEGIN_SRC haml
+    %h2 My Profile
+    .item
+      %label.wide My First Name
+      %input{ :type => "text", :value => "Hal"} 
+      -# %= label_tag :q, "Search for:"
+      -# "My First Name"
+      -# %= text_field "Hal"
+    .item
+      %label My Last Name
+      %input{ :type => "text", :value => "Henke"} 
+#+END_SRC
+#+BEGIN_SRC haml
+#+END_SRC
+#+BEGIN_SRC haml
+#+END_SRC
+
+** Troubleshooting
+*** syntax error, unexpected keyword_ensure, expecting keyword_end
+Check your indentation 
+ - haml doesnt know where to put an end keyword because you have a block where something is not idented below the control flow bit properly
 * Converting vendor/plugins to Rails 3 and/or gems
 This is pretty in depth:
 http://bibwild.wordpress.com/2012/04/25/converting-a-more-complex-rails-2-3-style-plugin-to-non-deprecated-under-rails-3-2/
@@ -1140,7 +1203,6 @@ Basically a few ways to do this:
 ** Use Rails::Engine inheritance
  - Generate a fake gemspec and whack it in the plugin root directory
  - 
-
 * Is it possible to tell which gems an app is *actually* using?
  - in short - no
 http://stackoverflow.com/questions/9793360/figuring-out-which-gems-rails-app-does-not-use
@@ -1161,8 +1223,6 @@ http://stackoverflow.com/questions/9793360/figuring-out-which-gems-rails-app-doe
  - get all "def xxxxx"
 
 Yeah this seems stupid - why parse stuff
-
-
 
 * Code Snippets
 ** Overriding Existing Module/Class Definitions
@@ -1305,57 +1365,6 @@ to:
       - effectively a shorthand for method
    4. =fields_for()= is same as 3 except does not create outer HTML form tags
       - therefore can be used to add form fields for other models in the same form 
-
-* Haml - (from hunome doc)
-** Emacs Mode
-*** Default Indentation Behaviour is annoying.
- - Indentation behaviour is currently set according to the value of the variable =indent-line-function=
- - And in haml this function is =haml-indent-line=
- - Should make something that will indent and un-indent based on Tab and Shift-Tab/Backtab
-** Some working example
-*** Setting a style tag on a page
-#+BEGIN_SRC haml
-%style
-  dt {color:red; font-weight:bold;}
-#+END_SRC
-*** Fields in a form
- - These are /roughly/ equivalent in terms of output:
-: %input{ :type => "text", :value => "First Name"}
-and:
-: = text_field :user, :firstname, :value => "Hey pal"
-although the second will have name and id set to =user[firstname]= and the first wont.
-
-Or if you have a =form_for= block
-: = f.text_field :firstname
-
-#+BEGIN_SRC haml
-    %h2 My Profile
-    .item
-      %label.wide My First Name
-      %input{ :type => "text", :value => "Hal"} 
-      -# %= label_tag :q, "Search for:"
-      -# "My First Name"
-      -# %= text_field "Hal"
-    .item
-      %label My Last Name
-      %input{ :type => "text", :value => "Henke"} 
-#+END_SRC
-#+BEGIN_SRC haml
-#+END_SRC
-#+BEGIN_SRC haml
-#+END_SRC
-
-** Troubleshooting
-*** syntax error, unexpected keyword_ensure, expecting keyword_end
-Check your indentation 
- - haml doesnt know where to put an end keyword because you have a block where something is not idented below the control flow bit properly
-* Compiling stuff for Production Mode
-: bundle exec rake assets:precompile
-: git add public/assets
-: git commit -m "vendor compiled assets"
-** To put on heroku
-If not on =master= branch
-: git push heroku yourbranch:master --force
 
 
 * Cool Gems/Tools
