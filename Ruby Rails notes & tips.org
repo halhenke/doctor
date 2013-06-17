@@ -934,6 +934,11 @@ option as in
 : describe "when out of area job", :focus => true do      
 or 
 : it "should pas validation", :focus => true do      
+** let can be anything in a block
+e.g. a series of commands to be repeated e.g.
+#+BEGIN_SRC ruby
+let!(:bdod) { Bdod.delete_all; Bdod.create!(:user => create(:user), :report_name => "rt2691_ebiw_jsc01_ext1_F790", :site => create(:site, :organisation => organisation), :organisation_id => organisation.id)}
+#+END_SRC
 ** Always run migrations first in test environment
 : bundle exec rake db:test:clone_structure
 ** It syntax
@@ -953,6 +958,9 @@ Some stuff shoudl go in a
 : let 
 block and not just in the describe section.
 Other stuff - such as including a module, should not go in these sections...
+** Stubbing
+This is some hash syntax
+: @form.stub!(:push_as_ess_comment? => false , :show_push_comment? => false)
 ** Rspec Rails
 *** Stubbing methods in views
 The following both used when I had a spec trying to render a view that was trying to call  a method 

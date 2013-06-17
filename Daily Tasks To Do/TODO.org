@@ -97,6 +97,24 @@ Need a password for Readability....
 *** Track/Aggregeate over time
 *** Desktop/Web App also preferrably
 ** TODO Get Pandora app
+* Things To Learn
+** TODO Public/Private Keys, Cryptography
+** TODO HTML exscaping
+** TODO Database Indexing
+** TODO Database Design
+** TODO Database Performance
+** TODO Common Security Risks
+*** Cross Site Scripting
+*** SQL INjection
+** TODO Basic Javascript Commands
+** TODO Javascript prototype/object differences
+** TODO Lambda Calculus
+** TODO NodeJS
+* Things To Read/Buy
+** TODO SCIP Scheme Book
+** TODO Javascript Crockford Book
+** TODO On Lisp
+** TODO Let Over Lambda
 * TODO Reorganise Org Note Docs into Directories
 ** TODO Thoughts/Docs etc
 ** TODO Change any bad hyperlinks
